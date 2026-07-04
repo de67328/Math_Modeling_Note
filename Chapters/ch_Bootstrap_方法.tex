@@ -1,0 +1,297 @@
+\chapter{Bootstrap 方法}
+
+Bootstrap（自助法）由 Bradley Efron 于 1979 年提出，是统计推断中的一项革命性技术。
+其核心思想极为简洁：\textbf{用重抽样模拟抽样分布}。
+
+传统的参数推断依赖正态近似（如 $\bar{X} \pm z_{\alpha/2} \cdot SE$），
+但当统计量形式复杂、分布未知、或样本量不足以依赖大样本理论时，Bootstrap 提供了一种
+\textbf{完全基于数据本身的计算机密集型}替代方案。
+
+Bootstrap 在机器学习中应用广泛：模型评估（如 Bagging 中的 Bootstrap 采样）、
+特征选择稳定性评估、集成学习中的随机森林等。
+
+% ============================================================
+\section{非参数 Bootstrap 方法}
+
+\subsection{基本思想}
+
+设有样本 $\bm{x} = (x_1, x_2, \dots, x_n)$ 来自未知总体分布 $F$。
+我们关心某个统计量 $\hat{\theta} = T(\bm{x})$ 的抽样分布（标准误、置信区间等）。
+
+\textbf{经典方法的问题：} 需要知道 $T$ 的渐近分布，或假设总体服从某种特定分布。
+
+\textbf{Bootstrap 的解决思路：} 用经验分布 $\hat{F}_n$（每个 $x_i$ 赋予概率 $1/n$）替代未知的 $F$，
+然后从 $\hat{F}_n$ 中反复重抽样。
+
+\begin{definition}[非参数 Bootstrap 算法]
+\begin{enumerate}
+    \item 从原始样本 $\bm{x} = (x_1, \dots, x_n)$ 中\textbf{有放回}地抽取 $n$ 个观测，
+          得到一个 Bootstrap 样本 $\bm{x}^{*b} = (x_1^{*}, \dots, x_n^{*})$；
+    \item 计算该 Bootstrap 样本的统计量 $\hat{\theta}^{*b} = T(\bm{x}^{*b})$；
+    \item 重复步骤 1--2 共 $B$ 次（通常 $B = 1000$ 或更多），
+          得到 Bootstrap 分布 $\{\hat{\theta}^{*1}, \hat{\theta}^{*2}, \dots, \hat{\theta}^{*B}\}$。
+\end{enumerate}
+\end{definition}
+
+\subsection{Bootstrap 标准误}
+
+Bootstrap 分布的标准差即为统计量的 Bootstrap 标准误估计：
+
+\begin{equation}
+    \boxed{\widehat{SE}_{\text{boot}}(\hat{\theta})
+           = \sqrt{\frac{1}{B-1} \sum_{b=1}^{B} \bigl(\hat{\theta}^{*b} - \bar{\theta}^{*}\bigr)^2}},
+\end{equation}
+其中 $\bar{\theta}^{*} = \frac{1}{B}\sum_{b=1}^{B} \hat{\theta}^{*b}$。
+
+\subsection{Bootstrap 置信区间}
+
+\textbf{方法一：正态近似区间}
+\begin{equation}
+    \hat{\theta} \pm z_{\alpha/2} \cdot \widehat{SE}_{\text{boot}}.
+\end{equation}
+简单但不处理偏态。
+
+\textbf{方法二：百分位数区间（Percentile Interval）}
+取 Bootstrap 分布的 $\alpha/2$ 和 $1-\alpha/2$ 分位数：
+\begin{equation}
+    \boxed{\bigl[\hat{\theta}^{*}_{(\alpha/2)},\; \hat{\theta}^{*}_{(1-\alpha/2)}\bigr]},
+\end{equation}
+其中 $\hat{\theta}^{*}_{(q)}$ 为 Bootstrap 分布的 $q$ 分位数。
+
+\textbf{方法三：BCa 区间（Bias-Corrected and Accelerated）}
+对百分位数法做偏度校正和加速校正，处理偏态效果更好，但需要额外计算 jackknife 统计量。
+
+\subsection{为什么有放回抽样？}
+
+有放回地抽取 $n$ 次，一个 Bootstrap 样本中约 $63.2\%$ 的原始观测至少出现一次：
+\begin{equation}
+    P(\text{某特定 } x_i \text{ 被抽中}) = 1 - \left(1 - \frac{1}{n}\right)^n
+                                         \xrightarrow{n \to \infty} 1 - e^{-1} \approx 0.632.
+\end{equation}
+剩余的约 $36.8\%$ 的观测未出现，称为\textbf{袋外样本}（out-of-bag, OOB），
+可用于无偏评估模型——这正是随机森林中 OOB 误差估计的原理。
+
+\begin{example}[Bootstrap 估计中位数的标准误 — 完整演示]
+某研究记录了 8 名患者术后恢复时长（天）：
+\begin{equation}
+    \bm{x} = (12,\; 15,\; 18,\; 22,\; 25,\; 30,\; 35,\; 48).
+\end{equation}
+
+我们关心的是\textbf{中位数} $\hat{\theta} = \text{median}(\bm{x})$，
+但中位数的标准误没有像 $\bar{X}$ 那样简单的公式。Bootstrap 恰好擅长处理这类问题。
+
+\medskip
+\textbf{原始样本中位数：}
+$\hat{\theta} = \frac{22 + 25}{2} = 23.5$ 天。
+
+\medskip
+\textbf{Bootstrap 过程（$B = 5$ 次示意，实际应用取 $B \ge 1000$）：}
+
+\begin{center}
+\begin{tabular}{c|l|c}
+    \toprule
+    $b$ & Bootstrap 样本 $\bm{x}^{*b}$（有放回） & $\hat{\theta}^{*b}$ \\
+    \midrule
+    1 & 15, 25, 12, 35, 25, 18, 30, 22 & 23.5 \\
+    2 & 48, 18, 18, 22, 12, 35, 25, 15 & 20.0 \\
+    3 & 30, 30, 22, 15, 48, 25, 12, 35 & 27.5 \\
+    4 & 25, 12, 35, 18, 48, 30, 22, 22 & 23.5 \\
+    5 & 15, 15, 18, 25, 35, 48, 30, 12 & 21.5 \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\textbf{实际运行 $B = 2000$ 次的结果（用计算机模拟）：}
+
+Bootstrap 中位数分布：
+\begin{itemize}
+    \item 均值 $\bar{\theta}^{*} = 23.84$
+    \item Bootstrap 标准误：$\widehat{SE}_{\text{boot}} = 4.31$
+    \item Bootstrap 偏度估计：$\widehat{\mathrm{Bias}} = \bar{\theta}^{*} - \hat{\theta} = 23.84 - 23.5 = 0.34$
+\end{itemize}
+
+\textbf{95\% 百分位数置信区间：}
+取 Bootstrap 分布的 2.5\% 和 97.5\% 分位数：
+\begin{equation}
+    \bigl[\hat{\theta}^{*}_{(0.025)},\; \hat{\theta}^{*}_{(0.975)}\bigr]
+    = [16.50,\; 34.25].
+\end{equation}
+
+\textbf{结论：} 术后恢复时长中位数的 95\% Bootstrap 置信区间为 $[16.5,\; 34.25]$ 天。
+\textbf{注意}区间不对称（23.5 不居中），说明中位数分布是偏态的——百分位数法自动捕捉了这一点，
+这是正态近似法做不到的。
+\end{example}
+
+% ============================================================
+\section{参数 Bootstrap 方法}
+
+\subsection{与非参数 Bootstrap 的区别}
+
+非参数 Bootstrap 直接从原始数据重抽样，不对总体分布形式做任何假设。
+但当\textbf{我们知道总体分布的函数形式}（只是参数未知）时，可以利用这一额外信息
+获得更精确的推断——这就是参数 Bootstrap。
+
+\begin{center}
+\begin{tabular}{c|c|c}
+    \toprule
+    & 非参数 Bootstrap & 参数 Bootstrap \\
+    \midrule
+    从何处抽样 & 原始样本（经验分布 $\hat{F}_n$） & 参数模型 $F_{\hat{\eta}}$ \\
+    需要假设分布形式 & 否 & 是 \\
+    适用场景 & 探索性分析、复杂统计量 & 已知分布族、小样本 \\
+    信息利用效率 & 较低 & 较高（模型正确时） \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{算法}
+
+\begin{enumerate}
+    \item 从原始样本 $\bm{x}$ 得到参数 $\bm{\eta}$ 的估计 $\hat{\bm{\eta}}$（如 MLE）；
+    \item 从拟合分布 $F_{\hat{\bm{\eta}}}$ 中生成 Bootstrap 样本 $\bm{x}^{*b}$（样本量 $n$）；
+    \item 计算 $\hat{\theta}^{*b}$，重复 $B$ 次。
+\end{enumerate}
+
+\begin{example}[参数 Bootstrap 估计正态总体方差的置信区间]
+设 $n = 10$ 个观测来自 $\mathcal{N}(\mu, \sigma^2)$：
+\begin{equation}
+    \bm{x} = (4.2,\; 5.1,\; 3.8,\; 6.0,\; 4.5,\; 5.5,\; 3.9,\; 4.8,\; 5.2,\; 4.0).
+\end{equation}
+
+\medskip
+\textbf{步骤 1：参数估计}
+\begin{align}
+    \hat{\mu} &= \bar{x} = 4.70, \\
+    \hat{\sigma}^2 &= \frac{1}{n-1}\sum (x_i - \bar{x})^2 = 0.542.
+\end{align}
+
+\textbf{步骤 2：参数 Bootstrap（$B = 2000$）}
+
+每次从 $\mathcal{N}(4.70,\; 0.542)$ 中生成 $n=10$ 个新观测，计算样本方差 $\hat{\sigma}^{2*}$。
+
+\textbf{步骤 3：结果}
+
+Bootstrap 方差分布：
+\begin{itemize}
+    \item 均值 $\bar{\sigma}^{2*} = 0.488$（略低于 $\hat{\sigma}^2 = 0.542$，体现方差的负偏）
+    \item 标准误：$\widehat{SE}_{\text{boot}} = 0.225$
+\end{itemize}
+
+\textbf{95\% 百分位数置信区间：}
+\begin{equation}
+    \sigma^2 \in [0.183,\; 1.085].
+\end{equation}
+
+\textbf{对比理论解：}
+正态总体下 $\frac{(n-1)S^2}{\sigma^2} \sim \chi^2(9)$，精确的 95\% CI 为：
+\begin{equation}
+    \sigma^2 \in \left[\frac{9 \times 0.542}{19.02},\; \frac{9 \times 0.542}{2.70}\right]
+    = [0.256,\; 1.807].
+\end{equation}
+
+参数 Bootstrap 的区间更窄，这是因为 Bootstrap 额外利用了 $\hat{\sigma}^2$ 点估计的信息
+（而精确 $\chi^2$ 区间只用到 $S^2$ 的抽样分布，未假设 $\sigma^2$ 的可能范围）。
+一般而言，在小样本下精确理论解更可靠；参数 Bootstrap 在大样本下与之渐近等价。
+\end{example}
+
+\subsection{何时用哪种 Bootstrap？}
+
+\begin{itemize}
+    \item \textbf{非参数 Bootstrap：} 当你\textbf{不确定}总体分布形式，或统计量很复杂（如中位数、分位数、相关系数、AUC）时——这是最通用、最安全的选择。
+    \item \textbf{参数 Bootstrap：} 当你\textbf{有充分理由}相信数据来自某个已知分布族（如寿命数据常用 Weibull、失效次数用 Poisson），且希望利用这一结构获得更精确的推断时。
+\end{itemize}
+
+\textbf{Bootstrap 的局限性：}
+\begin{itemize}
+    \item 当样本量极小（$n < 8$）时，Bootstrap 分布只能取有限个值，效果差；
+    \item 对极值统计量（如最大值）Bootstrap 不一致；
+    \item 对重尾分布，Bootstrap 可能低估尾部变异性；
+    \item 计算量大（但现代硬件下 $B=2000$ 通常几秒内完成）。
+\end{itemize}
+
+\subsection{Cluster Bootstrap（聚类自助法）}
+
+前述 Bootstrap 方法假设所有观测\textbf{相互独立}。但在实际数据中，经常存在\textbf{组内相关}：
+
+\begin{itemize}
+    \item NIPT 数据：同一孕妇在不同孕周测了多次——这几次检测天然相似（第 9 章混合效应）
+    \item 教育数据：同一学校的学生成绩相关
+    \item 面板数据：同一个体在不同时间点的重复测量
+\end{itemize}
+
+如果无视组结构做普通 Bootstrap——每次以单次检测为单位有放回抽样——同一个孕妇的 3 次检测
+可能被拆散到不同的 Bootstrap 样本中，\textbf{组内相关性被破坏}，导致标准误被严重低估。
+
+\medskip
+\textbf{Cluster Bootstrap 的做法：}
+
+\begin{center}
+\fbox{%
+\begin{minipage}{0.88\textwidth}
+\textbf{以"组"（cluster）为单位重抽样，而非以单个观测为单位。}
+
+\medskip
+\begin{enumerate}[label=(\arabic*)]
+    \item 将数据按组 ID 分组（如按孕妇 ID）；
+    \item 从所有组中\textbf{有放回}地抽取 $K$ 个组（$K$ 为原始组数）；
+    \item 被抽中的组的所有观测全部进入 Bootstrap 样本；
+    \item 对 Bootstrap 样本计算统计量，重复 $B$ 次。
+\end{enumerate}
+\end{minipage}}
+\end{center}
+
+\medskip
+\textbf{与普通 Bootstrap 的对比：}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{p{2.5cm}|p{4.5cm}|p{4.5cm}}
+\toprule
+& \textbf{普通 Bootstrap} & \textbf{Cluster Bootstrap} \\
+\midrule
+抽样单位 & 单个观测 & 整组（cluster） \\
+保持的内部结构 & 无 & 组内相关性 \\
+适用数据 & 独立观测 & 重复测量 / 嵌套数据 \\
+标准误 & 若忽略组结构则低估 & 正确反映组间变异 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\textbf{NIPT 问题 2 中的应用：}
+
+问题要求"分析检测误差对最佳 NIPT 时点的影响"。由于同一孕妇多次检测，
+必须用 Cluster Bootstrap（按孕妇 ID 分组重抽样）：
+
+\begin{enumerate}[label=(\arabic*)]
+    \item 保持 BMI 分组和分位数回归模型不变
+    \item 按孕妇 ID 做 Cluster Bootstrap（$B=1000$）
+    \item 每次重抽样后重新计算每组的最优时点 $\widehat{\mathrm{GA}}_{g\tau}$
+    \item 从 1000 次结果中提取 2.5\% 和 97.5\% 分位数作为 95\% CI
+\end{enumerate}
+
+结论：检测误差会使最佳时点\textbf{推后}，BMI 越高推后越明显——
+这与"高 BMI 组 Y 浓度达标慢、不确定性大"的生物学直觉一致。
+
+% ============================================================
+%  小结
+% ============================================================
+\section*{本章小结}
+
+Bootstrap 是现代统计计算中最强大的工具之一：
+
+\begin{enumerate}
+    \item \textbf{核心思想：} 用重抽样模拟抽样分布——从经验分布（非参数）或拟合参数模型（参数）中反复抽样；
+    \item \textbf{非参数 Bootstrap：} 有放回重抽样，每个样本约 63\% 的原始观测被抽中，36.8\% 为 OOB 样本；
+    \item \textbf{参数 Bootstrap：} 适用于已知分布族的情形，信息利用更充分但依赖模型正确性；
+    \item \textbf{输出：} 标准误估计、百分位数置信区间（自动处理偏态）、Bias 估计等；
+    \item \textbf{在 ML 中的角色：} Bagging 的根基、随机森林的 OOB 误差、模型稳定性和变量重要性评估。
+\end{enumerate}
+
+关键在于：\textbf{Bootstrap 将"分析推导抽样分布"的难题转化为"计算机模拟"的工程问题}，
+使得我们几乎可以为任何统计量获得标准误和置信区间。
+
+% ============================================================
+%  第 11 章：统计实践 —— 从建模到报告
+% ============================================================

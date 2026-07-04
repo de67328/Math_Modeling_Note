@@ -1,0 +1,959 @@
+\chapter{分类的线性方法}
+
+本章聚焦于\textbf{决策边界为线性}的分类方法。虽然限制在线性边界，但通过基展开可以推广到二次或更一般的非线性边界。
+
+% ============ §4.1 引言 ============
+\section{引言}
+
+分类问题中，预测函数 $G(x)$ 取值于离散集合 $\mathcal{G}$，因此可将输入空间划分为对应各类的区域。
+若这些区域的边界是线性的，就称为\textbf{分类的线性方法}。
+
+\subsection{判别函数方法}
+
+一类通用方法是：对每个类别 $k$ 建模一个\textbf{判别函数} $\delta_k(x)$，然后分类到最大值：
+\begin{equation}
+    \hat{G}(x) = \argmax_{k \in \mathcal{G}} \delta_k(x).
+\end{equation}
+
+如果 $\delta_k(x)$（或其某个单调变换）是 $x$ 的线性函数，则决策边界是线性的。
+
+\subsection{Logit 变换与 Logistic 模型}
+
+对于二分类，一个流行的后验概率模型是：
+
+\begin{equation}\label{eq:logistic_posterior}
+    \Pr(G = 1 \mid X = x) = \frac{\exp(\beta_0 + \beta^\top x)}{1 + \exp(\beta_0 + \beta^\top x)},
+    \quad
+    \Pr(G = 2 \mid X = x) = \frac{1}{1 + \exp(\beta_0 + \beta^\top x)}.
+\end{equation}
+
+取 logit 变换 $\log[p/(1-p)]$ 后得到线性形式：
+\begin{equation}\label{eq:logit_linear}
+    \log\frac{\Pr(G = 1 \mid X = x)}{\Pr(G = 2 \mid X = x)} = \beta_0 + \beta^\top x.
+\end{equation}
+
+决策边界是 $\{x \mid \beta_0 + \beta^\top x = 0\}$，即一个超平面。
+
+\subsection{实操流程：从线性函数到分类决策}
+
+看完公式 \eqref{eq:logistic_posterior} 和 \eqref{eq:logit_linear}，自然会产生三个疑问：
+\begin{enumerate}[label=(\arabic*)]
+    \item 目标还是最小化 $\E[L(f(X), Y)]$ 吗？
+    \item 「单调变换」到底加在哪一步？
+    \item $\Pr(G=1\mid X=x)$ 在整个流程中起什么作用？
+\end{enumerate}
+
+下面把完整流水线串起来。
+
+\subsubsection{预测阶段（前向传播）：三段式流水线}
+
+给定一个已训练好的系数 $\beta_0, \beta$，对新输入 $x$ 做分类经过三步：
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={draw, rounded corners, minimum width=3.2cm, minimum height=0.9cm, align=center, font=\small},
+    arrow/.style={->, >=stealth, thick}
+]
+\node[box, fill=blue!8] (A) {\textbf{Step 1：线性得分}\\[2pt] $\eta(x) = \beta_0 + \beta^\top x$\\[2pt] 值域：$(-\infty, +\infty)$};
+\node[box, fill=green!8, right=0.8cm of A] (B) {\textbf{Step 2：sigmoid 变换}\\[2pt] $p(x) = \dfrac{1}{1 + e^{-\eta(x)}}$\\[2pt] 值域：$(0, 1)$};
+\node[box, fill=orange!8, right=0.8cm of B] (C) {\textbf{Step 3：决策}\\[2pt] $\hat{G}(x) = \begin{cases} 1 & p(x) > 0.5 \\ 2 & p(x) \le 0.5 \end{cases}$};
+\draw[arrow] (A) -- (B);
+\draw[arrow] (B) -- (C);
+\end{tikzpicture}
+\end{center}
+
+\textbf{关键洞察}：Step 1 中的 $\eta(x)$ 就是那个「线性函数」；Step 2 中的 sigmoid（即 $\text{logit}^{-1}$）就是那个「单调变换」。正向走是 $\eta \xrightarrow{\text{sigmoid}} p$，反向看就是 $\log\frac{p}{1-p} = \eta$，即 logit 变换。
+
+由于 sigmoid 是单调的，$\eta(x) > 0 \iff p(x) > 0.5$，所以决策边界可以等价地写为 $\{x \mid \eta(x) = 0\}$，即 $\{x \mid \beta_0 + \beta^\top x = 0\}$。\textbf{根本不需要显式计算 $p(x)$ 就能做分类。}
+
+\subsubsection{训练阶段：用什么损失函数？}
+
+你的第一个直觉是对的——总体框架仍是\textbf{最小化期望损失} $\E[L(f(X), Y)]$。但\textbf{损失函数不是平方误差！}
+
+对于分类，我们有两层损失：
+
+\begin{itemize}
+    \item \textbf{最终评估用 0--1 损失}：$L(G, \hat{G}) = \mathbb{I}\{G \neq \hat{G}\}$。这是真正关心的指标，但它不可导，不能直接优化。
+    \item \textbf{训练用负对数似然（交叉熵）}：对二分类 Logistic 回归，第 $i$ 个样本的损失为
+    \begin{equation}\label{eq:logistic_loss}
+        \ell_i(\beta) = -\Big[ \mathbb{I}\{y_i = 1\} \log p(x_i) + \mathbb{I}\{y_i = 2\} \log(1 - p(x_i)) \Big],
+    \end{equation}
+    其中 $p(x_i) = 1/(1 + e^{-(\beta_0 + \beta^\top x_i)})$。最小化 $\sum_i \ell_i(\beta)$ 等价于\textbf{最大化似然}。
+\end{itemize}
+
+\begin{remark}
+为什么不用平方误差？如果强行对 0/1 标签做线性最小二乘（即 §4.2 的指示矩阵回归），拟合值 $\hat{f}(x)$ 可能 $<0$ 或 $>1$，且会出现 masking。Logistic 回归通过 sigmoid 变换把输出压缩到 $[0,1]$，解决了这个问题。
+\end{remark}
+
+\subsubsection{$\Pr(G=1\mid X=x)$ 的作用}
+
+后验概率 $p(x) = \Pr(G=1 \mid X=x)$ 在整个流程中扮演三个角色：
+
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{建模目标}：我们不是直接建模 $G(x)$，而是建模 $\Pr(G \mid X=x)$——一个 $[0,1]$ 内的实数。这比直接输出离散标签信息更丰富。
+    \item \textbf{sigmoid 的输出}：$p(x)$ 是线性得分 $\eta(x)$ 经过 sigmoid 后的结果，是连接线性函数与分类决策的桥梁。
+    \item \textbf{置信度度量}：$p(x)$ 不仅告诉我们分到哪一类，还告诉我们有多确信。例如 $p(x)=0.51$ 和 $p(x)=0.99$ 都预测类别 1，但后者置信度更高。
+\end{enumerate}
+
+\subsubsection{一句话总结}
+
+\begin{center}
+\boxed{\text{Logistic 回归} = \text{线性函数} \xrightarrow{\text{sigmoid}} \text{概率} \xrightarrow{>0.5} \text{分类}，\;\text{用交叉熵（而非 MSE）拟合}}
+\end{center}
+
+本章将讨论两种产生线性 log-odds 的方法：
+\begin{itemize}
+    \item \textbf{线性判别分析 (LDA)}；
+    \item \textbf{线性 Logistic 回归}。
+\end{itemize}
+二者本质区别在于\textbf{线性函数拟合到训练数据的方式}不同。
+
+此外还介绍直接建模分离超平面的方法：\textbf{感知机}（Rosenblatt, 1958）和\textbf{最优分离超平面}（Vapnik, 1996，不可分情况见第12章）。
+
+\subsection{基展开：从线性到非线性}
+
+通过变量集的基展开，可以将线性边界推广为非线性边界。例如添加平方项和交互项：
+\begin{equation*}
+    X_1, X_2 \;\longrightarrow\; X_1, X_2, X_1^2, X_2^2, X_1X_2,
+\end{equation*}
+增广为 $p(p+1)/2$ 个额外变量。增广空间中的线性函数映射到原始空间即为二次函数，从而实现二次决策边界（见图 4.1）。
+
+任何基变换 $h: \R^p \to \R^q$（$q > p$）都可以类似使用，后续章节将进一步探讨。
+
+\subsection{本章对 $f$ 的核心限制}
+
+本章名为「分类的线性方法」，对判别函数 $f$（或 $\delta_k$）的根本限制是：
+
+\begin{center}
+\boxed{\text{决策边界必须是线性的（即 }\R^p\text{ 中的超平面）}}
+\end{center}
+
+但这并不意味着 $\delta_k(x)$ 或 $\Pr(G=k\mid X=x)$ 本身必须是 $x$ 的线性函数。原书原文明确指出：
+
+\begin{quote}
+``Actually, all we require is that some monotone transformation of $\delta_k$ or $\Pr(G = k \mid X = x)$ be linear for the decision boundaries to be linear.''
+\end{quote}
+
+也就是说：只要存在某个单调变换 $g$，使得 $g(\delta_k(x))$ 是 $x$ 的线性函数，那么决策边界 $\{x\mid \delta_k(x)=\delta_\ell(x)\}$ 就是线性的。
+
+各方法以不同方式落实这一限制：
+
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{指示矩阵回归（\S4.2）}：直接限制 $\hat{f}_k(x) = \beta_{k0} + \beta_k^\top x$ 为线性。这是最「刚性」的——不仅边界线性，拟合值本身也是线性的，导致 masking 问题。
+    \item \textbf{LDA（\S4.3）}：通过\textbf{分布假设}间接实现。假设每类 $f_k(x)$ 为多元 Gaussian 且\textbf{协方差矩阵相同}（$\Sigma_k=\Sigma$），则 log-ratio 中的二次项抵消，自然导出线性判别函数 $\delta_k(x)=x^\top\Sigma^{-1}\mu_k - \frac12\mu_k^\top\Sigma^{-1}\mu_k + \log\pi_k$。
+    \item \textbf{Logistic 回归（\S4.4）}：直接假设 log-odds 为线性：$\log\frac{\Pr(G=k)}{\Pr(G=K)}=\beta_{k0}+\beta_k^\top x$。这里限制的是后验概率的 logit 变换，而非判别函数本身。
+    \item \textbf{分离超平面方法}：显式地寻找一个超平面来分离类别。
+\end{enumerate}
+
+\textbf{为什么限制为线性？} 不是因为我们相信真实边界是线性的，而是出于\textbf{偏差-方差权衡}：线性边界的偏差可以接受，但其估计方差远低于复杂模型。数据往往只能支持简单边界，线性模型提供了稳定且可解释的解。此外，通过基展开 $h(X)$ 可以将线性限制推广为非线性边界（如二次判别边界），在对 $\beta$ 保持线性的同时获得灵活性。
+
+\begin{remark}
+QDA（\S4.3）放松了等协方差假设，边界变为二次的——这已超出「线性方法」的范畴，但仍属于参数化 Gaussian 框架内的自然推广。
+\end{remark}
+
+
+% ============ §4.2 指示矩阵的线性回归 ============
+\section{指示矩阵的线性回归}
+
+\subsection{模型设定}
+
+将 $K$ 个类别用指示变量编码：$Y_k = 1$ 若 $G = k$，否则 $0$。$N$ 个训练样本构成 $N \times K$ 的指示响应矩阵 $\mathbf{Y}$，每行恰好有一个 1。
+
+对 $\mathbf{Y}$ 的每一列同时拟合线性回归：
+\begin{equation}\label{eq:indicator_regression}
+    \hat{\mathbf{Y}} = \mathbf{X}(\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{Y},
+\end{equation}
+得到 $(p+1) \times K$ 的系数矩阵 $\hat{\mathbf{B}} = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{Y}$。
+
+对新观测 $x$ 的分类规则：
+\begin{equation}\label{eq:indicator_classify}
+    \hat{G}(x) = \argmax_{k \in \mathcal{G}} \hat{f}_k(x),
+    \quad \text{其中 } \hat{f}(x) = (1, x^\top)\hat{\mathbf{B}}.
+\end{equation}
+
+\subsection{理论依据}
+
+一种形式化的理由是：将回归视为条件期望的估计。由于 $\E(Y_k \mid X = x) = \Pr(G = k \mid X = x)$，每个 $Y_k$ 的条件期望是合理的估计目标。
+
+关键问题在于：\textbf{刚性线性回归对条件期望的近似有多好？}
+
+\begin{remark}
+可以验证：只要模型有截距项，$\sum_{k} \hat{f}_k(x) = 1$ 对任意 $x$ 成立。但 $\hat{f}_k(x)$ 可能为负或大于 1——这是线性回归刚性本质的后果，尤其是对训练数据凸包之外的预测。
+\end{remark}
+
+通过基展开 $h(X)$ 上的线性回归，当 $N \to \infty$ 时自适应地增加基函数数量，可以一致地估计概率（第5章讨论）。
+
+\subsection{最近目标分类视角}
+
+令 $t_k$ 为 $K \times K$ 单位矩阵的第 $k$ 列（第 $k$ 类的目标向量）。最小二乘准则可写为：
+\begin{equation}\label{eq:closest_target}
+    \min_{\mathbf{B}} \sum_{i=1}^{N} \big\| y_i - [(1, x_i^\top)\mathbf{B}]^\top \big\|^2.
+\end{equation}
+分类时选择与拟合向量最近的目标：
+\begin{equation}
+    \hat{G}(x) = \argmin_{k} \big\| \hat{f}(x) - t_k \big\|^2.
+\end{equation}
+
+这与最大化 $\hat{f}_k(x)$ 完全等价，因为平方范数是分量可分离的。
+
+\subsection{完整数值示例（$N=5,\;K=3,\;p=1$）}
+
+下面用一个具体的小数据集走通全流程。
+
+\subsubsection{Step 1：构造数据}
+
+5 个样本，1 个特征 $X$，3 个类别：
+
+\begin{center}
+\begin{tabular}{c|c|c}
+\hline
+$i$ & $X$ & 类别 $G$ \\
+\hline
+1 & 1 & 1 \\
+2 & 2 & 1 \\
+3 & 3 & 2 \\
+4 & 4 & 2 \\
+5 & 5 & 3 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{Step 2：构建设计矩阵 $\mathbf{X}$ 和指示矩阵 $\mathbf{Y}$}
+
+\[
+\underset{5\times 2}{\mathbf{X}} = 
+\begin{pmatrix}
+1 & 1 \\
+1 & 2 \\
+1 & 3 \\
+1 & 4 \\
+1 & 5
+\end{pmatrix},
+\qquad
+\underset{5\times 3}{\mathbf{Y}} = 
+\begin{pmatrix}
+1 & 0 & 0 \\
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{pmatrix}.
+\]
+
+$\mathbf{X}$ 第一列全是 1（截距），第二列是特征 $X$。$\mathbf{Y}$ 每行有且仅有一个 1。
+
+\subsubsection{Step 3：计算 $\mathbf{X}^\top\mathbf{X}$ 和 $\mathbf{X}^\top\mathbf{Y}$}
+
+\[
+\mathbf{X}^\top\mathbf{X} = 
+\begin{pmatrix}
+5 & 15 \\
+15 & 55
+\end{pmatrix},
+\qquad
+\mathbf{X}^\top\mathbf{Y} = 
+\begin{pmatrix}
+2 & 2 & 1 \\
+3 & 7 & 5
+\end{pmatrix}.
+\]
+
+\subsubsection{Step 4：求逆并计算系数矩阵 $\hat{\mathbf{B}}$}
+
+\[
+\det(\mathbf{X}^\top\mathbf{X}) = 5 \times 55 - 15^2 = 50,
+\quad
+(\mathbf{X}^\top\mathbf{X})^{-1} = \frac{1}{50}
+\begin{pmatrix}
+55 & -15 \\
+-15 & 5
+\end{pmatrix}
+= \begin{pmatrix}
+1.1 & -0.3 \\
+-0.3 & 0.1
+\end{pmatrix}.
+\]
+
+\[
+\hat{\mathbf{B}} = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{Y}
+= \begin{pmatrix}
+1.1 & -0.3 \\
+-0.3 & 0.1
+\end{pmatrix}
+\begin{pmatrix}
+2 & 2 & 1 \\
+3 & 7 & 5
+\end{pmatrix}
+= \begin{pmatrix}
+1.3 & 0.1 & -0.4 \\
+-0.3 & 0.1 & 0.2
+\end{pmatrix}.
+\]
+
+因此三个类的拟合函数为：
+\[
+\hat{f}_1(x) = 1.3 - 0.3x,\qquad
+\hat{f}_2(x) = 0.1 + 0.1x,\qquad
+\hat{f}_3(x) = -0.4 + 0.2x.
+\]
+
+验证：$\hat{f}_1(x)+\hat{f}_2(x)+\hat{f}_3(x) = (1.3+0.1-0.4) + (-0.3+0.1+0.2)x = 1$。✓
+
+\subsubsection{Step 5：用 $\hat{\mathbf{B}}$ 对新点分类}
+
+\begin{center}
+\begin{tabular}{c|c|c|c|c}
+\hline
+新点 $x$ & $\hat{f}_1(x)$ & $\hat{f}_2(x)$ & $\hat{f}_3(x)$ & 预测类别 \\
+\hline
+2.5 & $1.3 - 0.75 = 0.55$ & $0.1 + 0.25 = 0.35$ & $-0.4 + 0.50 = 0.10$ & \textbf{1} \\
+3.5 & $1.3 - 1.05 = 0.25$ & $0.1 + 0.35 = 0.45$ & $-0.4 + 0.70 = 0.30$ & \textbf{2} \\
+5.5 & $1.3 - 1.65 = -0.35$ & $0.1 + 0.55 = 0.65$ & $-0.4 + 1.10 = 0.70$ & \textbf{3} \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{Step 6：确定决策边界}
+
+令 $\hat{f}_k(x) = \hat{f}_\ell(x)$：
+\[
+\begin{aligned}
+\text{类 1--2:}&\quad 1.3 - 0.3x = 0.1 + 0.1x \;\Longrightarrow\; x = 3, \\
+\text{类 2--3:}&\quad 0.1 + 0.1x = -0.4 + 0.2x \;\Longrightarrow\; x = 5, \\
+\text{类 1--3:}&\quad 1.3 - 0.3x = -0.4 + 0.2x \;\Longrightarrow\; x = 3.4 .
+\end{aligned}
+\]
+
+\begin{center}
+\begin{tikzpicture}[scale=1.2]
+\draw[->] (0,0) -- (6.5,0) node[right] {$x$};
+\draw[->] (0,-0.5) -- (0,0.8);
+% Data points
+\fill[blue] (1,0.04) circle (2pt) node[below=2pt] {\small 1};
+\fill[blue] (2,0.04) circle (2pt) node[below=2pt] {\small 2};
+\fill[orange] (3,0.04) circle (2pt) node[below=2pt] {\small 3};
+\fill[orange] (4,0.04) circle (2pt) node[below=2pt] {\small 4};
+\fill[green!60!black] (5,0.04) circle (2pt) node[below=2pt] {\small 5};
+% Decision boundaries
+\draw[dashed, red, thick] (3,-0.15) -- (3,0.7) node[above] {$x=3$};
+\draw[dashed, red, thick] (5,-0.15) -- (5,0.7) node[above] {$x=5$};
+% Region labels
+\node at (1.5, -0.35) {\small 类别 1};
+\node at (4.0, -0.35) {\small 类别 2};
+\node at (5.8, -0.35) {\small 类别 3};
+\end{tikzpicture}
+\end{center}
+
+最终分类规则：$x<3 \to$ 类别 1，$3<x<5 \to$ 类别 2，$x>5 \to$ 类别 3。在本例中三类有序排列且分离良好，没有发生 masking。
+
+\begin{remark}
+注意 $\hat{f}_2(5.5)=0.65$ 和 $\hat{f}_3(5.5)=0.70$ 都很正常（在 $[0,1]$ 内），但 $\hat{f}_1(5.5) = -0.35$ 是负数——这就是线性回归刚性本质的体现：\textbf{在外推区域，拟合值可能超出 $[0,1]$}。Logistic 回归通过 sigmoid 变换解决了这个问题。
+\end{remark}
+
+\subsection{Masking 问题}
+
+当 $K \geq 3$ 时，线性回归存在严重的\textbf{掩蔽 (masking)} 问题：某些类别可能被其他类别完全掩盖。
+
+\begin{example}[三类完美分离的 masking]
+图 4.2 展示了一个极端情况：三类数据被线性决策边界完美分离，但线性回归完全错过了中间类。
+将数据投影到连接三个类质心的直线上，中间类的回归线是水平的，其拟合值永远不会最大。
+\end{example}
+
+\begin{remark}
+一个宽松的通用规则是：如果 $K \geq 3$ 个类别排成一线，可能需要高达 $K-1$ 次的多项式才能区分它们。在 $p$ 维输入空间中，最坏情况下需要总次数 $K-1$ 的通用多项式和交互项，共 $O(p^{K-1})$ 个项。
+\end{remark}
+
+\subsection{Masking 数值演示（$N=5,\;K=3,\;p=1$）}
+
+下面构造一个会发生 masking 的数据集，与上一节的正常示例对比。
+
+\subsubsection{数据构造：让中间类「被夹击」}
+
+关键思路：让类别 1 和类别 3 分别位于两端，类别 2 孤零零在中间。
+
+\begin{center}
+\begin{tabular}{c|c|c}
+\hline
+$i$ & $X$ & 类别 $G$ \\
+\hline
+1 & 0 & 1 \\
+2 & 1 & 1 \\
+3 & 4 & 2 \\
+4 & 7 & 3 \\
+5 & 8 & 3 \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9]
+\draw[->] (0,0) -- (9,0) node[right] {$x$};
+\fill[blue] (0,0.1) circle (3pt) node[above=3pt] {\small $x_1$=0};
+\fill[blue] (1,0.1) circle (3pt) node[above=3pt] {\small $x_2$=1};
+\fill[orange] (4,0.1) circle (3pt) node[above=3pt] {\small $x_3$=4};
+\fill[green!60!black] (7,0.1) circle (3pt) node[above=3pt] {\small $x_4$=7};
+\fill[green!60!black] (8,0.1) circle (3pt) node[above=3pt] {\small $x_5$=8};
+\node[blue] at (0.5, -0.5) {类1};
+\node[orange] at (4, -0.5) {类2};
+\node[green!60!black] at (7.5, -0.5) {类3};
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{Step 1--2：构造 $\mathbf{X}$ 和 $\mathbf{Y}$}
+
+\[
+\mathbf{X}_{5\times 2} = 
+\begin{pmatrix}
+1 & 0 \\
+1 & 1 \\
+1 & 4 \\
+1 & 7 \\
+1 & 8
+\end{pmatrix},
+\qquad
+\mathbf{Y}_{5\times 3} = 
+\begin{pmatrix}
+1 & 0 & 0 \\
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1 \\
+0 & 0 & 1
+\end{pmatrix}.
+\]
+
+\subsubsection{Step 3：计算 $\mathbf{X}^\top\mathbf{X}$ 和 $\mathbf{X}^\top\mathbf{Y}$}
+
+\[
+\mathbf{X}^\top\mathbf{X} = 
+\begin{pmatrix}
+5 & 20 \\
+20 & 130
+\end{pmatrix},
+\quad
+\mathbf{X}^\top\mathbf{Y} = 
+\begin{pmatrix}
+2 & 1 & 2 \\
+1 & 4 & 15
+\end{pmatrix}.
+\]
+
+\subsubsection{Step 4：系数矩阵 $\hat{\mathbf{B}}$}
+
+\[
+\det = 5 \times 130 - 20^2 = 250,\quad
+(\mathbf{X}^\top\mathbf{X})^{-1} = \frac1{250}
+\begin{pmatrix}
+130 & -20 \\
+-20 & 5
+\end{pmatrix}
+= \begin{pmatrix}
+0.52 & -0.08 \\
+-0.08 & 0.02
+\end{pmatrix}.
+\]
+
+\[
+\hat{\mathbf{B}} = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{Y}
+= \begin{pmatrix}
+0.52 & -0.08 \\
+-0.08 & 0.02
+\end{pmatrix}
+\begin{pmatrix}
+2 & 1 & 2 \\
+1 & 4 & 15
+\end{pmatrix}
+= \begin{pmatrix}
+0.96 & 0.20 & -0.16 \\
+-0.14 & 0.00 & 0.14
+\end{pmatrix}.
+\]
+
+因此：
+\[
+\boxed{\hat{f}_1(x) = 0.96 - 0.14x},\qquad
+\boxed{\hat{f}_2(x) = 0.20},\qquad
+\boxed{\hat{f}_3(x) = -0.16 + 0.14x}.
+\]
+
+\textbf{关键发现：$\hat{f}_2(x)$ 是常数 $0.20$，斜率为零！}这意味着一根水平线——这正是 masking 的数学表现。
+
+验证：$\sum_k \hat{f}_k(x) = (0.96+0.20-0.16) + (-0.14+0+0.14)x = 1$。✓
+
+\subsubsection{Step 5：检验各类拟合值——谁在主导？}
+
+\begin{center}
+\begin{tabular}{c|c|c|c|c}
+\hline
+$x$ & $\hat{f}_1(x)$ & $\hat{f}_2(x)$ & $\hat{f}_3(x)$ & 最大值 \\
+\hline
+0 & $0.96$ & $0.20$ & $-0.16$ & \textbf{类1} (0.96) \\
+2 & $0.68$ & $0.20$ & $0.12$ & \textbf{类1} (0.68) \\
+4 & $0.40$ & $0.20$ & $0.40$ & \textbf{类1/3 平局} (0.40) \\
+6 & $0.12$ & $0.20$ & $0.68$ & \textbf{类3} (0.68) \\
+8 & $-0.16$ & $0.20$ & $0.96$ & \textbf{类3} (0.96) \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{在任意 $x$ 处，$\hat{f}_2(x)=0.20$ 永远不会是最大值！}
+
+\subsubsection{Step 6：从数学上看为什么会这样}
+
+求两两决策边界：
+\[
+\begin{aligned}
+\text{类 1--2:}&\quad 0.96 - 0.14x = 0.20 \;\Longrightarrow\; x \approx 5.43, \\
+\text{类 2--3:}&\quad 0.20 = -0.16 + 0.14x \;\Longrightarrow\; x \approx 2.57, \\
+\text{类 1--3:}&\quad 0.96 - 0.14x = -0.16 + 0.14x \;\Longrightarrow\; x = 4.
+\end{aligned}
+\]
+
+注意：类 2「理论上应该统治」的区间是 $(2.57,\;5.43)$——在这个区间内，$\hat{f}_2$ 同时大于 $\hat{f}_1$ 和 $\hat{f}_3$ 的⋯等等，真的是这样吗？
+\[
+\begin{aligned}
+x &\in (2.57,\;5.43) \implies \begin{cases}
+\hat{f}_1(x) < 0.20 & \text{(只在 } x>5.43 \text{ 时)} \\
+\hat{f}_3(x) < 0.20 & \text{(只在 } x<2.57 \text{ 时)}
+\end{cases}
+\end{aligned}
+\]
+在 $(2.57,\;5.43)$ 内，$\hat{f}_1(x) > 0.20$ 且 $\hat{f}_3(x) > 0.20$，两者都不给 $\hat{f}_2$ 机会！
+
+\begin{center}
+\begin{tikzpicture}[scale=1.0]
+\draw[->] (-0.5,0) -- (9,0) node[right] {$x$};
+\draw[->] (0,-0.3) -- (0,1.1) node[above] {$\hat{f}_k(x)$};
+% f1
+\draw[blue, thick, domain=0:8.5] plot (\x, {0.96 - 0.14*\x}) node[right] {$\hat{f}_1$};
+% f2
+\draw[orange, thick] (0,0.2) -- (8.5,0.2) node[right] {$\hat{f}_2=0.20$};
+% f3
+\draw[green!60!black, thick, domain=0:8.5] plot (\x, {-0.16 + 0.14*\x}) node[right] {$\hat{f}_3$};
+% Decision boundaries
+\draw[dashed, red, thin] (2.57,-0.2) -- (2.57,0.55);
+\draw[dashed, red, thin] (4.0,-0.2) -- (4.0,0.55);
+\draw[dashed, red, thin] (5.43,-0.2) -- (5.43,0.55);
+\node[red, font=\footnotesize] at (2.57,0.65) {$x\approx2.57$};
+\node[red, font=\footnotesize] at (4.0,0.65) {$x=4$};
+\node[red, font=\footnotesize] at (5.43,0.65) {$x\approx5.43$};
+% Shade the dominated region
+\fill[orange, opacity=0.15] (2.57,0) rectangle (5.43,0.2);
+\node[orange, font=\footnotesize] at (4.0,0.08) {类2本应统治的区域};
+\end{tikzpicture}
+\end{center}
+
+橙色阴影是类 2 本应统治的区间，但被 $\hat{f}_1$ 和 $\hat{f}_3$ 的斜线从上方盖过。即使 $x=4$（类 2 唯一的训练点），$\hat{f}_1=\hat{f}_3=0.40$ 也远超 $\hat{f}_2=0.20$。
+
+\subsubsection{与正常示例的对比}
+
+\begin{center}
+\begin{tabular}{c|cc|c}
+\hline
+ & 正常示例（前节） & Masking 示例（本节） & 原因 \\
+\hline
+数据排列 & 1,1,2,2,3（各类均匀） & 1,1,2,3,3（中间稀疏） & 类2样本太少、太孤立 \\
+$\hat{f}_2$ 斜率 & $+0.10$（正斜率） & $\mathbf{0}$（水平线） & 线性回归无法为上翘分配系数 \\
+类2是否出现 & 是，$3<x<5$ & \textbf{否}，永不最大 & 水平线被两条斜线全程压制 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{本质原因}
+
+线性回归对每个类的指示变量独立拟合一条直线。当中间类样本稀疏且被两端类「夹击」时，最小二乘倾向于给中间类分配\textbf{近零斜率}——因为任何非零斜率都会增大对两端类标签的残差，而最小二乘被两端类的多数样本主导。中间类于是变成水平线，被全程压制。
+
+\textbf{这也解释了为什么 LDA 能解决 masking}：LDA 不是对每类独立拟合，而是通过共同的协方差矩阵 $\Sigma$ 把所有类的几何关系耦合在一起。
+
+\subsubsection{为什么只有 1 个点时 $\hat{f}_2$ 恰好是常数？——最小二乘的视角}
+
+回到 $\hat{f}_2(x) = 0.20$（斜率为零）这个结果。你的直觉很对：$\hat{f}_2$ 和 $\hat{f}_1, \hat{f}_3$ 是独立拟合的，给 $\hat{f}_2$ 加斜率不会直接影响另外两条线。那为什么最小二乘偏偏选择了斜率为零？
+
+\medskip
+\noindent\textbf{原因：简单线性回归的斜率公式。}
+
+$\hat{f}_2$ 只拟合类 2 的指示变量列：$\mathbf{y}_2 = (0,0,1,0,0)^\top$。这是 $N=5$ 个点上的简单线性回归（带截距）。斜率的 OLS 公式为：
+\[
+\hat{\beta}_{12} = \frac{\Cov(x, y_2)}{\Var(x)}
+= \frac{\sum_{i=1}^{N} (x_i - \bar{x})(y_{2i} - \bar{y}_2)}{\sum_{i=1}^{N} (x_i - \bar{x})^2}.
+\]
+
+代入数值：$\bar{x} = \frac{0+1+4+7+8}{5} = 4$，$\bar{y}_2 = \frac{1}{5} = 0.2$。
+\[
+\begin{aligned}
+\Cov(x, y_2) &= (0-4)(0-0.2) + (1-4)(0-0.2) + \underbrace{(4-4)}_{=0}(1-0.2) + (7-4)(0-0.2) + (8-4)(0-0.2) \\
+&= (-4)(-0.2) + (-3)(-0.2) + 0 + (3)(-0.2) + (4)(-0.2) \\
+&= 0.8 + 0.6 + 0 - 0.6 - 0.8 = \mathbf{0}.
+\end{aligned}
+\]
+
+\[
+\hat{\beta}_{12} = \frac{0}{\Var(x)} = 0.
+\]
+
+\textbf{协方差恰好为零！} 这不是巧合——因为类 2 唯一的训练点 $x=4$ 恰好等于所有样本的均值 $\bar{x}=4$。在最小二乘的几何中，回归直线必然经过 $(\bar{x}, \bar{y}_2) = (4, 0.2)$。此时类 2 的正样本就在「重心」上，\textbf{没有任何杠杆来撬动斜率}——无论向左还是向右倾斜，都会增大其余 4 个零标签点的残差，而不会改善 $x=4$ 处的拟合（它已经被截距覆盖了）。
+
+\medskip
+\noindent\textbf{如果类 2 的点不在均值呢？}
+
+假设把类 2 的点从 $x=4$ 移到 $x=5$（即数据变为 $0,1,5,7,8$），则：
+\[
+\bar{x} = 4.2,\quad
+\begin{aligned}
+\Cov(x, y_2) &= (-4.2)(-0.2) + (-3.2)(-0.2) + (0.8)(0.8) + (2.8)(-0.2) + (3.8)(-0.2) \\
+&= 0.84 + 0.64 + 0.64 - 0.56 - 0.76 = 0.80,
+\end{aligned}
+\]
+\[
+\hat{\beta}_{12} = \frac{0.80}{50.8} \approx 0.016,\quad
+\hat{f}_2(x) \approx 0.134 + 0.016x.
+\]
+
+斜率不再是零，但非常接近零（几乎水平）。Masking 依然发生，只是不如斜率为零时那么「干净」。
+
+\medskip
+\noindent\textbf{结论：}
+
+\begin{center}
+\boxed{\text{$\hat{f}_2$ 为常数是\textbf{最小二乘 + 正样本位于重心}的共同结果，不是独立拟合的必然。}}
+\end{center}
+
+独立拟合意味着各 $\hat{f}_k$ 互不干扰，但每条 $\hat{f}_k$ 自身的斜率完全由最小二乘决定。当 $K \geq 3$ 且中间类样本稀疏时，最小二乘自然倾向于给中间类分配近零斜率，从而产生 masking。这正是 ESL 指出「指示矩阵回归本质上是刚性线性回归」的含义——刚性不在于各条线之间的耦合，而在于\textbf{每条线自身的线性约束 + 最小二乘准则}共同导致的脆弱性。
+
+\begin{remark}
+即使在 $x=4$（类 2 唯一训练点所在位置），$\hat{f}_2(4)=0.20$ 也小于 $\hat{f}_1(4)=\hat{f}_3(4)=0.40$——\textbf{连自己的训练样本都分不对}。这是 masking 最直观的体现。
+\end{remark}
+
+
+% ============ §4.3 线性判别分析 ============
+\section{线性判别分析 (LDA)}
+
+\subsection{Bayes 分类框架}
+
+分类的决策论（§2.4）指出，最优分类需要知道后验概率 $\Pr(G \mid X)$。设 $f_k(x)$ 为类别 $k$ 下 $X$ 的条件密度，$\pi_k$ 为类别 $k$ 的先验概率。由 Bayes 定理：
+\begin{equation}\label{eq:bayes_class}
+    \Pr(G = k \mid X = x) = \frac{f_k(x) \pi_k}{\sum_{\ell=1}^{K} f_\ell(x) \pi_\ell}.
+\end{equation}
+
+\subsubsection{为什么最优分类需要 $\Pr(G \mid X)$？——从损失函数到后验概率}
+
+前面 §4.1--§4.2 讨论了各种分类方法，但始终没有显式写出 $\Pr(G \mid X)$ 和损失函数 $L(G, \hat{G})$ 之间的关系。这里补全。
+
+\medskip
+\noindent\textbf{给定 $x$，预测类别 $k$ 的期望损失：}
+
+设损失函数为 $L(g, \hat{g})$，其中 $g$ 为真实类别，$\hat{g}$ 为预测类别。对于一个新的输入点 $x$，若我们预测其类别为 $k$，则该决策的\textbf{条件期望损失}为：
+\begin{equation}\label{eq:cond_risk}
+    R(k \mid x) = \E_{G\mid X}\big[\,L(G, k) \mid X = x\,\big]
+    = \sum_{\ell=1}^{K} L(\ell, k) \cdot \Pr(G = \ell \mid X = x).
+\end{equation}
+即：遍历所有可能的真实类别 $\ell$，用后验概率加权对应的损失。
+
+\medskip
+\noindent\textbf{$\E[L(G, \hat{G})]$ 与 $R(k \mid x)$ 的关系：}
+
+上述 $R(k \mid x)$ 是\textbf{给定 $x$ 之后}，选择类别 $k$ 的条件风险。而我们在 §4.1 讨论的 $\E[L(G, \hat{G})]$ 是\textbf{无条件}期望损失。二者通过全期望公式（tower property）连接：
+\begin{equation}\label{eq:tower_risk}
+    \E\big[L(G, \hat{G}(X))\big]
+    = \E_X\!\Big[\E_{G\mid X}\big[L(G, \hat{G}(X)) \mid X\big]\Big]
+    = \E_X\!\big[R(\hat{G}(X) \mid X)\big].
+\end{equation}
+
+展开为积分形式：
+\[
+\E[L(G, \hat{G})] = \int_{\mathcal{X}} R(\hat{G}(x) \mid x) \; dP_X(x).
+\]
+
+\textbf{含义}：整体期望损失 = 在每个 $x$ 处查询分类器 $\hat{G}(x)$ 所选类别的条件风险 $R(\hat{G}(x)\mid x)$，再对 $x$ 的分布取平均。
+
+由此，Bayes 最优分类器的构造逻辑是\textbf{逐点最小化}——对每个 $x$ 独立地选择使 $R(k\mid x)$ 最小的 $k$：
+\begin{equation}\label{eq:bayes_pointwise}
+    \hat{G}^*(x) = \argmin_{k \in \mathcal{G}} R(k \mid x),
+\end{equation}
+其对应的\textbf{Bayes 风险}（不可再降低的最小期望损失）为：
+\begin{equation}\label{eq:bayes_risk}
+    R^* = \E_X\!\Big[\min_{k} R(k \mid X)\Big].
+\end{equation}
+
+对任意分类器 $\hat{G}$，恒有 $\E[L(G, \hat{G})] \ge R^*$。
+
+\medskip
+\noindent\textbf{代入 0--1 损失：}
+
+对于分类问题最自然的损失——0--1 损失 $L(\ell, k) = \mathbb{I}\{\ell \neq k\}$：
+\begin{equation}\label{eq:zero_one_risk}
+    \begin{aligned}
+    R(k \mid x) &= \sum_{\ell=1}^{K} \mathbb{I}\{\ell \neq k\} \cdot \Pr(G = \ell \mid X = x) \\
+    &= \sum_{\ell \neq k} \Pr(G = \ell \mid X = x) \\
+    &= 1 - \Pr(G = k \mid X = x).
+    \end{aligned}
+\end{equation}
+
+\begin{center}
+\boxed{\text{预测为类别 $k$ 的期望 0--1 损失} \;=\; 1 - \Pr(G = k \mid X = x)}
+\end{center}
+
+\medskip
+\noindent\textbf{Bayes 最优分类器：}
+
+要最小化期望 0--1 损失，只需最大化后验概率。因此最优分类规则为：
+\begin{equation}\label{eq:bayes_classifier}
+    \hat{G}^*(x) = \argmax_{k \in \mathcal{G}} \Pr(G = k \mid X = x).
+\end{equation}
+
+这就是「最优分类需要知道后验概率」的完整数学链条：
+\[
+\boxed{\text{最小化 } \E[L(G,\hat{G})] \;\Longleftrightarrow\; \text{逐点最小化 } R(k\mid x) \;\Longleftrightarrow\; \text{最大化 } \Pr(G=k\mid X=x)}
+\]
+
+\medskip
+\noindent\textbf{推广到一般损失函数：}
+
+若损失不是 0--1（例如非对称损失：把「类 1 错判为类 2」的代价远大于反向），则 \eqref{eq:cond_risk} 依然适用——只需将 $L(\ell,k)$ 替换为实际损失矩阵。此时最优分类不再是简单地取最大后验，而是取最小期望代价。
+
+\medskip
+\noindent\textbf{回到本章的方法：}
+
+本章所有方法本质上都是在\textbf{用不同方式估计 $\Pr(G = k \mid X = x)$}（或其单调变换）：
+\begin{itemize}
+    \item LDA/QDA：假设 $f_k(x)$ 为 Gaussian → Bayes 定理 → 后验；
+    \item Logistic 回归：直接参数化 log-odds → sigmoid → 后验；
+    \item 指示矩阵回归：用 $\hat{f}_k(x)$ 近似 $\Pr(G=k\mid X=x)$（但可能越界）。
+\end{itemize}
+
+\subsubsection{完整数值示例：从密度到后验到决策}
+
+下面用一个二分类一维 Gaussian 例子走完整个 Bayes 分类流水线。
+
+\medskip
+\noindent\textbf{设定：}
+\begin{itemize}
+    \item 类别 1：$X \mid G=1 \sim \mathcal{N}(\mu_1=2,\; \sigma^2=1)$，先验 $\pi_1 = 0.4$；
+    \item 类别 2：$X \mid G=2 \sim \mathcal{N}(\mu_2=5,\; \sigma^2=1)$，先验 $\pi_2 = 0.6$。
+\end{itemize}
+两类的方差相同（这是 LDA 的前提），但先验不同。
+
+\medskip
+\noindent\textbf{Step 1：对新点 $x=3$，计算类条件密度 $f_k(x)$。}
+
+\[
+f_k(x) = \frac{1}{\sqrt{2\pi}\,\sigma} \exp\!\left(-\frac{(x-\mu_k)^2}{2\sigma^2}\right),\qquad
+\frac{1}{\sqrt{2\pi}} \approx 0.3989.
+\]
+
+\[
+\begin{aligned}
+f_1(3) &= 0.3989 \cdot \exp\!\left(-\frac{(3-2)^2}{2}\right)
+       = 0.3989 \cdot e^{-0.5}
+       \approx 0.3989 \cdot 0.6065 = 0.2420, \\[4pt]
+f_2(3) &= 0.3989 \cdot \exp\!\left(-\frac{(3-5)^2}{2}\right)
+       = 0.3989 \cdot e^{-2}
+       \approx 0.3989 \cdot 0.1353 = 0.0540.
+\end{aligned}
+\]
+
+\noindent\textbf{Step 2：Bayes 定理 → 后验概率 $\Pr(G=k \mid X=3)$。}
+
+\[
+\begin{aligned}
+\Pr(G=1 \mid X=3) &= \frac{f_1(3)\,\pi_1}{f_1(3)\,\pi_1 + f_2(3)\,\pi_2} \\
+&= \frac{0.2420 \times 0.4}{0.2420 \times 0.4 + 0.0540 \times 0.6}
+ = \frac{0.0968}{0.0968 + 0.0324}
+ = \frac{0.0968}{0.1292}
+ \approx \mathbf{0.749}, \\[8pt]
+\Pr(G=2 \mid X=3) &= 1 - 0.749 = \mathbf{0.251}.
+\end{aligned}
+\]
+
+\noindent\textbf{Step 3：计算条件风险 $R(k \mid x)$（0--1 损失）。}
+
+\[
+R(1 \mid 3) = 1 - \Pr(G=1 \mid X=3) = 1 - 0.749 = \mathbf{0.251},
+\]
+\[
+R(2 \mid 3) = 1 - \Pr(G=2 \mid X=3) = 1 - 0.251 = \mathbf{0.749}.
+\]
+
+\noindent\textbf{Step 4：最优决策。}
+\[
+\hat{G}^*(3) = \argmin_k R(k \mid 3) = \argmax_k \Pr(G=k \mid X=3) = \mathbf{1}.
+\]
+
+在 $x=3$ 处，预测为类别 1 的期望 0--1 损失（0.251）远小于预测为类别 2（0.749），因此判为类别 1。
+
+\medskip
+\noindent\textbf{Step 5（附加）：求决策边界。}
+
+决策边界是 $\Pr(G=1 \mid X=x) = \Pr(G=2 \mid X=x)$ 的位置，即 $f_1(x)\,\pi_1 = f_2(x)\,\pi_2$：
+
+\[
+0.4 \cdot \exp\!\left(-\frac{(x-2)^2}{2}\right) = 0.6 \cdot \exp\!\left(-\frac{(x-5)^2}{2}\right).
+\]
+
+取对数：
+\[
+\ln 0.4 - \frac{(x-2)^2}{2} = \ln 0.6 - \frac{(x-5)^2}{2}.
+\]
+
+\[
+-0.9163 - \frac{x^2 - 4x + 4}{2} = -0.5108 - \frac{x^2 - 10x + 25}{2}.
+\]
+
+两边乘以 2：
+\[
+-1.8326 - (x^2 - 4x + 4) = -1.0216 - (x^2 - 10x + 25).
+\]
+展开并消去 $-x^2$：
+\[
+-1.8326 - x^2 + 4x - 4 = -1.0216 - x^2 + 10x - 25
+\;\Longrightarrow\;
+-6x = -20.189
+\;\Longrightarrow\;
+x \approx 3.365.
+\]
+
+更简洁地用判别函数：由于方差相等，边界也可由 \eqref{eq:lda_logratio} 的特例得出：
+\[
+x = \frac{\mu_1 + \mu_2}{2} - \frac{\sigma^2}{\mu_2 - \mu_1}\ln\frac{\pi_2}{\pi_1}
+  = \frac{7}{2} - \frac{1}{3}\ln\frac{0.6}{0.4}
+  = 3.5 - \frac{\ln 1.5}{3}
+  \approx 3.5 - 0.135 = 3.365.
+\]
+
+\begin{center}
+\begin{tikzpicture}[scale=1.2]
+\draw[->] (0,0) -- (7,0) node[right] {$x$};
+\draw[->] (0,0) -- (0,0.55) node[above] {};
+% Densities
+\draw[blue, thick, domain=0:7, samples=50] plot (\x, {0.4*0.3989*exp(-(\x-2)^2/2)});
+\node[blue] at (1.2,0.32) {$f_1(x)\,\pi_1$};
+\draw[red, thick, domain=0:7, samples=50] plot (\x, {0.6*0.3989*exp(-(\x-5)^2/2)});
+\node[red] at (5.5,0.30) {$f_2(x)\,\pi_2$};
+% Decision boundary
+\draw[dashed, thick] (3.365,0) -- (3.365,0.45);
+\node[above] at (3.365,0.46) {$x^*\approx3.365$};
+% Point x=3
+\draw[fill=black] (3,0) circle (2pt) node[below=4pt] {$x=3$};
+% Region labels
+\node at (1.7, -0.2) {判为类1};
+\node at (5.0, -0.2) {判为类2};
+\end{tikzpicture}
+\end{center}
+
+\textbf{总结流水线：}
+
+\[
+\begin{array}{c}
+\text{类条件密度 } f_k(x) \\
+\downarrow\;\text{Bayes 定理} \\
+\text{后验概率 } \Pr(G=k \mid X=x) \\
+\downarrow\;\text{0-1 损失} \\
+\text{条件风险 } R(k \mid x) = 1 - \Pr(G=k \mid X=x) \\
+\downarrow\;\argmin_k \\
+\text{最优分类 } \hat{G}^*(x)
+\end{array}
+\]
+
+在本例中，当 $x < 3.365$ 时判为类 1，否则判为类 2。注意由于 $\pi_2 > \pi_1$，边界从 $\frac{\mu_1+\mu_2}{2}=3.5$ 向左偏移到了 $3.365$——先验的差异会移动决策边界。
+
+
+基于类条件密度的常见方法有：
+\begin{itemize}
+    \item 线性/二次判别分析：使用 Gaussian 密度；
+    \item 混合 Gaussian：允许非线性边界（§6.8）；
+    \item 非参数密度估计：最大灵活性（§6.6.2）；
+    \item Naive Bayes：假设各输入在类内条件独立（§6.6.3）。
+\end{itemize}
+
+\subsection{Gaussian 假设下的 LDA}
+
+假设每类密度为多元 Gaussian：
+\begin{equation}\label{eq:gaussian_density}
+    f_k(x) = \frac{1}{(2\pi)^{p/2} |\Sigma_k|^{1/2}}
+    \exp\!\left(-\frac{1}{2}(x - \mu_k)^\top \Sigma_k^{-1}(x - \mu_k)\right).
+\end{equation}
+
+\textbf{LDA 的特例}：假设各类协方差相同 $\Sigma_k = \Sigma$（对所有 $k$）。比较两类 $k$ 和 $\ell$ 时，考虑 log-ratio：
+\begin{equation}\label{eq:lda_logratio}
+    \log\frac{\Pr(G = k \mid X = x)}{\Pr(G = \ell \mid X = x)}
+    = \log\frac{\pi_k}{\pi_\ell}
+    - \frac{1}{2}(\mu_k + \mu_\ell)^\top \Sigma^{-1}(\mu_k - \mu_\ell)
+    + x^\top \Sigma^{-1}(\mu_k - \mu_\ell).
+\end{equation}
+
+\begin{remark}
+等协方差矩阵使得归一化因子和指数中的二次项相互抵消，log-ratio 成为 $x$ 的线性函数。因此决策边界是超平面。
+\end{remark}
+
+\subsection{线性判别函数}
+
+从 \eqref{eq:lda_logratio} 可提取出等价的判别函数：
+\begin{equation}\label{eq:lda_discriminant}
+    \delta_k(x) = x^\top \Sigma^{-1} \mu_k - \frac{1}{2} \mu_k^\top \Sigma^{-1} \mu_k + \log \pi_k.
+\end{equation}
+分类规则为 $\hat{G}(x) = \argmax_k \delta_k(x)$。
+
+\begin{remark}
+决策边界不是类质心连线的垂直平分线，除非 $\Sigma = \sigma^2 \mathbf{I}$ 且各类先验相等。
+\end{remark}
+
+\subsection{参数估计}
+
+实践中参数由训练数据估计：
+\begin{itemize}
+    \item $\hat{\pi}_k = N_k / N$，其中 $N_k$ 为第 $k$ 类的样本数；
+    \item $\hat{\mu}_k = \sum_{g_i = k} x_i / N_k$；
+    \item $\hat{\Sigma} = \sum_{k=1}^{K} \sum_{g_i = k} (x_i - \hat{\mu}_k)(x_i - \hat{\mu}_k)^\top / (N - K)$（pooled 协方差）。
+\end{itemize}
+
+\subsection{二分类 LDA 与最小二乘的对应}
+
+对于二分类，LDA 分类为类别 2 的条件是：
+\begin{equation}\label{eq:lda_twoclass}
+    x^\top \hat{\Sigma}^{-1}(\hat{\mu}_2 - \hat{\mu}_1)
+    > \frac{1}{2}(\hat{\mu}_1 + \hat{\mu}_2)^\top \hat{\Sigma}^{-1}(\hat{\mu}_2 - \hat{\mu}_1)
+    - \log(N_2 / N_1).
+\end{equation}
+
+若将两类分别编码为 $+1$ 和 $-1$，最小二乘得到的系数向量与 LDA 方向成比例（习题 4.2）。但除非 $N_1 = N_2$，截距不同，从而决策规则不同。
+
+\begin{remark}
+LDA 方向通过最小二乘的推导不依赖于 Gaussian 假设，因此适用范围超出 Gaussian 数据。但截距/切点的推导确实需要 Gaussian 假设。实践中，可以选择经验上最小化训练误差的切点，效果通常很好。
+\end{remark}
+
+当 $K > 2$ 时，LDA 与指示矩阵的线性回归不再等价，且 LDA 能避免 masking 问题。回归与 LDA 的对应可通过最优得分（§12.5）建立。
+
+
+% ============ §4.3.2 二次判别分析 (QDA) ============
+\section{二次判别分析 (QDA)}
+
+若不假设各类协方差相等（$\Sigma_k$ 不同），则 \eqref{eq:lda_logratio} 中的抵消不再发生，$x$ 的二次项保留。得到\textbf{二次判别函数}：
+
+\begin{equation}\label{eq:qda_discriminant}
+    \delta_k(x) = -\frac{1}{2}\log|\Sigma_k|
+    - \frac{1}{2}(x - \mu_k)^\top \Sigma_k^{-1}(x - \mu_k)
+    + \log \pi_k.
+\end{equation}
+
+每对类别之间的决策边界由二次方程 $\{x \mid \delta_k(x) = \delta_\ell(x)\}$ 描述。
+
+\subsection{参数数量}
+
+\begin{itemize}
+    \item LDA：$(K-1) \times (p+1)$ 个参数（因为只需知道 $\delta_k(x) - \delta_K(x)$ 的差分）；
+    \item QDA：$(K-1) \times \{p(p+3)/2 + 1\}$ 个参数。
+\end{itemize}
+
+当 $p$ 较大时，QDA 的参数数量急剧增加。
+
+\subsection{LDA 与 QDA 的性能讨论}
+
+LDA 和 QDA 在很多分类任务中表现优异。例如 STATLOG 项目（Michie et al., 1994）中：
+\begin{itemize}
+    \item LDA 在 22 个数据集中的 7 个上进入前三；
+    \item QDA 在 4 个数据集上进入前三；
+    \item 二者之一在 10 个数据集上进入前三。
+\end{itemize}
+
+\begin{remark}
+LDA/QDA 表现好的原因不太可能是数据近似 Gaussian 且协方差近似相等。更可能的原因是：\textbf{数据只能支持简单的线性或二次决策边界}，而 Gaussian 模型提供的估计是稳定的。这是偏差-方差权衡——线性边界的偏差可以接受，因为其方差远低于更复杂的替代方法。
+\end{remark}

@@ -1,0 +1,2200 @@
+\chapter{统计学习导论}
+
+统计学习的核心问题是：\textbf{从数据中学习一个函数，使得它能对未见过的输入做出准确的预测。}
+
+% ============ §1 监督学习 ============
+\section{监督学习的数学框架}
+
+\subsection{基本设定}
+
+\begin{definition}[监督学习的构成要素]
+监督学习由以下要素构成：
+\begin{enumerate}[label=(\roman*)]
+    \item \textbf{输入空间} $\mathcal{X} \subseteq \R^p$：$p$ 维特征（自变量）的取值空间；
+    \item \textbf{输出空间} $\mathcal{Y}$：
+    \begin{itemize}
+        \item 回归问题：$\mathcal{Y} = \R$（定量输出）；
+        \item 分类问题：$\mathcal{Y} = \{1, 2, \dots, K\}$（定性输出，$K$ 类）；
+    \end{itemize}
+    \item \textbf{训练数据} $\mathcal{D} = \{(\mathbf{x}_1, y_1), \dots, (\mathbf{x}_N, y_N)\}$，
+    其中 $(\mathbf{x}_i, y_i) \stackrel{\mathrm{i.i.d.}}{\sim} P(X, Y)$；
+    \item \textbf{预测函数}（模型）：$f: \mathcal{X} \to \mathcal{Y}$；
+    \item \textbf{损失函数} $L: \mathcal{Y} \times \mathcal{Y} \to \R_{\ge 0}$，衡量预测 $f(\mathbf{x})$ 与真实 $y$ 之间的代价。
+\end{enumerate}
+\end{definition}
+
+\subsection{损失函数}
+
+\begin{definition}[常见损失函数]
+\begin{itemize}
+    \item \textbf{平方损失}（回归）：
+    \begin{equation}
+        L(y, f(\mathbf{x})) = (y - f(\mathbf{x}))^2.
+    \end{equation}
+    \item \textbf{绝对损失}（回归）：
+    \begin{equation}
+        L(y, f(\mathbf{x})) = |y - f(\mathbf{x})|.
+    \end{equation}
+    \item \textbf{0--1 损失}（分类）：
+    \begin{equation}
+        L(y, f(\mathbf{x})) = \mathbb{I}\{y \neq f(\mathbf{x})\}.
+    \end{equation}
+    \item \textbf{交叉熵损失 / 负对数似然}（分类）：
+    \begin{equation}
+        L(y, \hat{\mathbf{p}}) = -\sum_{k=1}^{K} \mathbb{I}\{y = k\} \log \hat{p}_k,
+    \end{equation}
+    其中 $\hat{\mathbf{p}} = (\hat{p}_1, \dots, \hat{p}_K)$ 为预测的类别概率向量。
+    \item \textbf{Hinge 损失}（SVM）：
+    \begin{equation}
+        L(y, f(\mathbf{x})) = \max(0, 1 - y f(\mathbf{x})),\quad y \in \{-1, +1\}.
+    \end{equation}
+\end{itemize}
+\end{definition}
+
+\subsection{期望风险与经验风险}
+
+\begin{definition}[期望风险 (Expected Risk)]
+给定损失函数 $L$，预测函数 $f$ 的期望风险（泛化误差）为：
+\begin{equation}\label{eq:expected_risk}
+    R(f) = \E_{(X,Y) \sim P}\big[L(Y, f(X))\big]
+         = \int_{\mathcal{X} \times \mathcal{Y}} L(y, f(\mathbf{x})) \; dP(\mathbf{x}, y).
+\end{equation}
+学习的目标是找到 $f^*$ 使得 $R(f)$ 最小化：
+\begin{equation}
+    f^* = \argmin_{f \in \mathcal{F}} R(f),
+\end{equation}
+其中 $\mathcal{F}$ 为假设空间（模型族）。
+\end{definition}
+
+由于真实分布 $P(X, Y)$ 未知，无法直接计算 $R(f)$。在实践中，我们最小化\textbf{经验风险}：
+
+\begin{definition}[经验风险 (Empirical Risk)]
+\begin{equation}\label{eq:empirical_risk}
+    \widehat{R}(f) = \frac{1}{N} \sum_{i=1}^{N} L(y_i, f(\mathbf{x}_i)).
+\end{equation}
+\end{definition}
+
+\begin{definition}[经验风险最小化 (ERM)]
+\begin{equation}\label{eq:erm}
+    \hat{f} = \argmin_{f \in \mathcal{F}} \frac{1}{N} \sum_{i=1}^{N} L(y_i, f(\mathbf{x}_i)).
+\end{equation}
+\end{definition}
+
+\medskip
+\textbf{核心挑战：} ERM 得到的 $\hat{f}$ 在训练数据上表现好，但我们需要它在\textbf{未见数据}上也表现好。这引出了统计学习理论的核心概念——泛化误差界与偏差-方差权衡。
+
+\subsection{EPE 与 ERM：理想与现实的桥梁}
+
+前两小节的内容可以总结为一个简洁的逻辑链条：
+
+\[
+\underbrace{\min_f \E[L(Y, f(X))]}_{\text{EPE 最小化：理想目标，不可计算}}
+\;\xrightarrow{\text{大数定律：用样本均值替代期望}}\;
+\underbrace{\min_f \frac{1}{N}\sum_{i=1}^{N} L(y_i, f(x_i))}_{\text{ERM：实际做法，可计算}}
+\]
+
+\subsubsection{EPE 是真正的目标}
+
+无论回归还是分类，EPE 统一了所有监督学习问题的优化目标：
+\[
+\mathrm{EPE}(f) = \E_{(X,Y) \sim P}\big[L(Y, f(X))\big].
+\]
+只取决于损失函数 $L$，不挑问题类型：
+\begin{itemize}
+    \item 平方损失 → 回归 → 最优解 $f^* = \E[Y \mid X]$；
+    \item 0--1 损失 → 分类 → 最优解 $f^* = \argmax_k \Pr(G=k \mid X)$；
+    \item 一般损失矩阵 → 非对称代价分类 → 最优解 $\argmin_g \sum_k L(G_k,g)\Pr(G_k \mid X)$。
+\end{itemize}
+
+\subsubsection{ERM 是唯一能做的}
+
+EPE 的期望 $\E[\cdot]$ 是对真实联合分布 $P(X,Y)$ 取的，而 $P$ 未知。
+我们手中只有从 $P$ 中独立抽取的 $N$ 个样本 $\{(x_i, y_i)\}_{i=1}^N$。
+
+\textbf{大数定律}保证：独立同分布样本的均值收敛到期望：
+\[
+\frac{1}{N}\sum_{i=1}^{N} L(y_i, f(x_i)) \;\xrightarrow{N \to \infty}\; \E[L(Y, f(X))].
+\]
+
+因此，$\frac{1}{N}\sum L(y_i, f(x_i))$ 是 $\E[L(Y, f(X))]$ 最自然、最直接的\textbf{样本替代品}——
+不需要任何分布假设、不需要参数化，仅靠大数定律就完成了从 EPE 到 ERM 的转换。
+这正是 ERM 框架如此通用的根本原因。
+
+\subsubsection{EPE 与 ERM 的对比}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{p{3cm}|p{6cm}|p{6cm}}
+\toprule
+& \textbf{EPE（期望预测误差）} & \textbf{ERM（经验风险最小化）} \\
+\midrule
+\textbf{公式}   & $\E_{(X,Y)\sim P}[L(Y, f(X))]$ & $\min_f \frac{1}{N}\sum_{i=1}^{N} L(y_i, f(x_i))$ \\
+\textbf{能否计算} & ❌ 需要知道 $P(X,Y)$ & ✅ 只需要训练样本 \\
+\textbf{角色}     & \textbf{理想目标}（你真正想最小化的） & \textbf{实际手段}（你唯一能做的） \\
+\textbf{关系}     & \multicolumn{2}{c}{大数定律：$\frac{1}{N}\sum L(y_i, f(x_i)) \to \E[L(Y, f(X))]$} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{核心张力：泛化差距}
+
+ERM 最小化得到的是 $\hat{f}$，EPE 最小的才是 $f^*$。两者一般不相等：
+\begin{itemize}
+    \item \textbf{训练误差}（ERM 的值）可以压到任意低，甚至为零（如 $k$-NN 取 $k=1$）；
+    \item \textbf{测试误差}（EPE 的估计）才是真正在乎的。
+\end{itemize}
+
+当 ERM 很低而 EPE 很高时 → \textbf{过拟合}。
+这正是为什么后续章节需要正则化、交叉验证、模型选择——
+全是为了填平 ERM 和 EPE 之间的这道沟（泛化差距）。
+
+\subsection{最优预测器：回归函数}
+
+下面用 ESL 的符号体系，严格推导平方损失和 0--1 损失下的最优预测器。
+记 $X \in \R^p$ 为实值随机输入向量，$Y \in \R$ 为实值随机输出，
+二者的联合分布为 $\Pr(X, Y)$。
+
+\subsubsection{平方损失下的推导（回归）}
+
+\begin{definition}[期望预测误差 (Expected Prediction Error, EPE)]
+在平方损失下，函数 $f$ 的期望预测误差为：
+\begin{equation}\label{eq:epe_sq}
+    \mathrm{EPE}(f)
+    = \E\big[(Y - f(X))^2\big]
+    = \int_{\R^p \times \R} \big[y - f(\mathbf{x})\big]^2 \; \Pr(d\mathbf{x}, dy).
+\end{equation}
+这里 $\Pr(d\mathbf{x}, dy)$ 是 $X$ 与 $Y$ 的联合概率测度。
+\end{definition}
+
+下面推导使 $\mathrm{EPE}(f)$ 最小的 $f$。
+
+\textbf{Step 1 --- 条件期望展开.}
+对 $X$ 取条件，将联合期望分解为：
+\begin{align}
+    \mathrm{EPE}(f)
+    &= \E_X \E_{Y \mid X}\Big( \big[Y - f(X)\big]^2 \;\Big|\; X \Big) \label{eq:epe_step1} \\
+    &= \int_{\R^p} \left[ \int_{\R} \big[y - f(\mathbf{x})\big]^2 \; \Pr(dy \mid \mathbf{x}) \right] \Pr(d\mathbf{x}). \nonumber
+\end{align}
+
+\textbf{Step 2 --- 逐点最小化.}
+由于 \eqref{eq:epe_step1} 中被积函数非负，最小化 $\mathrm{EPE}(f)$ 等价于对每个固定的 $\mathbf{x}$，
+选择 $f(\mathbf{x})$ 来最小化\textbf{条件期望}：
+\begin{equation}\label{eq:epe_pointwise}
+    f(\mathbf{x}) = \argmin_{c \in \R} \; \E_{Y \mid X}\Big( \big[Y - c\big]^2 \;\Big|\; X = \mathbf{x} \Big).
+\end{equation}
+
+\textbf{Step 3 --- 求解 $c^*$.}
+记 $\mu(\mathbf{x}) = \E[Y \mid X = \mathbf{x}]$，将平方展开：
+\begin{align}
+    \E_{Y \mid X}\big[(Y - c)^2 \mid X = \mathbf{x}\big]
+    &= \E\big[(Y - \mu(\mathbf{x}) + \mu(\mathbf{x}) - c)^2 \mid X = \mathbf{x}\big] \nonumber \\
+    &= \E\big[(Y - \mu(\mathbf{x}))^2 \mid X = \mathbf{x}\big]
+       + 2\underbrace{\E\big[(Y - \mu(\mathbf{x}))(\mu(\mathbf{x}) - c) \mid X = \mathbf{x}\big]}_{=0} \nonumber \\
+    &\qquad + \E\big[(\mu(\mathbf{x}) - c)^2 \mid X = \mathbf{x}\big] \nonumber \\
+    &= \underbrace{\Var(Y \mid X = \mathbf{x})}_{\text{与 $c$ 无关}}
+       + \underbrace{(\mu(\mathbf{x}) - c)^2}_{\ge 0}. \label{eq:epe_expand}
+\end{align}
+交叉项为零的原因如下。在条件期望 $\E[\,\cdot \mid X = \mathbf{x}]$ 中，
+$\mu(\mathbf{x}) = \E[Y \mid X = \mathbf{x}]$ 和 $c$ 都是常数（因为已经条件在 $\mathbf{x}$ 上），可以提到期望外：
+\[
+\E\big[(Y - \mu(\mathbf{x}))(\mu(\mathbf{x}) - c) \mid X = \mathbf{x}\big]
+= (\mu(\mathbf{x}) - c) \cdot \E\big[Y - \mu(\mathbf{x}) \mid X = \mathbf{x}\big].
+\]
+而 $\E[Y - \mu(\mathbf{x}) \mid X = \mathbf{x}] = \E[Y \mid \mathbf{x}] - \E[\mu(\mathbf{x}) \mid \mathbf{x}]
+= \mu(\mathbf{x}) - \mu(\mathbf{x}) = 0$。
+$\E[\mu(\mathbf{x}) \mid \mathbf{x}] = \mu(\mathbf{x})$ 是因为已经条件在 $\mathbf{x}$ 上，
+$\mu(\mathbf{x})$ 是确定的数——这和 $\E[5 \mid X] = 5$ 是同一个道理。
+
+直观理解：回归函数 $\mu(\mathbf{x})$ 的定义性特征就是把 $Y$ 分解为
+$Y = \mu(\mathbf{x}) + \varepsilon$，其中残差 $\varepsilon$ 的条件均值为零。
+若 $\E[\varepsilon \mid \mathbf{x}] \neq 0$，则 $\mu(\mathbf{x})$ 就不是真正的条件期望。
+
+\textbf{Step 4 --- 结论.}
+\eqref{eq:epe_expand} 中仅第二项依赖于 $c$，当 $c = \mu(\mathbf{x})$ 时取到最小值 0。因此：
+
+\begin{theorem}[平方损失下的最优预测器]\label{thm:optimal_regression}
+在平方损失 $L(y, f(\mathbf{x})) = (y - f(\mathbf{x}))^2$ 下，使 $\mathrm{EPE}(f)$ 最小的唯一函数是\textbf{回归函数 (regression function)}：
+\begin{equation}\label{eq:reg_func}
+    f^*(\mathbf{x}) = \E[Y \mid X = \mathbf{x}] = \int_{\R} y \cdot \Pr(dy \mid \mathbf{x}).
+\end{equation}
+\end{theorem}
+
+\subsubsection{EPE 的一般形式：损失矩阵}
+
+前面的 0--1 损失把所有分类错误一视同仁——把猫判为狗和判为老虎代价一样。
+但在实际问题中，不同错误的代价往往不同（例如：把恶性肿瘤判为良性的代价远大于反过来）。
+因此需要更一般的框架。
+
+\begin{definition}[损失矩阵与 EPE 的一般形式]
+设输出 $G \in \mathcal{G} = \{G_1, \dots, G_K\}$ 有 $K$ 个类别。
+定义 $K \times K$ 的\textbf{损失矩阵} $\mathbf{L}$，其元素：
+\[
+L_{k\ell} = L(G_k, G_\ell) = \text{将真实类 $G_k$ 错判为 $G_\ell$ 的代价},
+\quad L_{kk} = 0,\; L_{k\ell} \ge 0.
+\]
+
+分类器 $\hat{G}(X)$ 的期望预测误差为：
+\begin{equation}\label{eq:epe_general}
+    \mathrm{EPE} = \E\big[L(G, \hat{G}(X))\big]
+    = \E_X \sum_{k=1}^{K} L\big(G_k, \hat{G}(X)\big) \,\Pr(G_k \mid X).
+\end{equation}
+\end{definition}
+
+\textbf{Step 1 --- 条件期望展开.}
+与平方损失一样，对 $X$ 取条件：
+\begin{equation}\label{eq:epe_general_step1}
+    \mathrm{EPE} = \E_X \left[ \sum_{k=1}^{K} L\big(G_k, \hat{G}(X)\big) \,\Pr(G_k \mid X) \right].
+\end{equation}
+
+\textbf{Step 2 --- 逐点最小化.}
+由于被积函数非负，只需对每个 $\mathbf{x}$ 独立地选择 $\hat{G}(\mathbf{x}) \in \mathcal{G}$ 最小化括号内的条件风险：
+\begin{equation}\label{eq:epe_pointwise_general}
+    \hat{G}(\mathbf{x}) = \argmin_{g \in \mathcal{G}} \sum_{k=1}^{K} L(G_k, g) \,\Pr(G_k \mid X = \mathbf{x}).
+\end{equation}
+这就是\textbf{贝叶斯决策规则}的一般形式：在每个点上，选那个使\textbf{期望代价}最小的类。
+
+\textbf{Step 3 --- 退化到 0--1 损失.}
+当 $L(G_k, G_\ell) = \mathbb{I}\{k \neq \ell\}$（所有错误代价相同）时：
+\begin{align*}
+    \sum_{k=1}^{K} \mathbb{I}\{k \neq g\} \,\Pr(G_k \mid \mathbf{x})
+    &= \sum_{k \neq g} \Pr(G_k \mid \mathbf{x})
+    = 1 - \Pr(G = g \mid \mathbf{x}).
+\end{align*}
+最小化 $1 - \Pr(G = g \mid \mathbf{x})$ 等价于最大化 $\Pr(G = g \mid \mathbf{x})$，
+退化为之前得到的贝叶斯分类器（定理 \ref{thm:bayes_classifier}）。
+
+
+
+
+\subsubsection{0--1 损失下的详细推导（0--1 作为特例验证）}
+
+
+现在考虑 $K$ 类分类问题，输出 $G \in \mathcal{G} = \{1, 2, \dots, K\}$。
+
+
+0--1 损失是损失矩阵 $L(G_k, G_\ell) = \mathbb{I}\{k \neq \ell\}$ 的特例。下面用 EPE 框架从头推导。
+
+\begin{definition}[0--1 损失下的 EPE]
+\begin{equation}\label{eq:epe_01}
+    \mathrm{EPE}(f)
+    = \E\big[ \mathbb{I}\{G \neq f(X)\} \big]
+    = \int_{\R^p \times \mathcal{G}} \mathbb{I}\{g \neq f(\mathbf{x})\} \; \Pr(d\mathbf{x}, dg).
+\end{equation}
+\end{definition}
+
+\textbf{Step 1 --- 条件期望展开.}
+\begin{align}
+    \mathrm{EPE}(f)
+    &= \E_X \E_{G \mid X}\Big( \mathbb{I}\{G \neq f(X)\} \;\Big|\; X \Big) \nonumber \\
+    &= \int_{\R^p} \left[ \sum_{g=1}^{K} \mathbb{I}\{g \neq f(\mathbf{x})\} \; \Pr(G = g \mid X = \mathbf{x}) \right] \Pr(d\mathbf{x}). \label{eq:epe01_step1}
+\end{align}
+
+\textbf{Step 2 --- 逐点最小化.}
+对每个固定的 $\mathbf{x}$，需选择 $f(\mathbf{x}) \in \mathcal{G}$ 使括号内部最小。注意到：
+\[
+\sum_{g=1}^{K} \mathbb{I}\{g \neq k\} \; \Pr(G = g \mid \mathbf{x})
+= \sum_{g \neq k} \Pr(G = g \mid \mathbf{x})
+= 1 - \Pr(G = k \mid \mathbf{x}).
+\]
+因此最小化该式等价于最大化 $\Pr(G = k \mid \mathbf{x})$。
+
+\begin{theorem}[贝叶斯分类器]\label{thm:bayes_classifier}
+在 0--1 损失下，使 $\mathrm{EPE}(f)$ 最小的最优分类器为：
+\begin{equation}\label{eq:bayes_classifier}
+    f^*(\mathbf{x}) = \argmax_{k \in \{1,\dots,K\}} \Pr(G = k \mid X = \mathbf{x}).
+\end{equation}
+该分类器称为\textbf{贝叶斯分类器 (Bayes classifier)}，其错误率：
+\begin{equation}\label{eq:bayes_error}
+    \mathrm{EPE}(f^*) = \int_{\R^p} \Big[1 - \max_{k} \Pr(G = k \mid X = \mathbf{x})\Big] \Pr(d\mathbf{x})
+\end{equation}
+称为\textbf{贝叶斯错误率 (Bayes error rate)}——任何分类器都无法超越的下界。
+\end{theorem}
+
+\subsubsection{三种损失形式的统一视角}
+
+\[
+\begin{array}{c|c|c|c}
+\toprule
+& \textbf{平方损失（回归）} & \textbf{0--1 损失（分类）} & \textbf{一般损失矩阵} \\
+\midrule
+\text{EPE}     & \E[(Y - f(X))^2] & \E[\mathbb{I}\{G \neq f(X)\}] & \E[L(G, \hat{G}(X))] \\
+\text{逐点目标} & \min_c \E[(Y-c)^2 \mid X=\mathbf{x}] & \min_k [1 - \Pr(G=k \mid \mathbf{x})] & \min_g \sum_k L(G_k,g)\Pr(G_k \mid \mathbf{x}) \\
+\text{最优解}   & f^*(\mathbf{x}) = \E[Y \mid \mathbf{x}] & \argmax_k \Pr(G = k \mid \mathbf{x}) & \argmin_g \sum_k L(G_k,g)\Pr(G_k \mid \mathbf{x}) \\
+\text{不可达下界} & \E[\Var(Y \mid X)] & 1 - \E[\max_k \Pr(G = k \mid X)] & \E[\min_g \sum_k L(G_k,g)\Pr(G_k \mid X)] \\
+\bottomrule
+\end{array}
+\]
+
+所有情况下，最优预测器都依赖于真实的\textbf{条件分布} $P(Y \mid X)$。
+在实际问题中这个条件分布是未知的，因此学习问题的本质是：\textbf{用有限样本 $\mathcal{D}$ 去逼近 $P(Y \mid X)$ 或直接逼近 $f^*$}。
+
+\subsection{两种建模策略}
+
+统计学习提供了两种基本策略来逼近 $f^*(\mathbf{x}) = \E[Y \mid X = \mathbf{x}]$：
+
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{参数方法 (Parametric)}：假设 $f$ 具有某种参数化形式。
+    \begin{itemize}
+        \item 例：线性模型 $f(\mathbf{x}) = \bm{\beta}^\top \mathbf{x} + \beta_0$.
+        \item 将估计无穷维函数的问题简化为估计有限个参数。
+        \item 优点：高效、可解释；缺点：模型假设可能错误（欠拟合）。
+    \end{itemize}
+    
+    \item \textbf{非参数方法 (Nonparametric)}：不假设 $f$ 的具体形式，直接从数据中学习。
+    \begin{itemize}
+        \item 例：$k$-近邻、核平滑、决策树、神经网络。
+    \end{itemize}
+\end{enumerate}
+% ============ 完整示例 ============
+\subsection{完整示例：从数据到预测}
+
+下面通过两个完整的数值例子，把上文的概念串成一条线：
+\textbf{数据 $\to$ 模型假设 $\to$ 参数估计 $\to$ 预测 $\to$ 评估}。
+
+\subsubsection{例 1：一元线性回归（参数方法）}
+
+\textbf{Step 1 --- 数据.}
+设有 $N = 5$ 个观测：
+\[
+\mathcal{D} = \{(1, 2.1),\, (2, 3.8),\, (3, 6.2),\, (4, 7.9),\, (5, 10.1)\}.
+\]
+
+\textbf{Step 2 --- 模型假设.}
+假设 $Y$ 与 $X$ 呈线性关系：
+\begin{equation}\label{eq:ex_linear_model}
+    f(x) = \beta_0 + \beta_1 x.
+\end{equation}
+此时假设空间 $\mathcal{F} = \{f(x) = \beta_0 + \beta_1 x \mid \beta_0, \beta_1 \in \R\}$，仅含两个参数。
+
+\textbf{Step 3 --- 损失函数与优化.}
+采用平方损失，经验风险为：
+\[
+\widehat{R}(\beta_0, \beta_1) = \frac{1}{5}\sum_{i=1}^{5} \big(y_i - (\beta_0 + \beta_1 x_i)\big)^2.
+\]
+令梯度为零 $\pdv{\widehat{R}}{\beta_0} = \pdv{\widehat{R}}{\beta_1} = 0$，解得：
+\[
+\hat{\beta}_1 = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sum (x_i - \bar{x})^2} = \frac{10.0}{10.0} = 1.00,
+\qquad
+\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x} = 6.02 - 1.00 \times 3 = 3.02.
+\]
+
+用矩阵形式（\textbf{正规方程}）得到相同结果。令设计矩阵 $\mathbf{X} = \begin{bmatrix} \mathbf{1} & \mathbf{x} \end{bmatrix}$：
+\[
+\mathbf{X} =
+\begin{bmatrix}
+1 & 1 \\ 1 & 2 \\ 1 & 3 \\ 1 & 4 \\ 1 & 5
+\end{bmatrix},\;
+\mathbf{y} = \begin{bmatrix} 2.1 \\ 3.8 \\ 6.2 \\ 7.9 \\ 10.1 \end{bmatrix},\;
+\hat{\bm{\beta}} = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{y}
+= \begin{bmatrix} 3.02 \\ 1.00 \end{bmatrix}.
+\]
+
+\textbf{Step 4 --- 预测.}
+对新输入 $x_0 = 6$，预测值为：
+\[
+\hat{f}(6) = 3.02 + 1.00 \times 6 = 9.02.
+\]
+
+\textbf{Step 5 --- 评估.}
+训练集上的均方误差：
+\[
+\widehat{R}(\hat{\bm{\beta}}) = \frac{1}{5}\sum_{i=1}^{5} (y_i - \hat{y}_i)^2
+= \frac{0.0064 + 0.0144 + 0.0064 + 0.0144 + 0.0064}{5} \approx 0.0096.
+\]
+训练误差很小，说明模型对训练数据拟合良好。但真正的泛化能力需要用\textbf{独立测试集}来评估——这是第 7 章的核心议题。
+
+\subsubsection{例 2：二分类——线性回归用作分类器（ESL \S 2.4 经典示例）}
+
+\textbf{Step 1 --- 数据生成.}
+从两个二元正态分布中各抽取 100 个点，总计 $N = 200$：
+\begin{align}
+    \text{Class BLUE:}\quad & \mathbf{x} \sim \mathcal{N}\!\left(\begin{bmatrix} 1 \\ 0 \end{bmatrix},\; \mathbf{I}_2\right), \quad Y = 0,\\[4pt]
+    \text{Class ORANGE:}\quad & \mathbf{x} \sim \mathcal{N}\!\left(\begin{bmatrix} 0 \\ 1 \end{bmatrix},\; \mathbf{I}_2\right), \quad Y = 1.
+\end{align}
+
+\textbf{Step 2 --- 模型假设：线性回归用于分类.}
+虽然是分类问题，我们先用线性回归来拟合一个连续输出，然后通过阈值转化为类别：
+\begin{equation}\label{eq:ex_linclass}
+    \hat{Y} = \hat{\beta}_0 + \hat{\beta}_1 X_1 + \hat{\beta}_2 X_2,
+\end{equation}
+分类规则：
+\begin{equation}\label{eq:ex_class_rule}
+    \hat{G} = \begin{cases}
+        \text{ORANGE}, & \text{if } \hat{Y} > 0.5,\\
+        \text{BLUE},   & \text{if } \hat{Y} \le 0.5.
+    \end{cases}
+\end{equation}
+
+\textbf{Step 3 --- 参数估计.}
+将 BLUE 编码为 $y = 0$，ORANGE 编码为 $y = 1$，用最小二乘拟合：
+\[
+\hat{\bm{\beta}} = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{y}.
+\]
+得到的决策边界 $\hat{Y} = 0.5$ 在输入空间中是一条直线。
+
+\textbf{Step 4 --- 预测与决策边界.}
+将 $\hat{Y} = 0.5$ 代入 \eqref{eq:ex_linclass}：
+\[
+\hat{\beta}_0 + \hat{\beta}_1 X_1 + \hat{\beta}_2 X_2 = 0.5.
+\]
+这是一条将平面划分为两部分的直线——\textbf{线性决策边界}。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=1.2]
+    % 坐标轴
+    \draw[->,thick] (-3,0) -- (5,0) node[right] {$X_1$};
+    \draw[->,thick] (0,-3) -- (0,5) node[above] {$X_2$};
+    % 决策边界 (示意: X2 = -X1 + 1.5 附近)
+    \draw[thick, dashed, blue!60] (-1.5, 3.5) -- (4.5, -2.5) node[above left, black] {$\hat{Y} = 0.5$};
+    % BLUE 区域标注
+    \node[blue] at (-1.5, -1.5) {\footnotesize BLUE 区域};
+    % ORANGE 区域标注
+    \node[orange] at (3.5, 3.5) {\footnotesize ORANGE 区域};
+    % 示意点
+    \foreach \i in {1,...,8} {
+        \pgfmathsetmacro{\bx}{1 + 0.6*rand} \pgfmathsetmacro{\by}{0 + 0.6*rand}
+        \fill[blue] (\bx, \by) circle (1.5pt);
+    }
+    \foreach \i in {1,...,8} {
+        \pgfmathsetmacro{\ox}{0 + 0.6*rand} \pgfmathsetmacro{\oy}{1 + 0.6*rand}
+        \fill[orange] (\ox, \oy) circle (1.5pt);
+    }
+\end{tikzpicture}
+\caption{线性回归用于二分类：决策边界将特征空间划分为两个区域。蓝色点为 Class BLUE，橙色点为 Class ORANGE。}
+\label{fig:linear_classify}
+\end{figure}
+
+\textbf{Step 5 --- 评估：训练误差 vs 测试误差.}
+
+\textbf{(a) 训练误差.}
+在训练集（200 个点）上计算 0--1 损失：
+\begin{equation}\label{eq:train_err}
+    \widehat{R}_{\mathrm{train}}(\hat{f}) = \frac{1}{N_{\mathrm{train}}}\sum_{i=1}^{N_{\mathrm{train}}} \mathbb{I}\{ \hat{G}_i \neq G_i \}.
+\end{equation}
+
+\textbf{(b) 生成测试集.}
+从与训练集\textbf{相同的分布}中独立生成一个大规模测试集（例如 $N_{\mathrm{test}} = 10{,}000$ 个点），以精确估计泛化误差：
+\[
+\mathcal{D}_{\mathrm{test}} = \{(\mathbf{x}_j, y_j)\}_{j=1}^{N_{\mathrm{test}}},
+\quad \mathbf{x}_j \sim
+\begin{cases}
+\mathcal{N}\!\left(\begin{bmatrix} 1 \\ 0 \end{bmatrix},\; \mathbf{I}_2\right), & y_j = 0 \text{ (BLUE)}, \\[6pt]
+\mathcal{N}\!\left(\begin{bmatrix} 0 \\ 1 \end{bmatrix},\; \mathbf{I}_2\right), & y_j = 1 \text{ (ORANGE)}.
+\end{cases}
+\]
+
+注意：测试集中的点\textbf{绝不参与}模型训练——$\hat{f}$ 仅由训练集 $\mathcal{D}_{\mathrm{train}}$ 得到。这是评估中最重要的纪律。
+
+\textbf{(c) 测试误差.}
+在测试集上计算 0--1 损失，得到泛化误差的无偏估计：
+\begin{equation}\label{eq:test_err}
+    \widehat{R}_{\mathrm{test}}(\hat{f}) = \frac{1}{N_{\mathrm{test}}}\sum_{j=1}^{N_{\mathrm{test}}} \mathbb{I}\{ \hat{G}_j \neq G_j \}.
+\end{equation}
+
+\textbf{(d) 对比.}
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{c|c|c}
+\toprule
+& \textbf{公式} & \textbf{含义} \\
+\midrule
+训练误差 & $\frac{1}{N_{\mathrm{train}}}\sum_{i=1}^{N_{\mathrm{train}}} \mathbb{I}\{\hat{G}_i \neq G_i\}$ & 模型对\textbf{见过的}数据错多少 \\
+测试误差 & $\frac{1}{N_{\mathrm{test}}}\sum_{j=1}^{N_{\mathrm{test}}} \mathbb{I}\{\hat{G}_j \neq G_j\}$ & 模型对\textbf{未见过}的数据错多少 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+通常训练误差 $<$ 测试误差（因为参数是针对训练数据优化的）。若两者的差距很大，说明模型\textbf{过拟合}；若两者都很大，说明模型\textbf{欠拟合}。这一诊断框架将在第 7 章（模型评估与选择）中系统展开。
+
+\textbf{Step 6 --- 反思：线性回归做分类的问题.}
+\begin{itemize}
+    \item 编码方式（0/1）是任意的——若改为 $-1/+1$，结果不同；
+    \item $\hat{Y}$ 可能超出 $[0, 1]$，无法解释为概率；
+    \item 当 $K \ge 3$ 时，类别之间的顺序假设不合理。
+\end{itemize}
+这些缺陷正是第 4 章引入 \textbf{Logistic 回归}与\textbf{线性判别分析 (LDA)} 的动机。
+
+\subsubsection{例 3：k-近邻 (k-NN) 分类——非参数方法的代表}
+
+与例 2 使用完全相同的数据（两类二元高斯，各 100 个训练点），改用 $k$-近邻分类器。
+
+\textbf{算法.}
+对于输入 $\mathbf{x}$，k-NN 分类器的决策规则为：
+\begin{enumerate}[label=(\roman*)]
+    \item 在训练集中找出离 $\mathbf{x}$ 最近的 $k$ 个点，记其索引为 $\mathcal{N}_k(\mathbf{x})$；
+    \item 对这些点的类别进行\textbf{多数投票}：
+    \begin{equation}\label{eq:knn_vote}
+        \hat{G}(\mathbf{x}) = \argmax_{g \in \{\text{BLUE}, \text{ORANGE}\}}
+        \sum_{i \in \mathcal{N}_k(\mathbf{x})} \mathbb{I}\{G_i = g\}.
+    \end{equation}
+\end{enumerate}
+距离通常取欧氏距离：$\norm{\mathbf{x} - \mathbf{x}_i}$。
+
+\textbf{有效参数个数.}
+k-NN 没有显式的 $\bm{\beta}$ 参数，但其复杂度由 $k$ 控制。ESL 定义其\textbf{有效自由度}为：
+\begin{equation}\label{eq:knn_df}
+    \mathrm{df}(k) \approx \frac{N}{k}.
+\end{equation}
+直观含义：
+\begin{itemize}
+    \item $k = 1$：$\mathrm{df} \approx 200$——每个训练点就是一个"参数"，纯记忆，决策边界极度蜿蜒；
+    \item $k = 200$：$\mathrm{df} \approx 1$——所有人一起投票退化为多数类预测，模型僵硬；
+    \item $k \approx N/p$ 时，k-NN 与 $p$ 个参数的线性模型复杂度大致相当——这是模型选择的粗略基准。
+\end{itemize}
+
+\textbf{训练误差.}
+训练误差随 $k$ 单调递增（$k$ 越小越能完美记住训练集）：
+\[
+k = 1 \;\Rightarrow\; \text{训练误差} = 0
+\quad\text{（每个点都是自己的最近邻）}.
+\]
+因此\textbf{不能用训练误差来选择 $k$}——它永远偏向 $k = 1$。
+
+\textbf{测试误差与 $k$ 的选择.}
+在独立测试集（10,000 个点）上评估不同 $k$ 的表现，得到 U 形曲线（参见 ESL Figure 2.4）：
+\[
+\text{测试误差}(k) = \frac{1}{N_{\mathrm{test}}}\sum_{j=1}^{N_{\mathrm{test}}} \mathbb{I}\{\hat{G}_j^{(k)} \neq G_j\}.
+\]
+选择使测试误差最小的 $k$。在 Scenario 1（两类各一个高斯，线性最优边界）下，最优 $k$ 约在 30--40 左右。
+
+\medskip
+\textbf{两个极端：偏差-方差视角.}
+
+线性回归与 k-NN 代表了统计学习的两种\textbf{极端哲学}：
+
+\begin{center}
+\renewcommand{\arraystretch}{1.8}
+\begin{tabular}{p{2.5cm}|p{5.5cm}|p{5.5cm}}
+\toprule
+& \textbf{线性模型（参数方法）} & \textbf{k-近邻（非参数方法）} \\
+\midrule
+\textbf{核心假设} & 假设 $f$ 是线性的（全局刚性） & 不做假设，纯靠局部记忆 \\
+\textbf{偏差} & 高（模型错 → 预测系统偏） & 低（足够灵活，能拟合任意形状） \\
+\textbf{方差} & 低（估计量稳定，不易受扰动） & 高（局部依赖，对训练样本敏感） \\
+\textbf{决策边界} & 光滑、稳定 & 蜿蜒、不稳定 \\
+\textbf{典型问题} & 欠拟合（模型太简单） & 过拟合（$k$ 太小则死记硬背） \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{几乎所有现代 ML 方法都是这两种简单过程的变体：}
+\[
+\begin{array}{c|c}
+\textbf{线性模型谱系} & \textbf{最近邻谱系} \\ \hline
+\text{Ridge / Lasso（第 3 章）} & \text{核平滑（第 6 章）} \\
+\text{Logistic 回归 / LDA（第 4 章）} & \text{局部回归} \\
+\text{SVM（线性核）（第 12 章）} & \text{决策树 / 随机森林（第 9, 15 章）} \\
+\text{GAM / 样条（第 5, 9 章）} & \text{神经网络（第 11 章）} \\
+\end{array}
+\]
+
+所有现代方法的本质都是在\textbf{偏差与方差之间找平衡}——这构成了全书的方法论主线。
+
+\medskip
+\textbf{三个例子串联总结：}
+\[
+\begin{array}{c|c|c|c|c|c}
+\text{步骤} & \text{数据} & \text{模型} & \text{损失} & \text{优化} & \text{预测/评估} \\ \hline
+\text{例 1} & (x_i, y_i) \in \R \times \R & f(x)=\beta_0+\beta_1 x & \text{平方损失} & \text{正规方程} & \text{MSE} \\
+\text{例 2} & (\mathbf{x}_i, y_i) \in \R^2 \times \{0,1\} & f(\mathbf{x})=\bm{\beta}^\top \mathbf{x}+\beta_0 & \text{平方损失} & \text{正规方程} & \text{0--1 损失} \\
+\text{例 3} & \text{同例 2} & \text{$k$-NN 多数投票} & \text{0--1 损失} & \text{调 $k$} & \text{测试误差 U 形曲线}
+\end{array}
+\]
+
+\subsection{理论回看：从最优预测器到实际估计器}
+
+在前面的推导中，定理 \ref{thm:optimal_regression} 告诉我们：
+在平方损失下，最优预测器是回归函数
+$f^*(\mathbf{x}) = \E[Y \mid X = \mathbf{x}]$。
+但在实践中我们不知道真实的联合分布 $\Pr(X, Y)$，
+只能用训练数据 $\mathcal{D}$ 去\textbf{估计}它。
+例 1--3 恰恰展示了两种截然不同的估计策略。
+
+\subsubsection{线性回归的估计器（例 1 \& 例 2）}
+
+线性回归将条件期望限定为\textbf{线性函数}：
+\begin{equation}\label{eq:linear_approx}
+    f(\mathbf{x}) \approx \E[Y \mid X = \mathbf{x}] \;\Longrightarrow\;
+    \hat{f}(\mathbf{x}) = \hat{\beta}_0 + \sum_{j=1}^{p} \hat{\beta}_j X_j
+    = \mathbf{x}^\top \hat{\bm{\beta}}.
+\end{equation}
+
+其中 $\hat{\bm{\beta}}$ 通过\textbf{经验风险最小化}（平方损失）得到：
+\begin{equation}\label{eq:linear_erm}
+    \hat{\bm{\beta}} = \argmin_{\bm{\beta} \in \R^{p+1}}
+    \frac{1}{N} \sum_{i=1}^{N} \big(y_i - \mathbf{x}_i^\top \bm{\beta}\big)^2
+    = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{y}.
+\end{equation}
+
+\textbf{关键点：} 线性模型用一个\textbf{全局参数化假设}来逼近 $f^*$——
+对\textbf{所有} $\mathbf{x}$ 用同一组 $\hat{\bm{\beta}}$ 做预测。
+这等价于假设真实的 $\E[Y \mid X = \mathbf{x}]$ 恰好是 $\mathbf{x}$ 的线性函数。
+如果这个假设成立（Scenario 1），则偏差很小；如果不成立（Scenario 2），则偏差很大。
+
+\subsubsection{k-NN 的估计器（例 3）}
+
+k-NN 不做全局假设，而是用\textbf{局部样本平均}直接估计条件期望：
+\begin{equation}\label{eq:knn_approx}
+    f^*(\mathbf{x}) = \E[Y \mid X = \mathbf{x}]
+    \;\approx\;
+    \hat{f}(\mathbf{x}) = \frac{1}{k} \sum_{i \in \mathcal{N}_k(\mathbf{x})} y_i,
+\end{equation}
+其中 $\mathcal{N}_k(\mathbf{x})$ 是 $\mathbf{x}$ 的 $k$ 个最近邻的指标集。
+
+\textbf{关键点：} 这是条件期望的一个非常直接的\textbf{非参数估计}——
+用「离 $\mathbf{x}$ 最近的 $k$ 个点的 $y$ 的均值」作为 $\E[Y \mid X = \mathbf{x}]$ 的估计。
+不需要假设 $f$ 的形式，但也因此需要足够多的数据来保证局部平均的精度（维数灾难）。
+
+\subsubsection{两种估计器的渐近行为：谁逼近了 $f^*$？}
+
+一个关键问题是：当 $N \to \infty$ 时，$\hat{f}$ 是否收敛到 $f^*(\mathbf{x}) = \E[Y \mid X = \mathbf{x}]$？
+
+\textbf{k-NN}：在适当条件下（$N \to \infty,\; k \to \infty,\; k/N \to 0$），
+局部平均收敛到条件期望：
+\[
+\hat{f}_{\mathrm{kNN}}(\mathbf{x}) \xrightarrow{N \to \infty} \E[Y \mid X = \mathbf{x}] = f^*(\mathbf{x}).
+\]
+k-NN 是渐近无偏的——只要数据够多、$k$ 增长恰当，它最终能逼近真实的 $f^*$。
+
+\textbf{线性回归}：即使 $N \to \infty$，$\hat{f}$ 的极限\textbf{不一定是} $f^*$。
+线性回归的极限是 $f^*$ 在全体线性函数中的\textbf{最佳 $L_2$ 投影}：
+\[
+\hat{f}_{\mathrm{linear}}(\mathbf{x}) \xrightarrow{N \to \infty}
+\mathbf{x}^\top \bm{\beta}^*,
+\quad
+\bm{\beta}^* = \argmin_{\bm{\beta} \in \R^{p+1}}
+\E\big[(Y - \mathbf{X}^\top \bm{\beta})^2\big].
+\]
+只有当真实的 $f^*(\mathbf{x})$ 恰好是线性函数时，投影才等于 $f^*$ 本身；
+否则 $\mathbf{x}^\top \bm{\beta}^*$ 只是 $f^*$ 在线性子空间中的\textbf{最佳逼近}，而非 $f^*$ 本身。
+
+\textbf{投影的几何含义.}
+考虑全体平方可积函数的空间 $\mathcal{L}^2(P_X) = \{g \mid \E[g(X)^2] < \infty\}$，
+其上定义内积 $\langle g, h \rangle = \E[g(X)\,h(X)]$。
+
+线性函数构成一个子空间：
+\[
+\mathcal{L} = \big\{ g(\mathbf{x}) = \mathbf{x}^\top \bm{\beta} \;\big|\; \bm{\beta} \in \R^{p+1} \big\} \subset \mathcal{L}^2(P_X).
+\]
+
+最佳线性近似 $\mathbf{x}^\top \bm{\beta}^*$ 就是 $f^*$ 向 $\mathcal{L}$ 的\textbf{正交投影}：
+残差 $f^* - \mathbf{x}^\top \bm{\beta}^*$ 与 $\mathcal{L}$ 中每个函数正交，
+即 $\E\big[X_j \cdot (f^*(X) - X^\top \bm{\beta}^*)\big] = 0$ 对所有 $j$ 成立。
+
+换句话说：$\mathbf{x}^\top \bm{\beta}^*$ 是 $\mathcal{L}$ 中离 $f^*$ ``最近''的函数
+（在 $\|g\|^2 = \E[g(X)^2]$ 的距离意义下）。
+投影与真值之间的差距 $\|f^* - \mathbf{x}^\top \bm{\beta}^*\|^2$ 就是线性模型的\textbf{平方偏差}。
+
+用欧氏空间的类比：三维空间中，点 $f^*$ 向二维平面 $\mathcal{L}$ 作垂线，
+垂足 $\mathbf{x}^\top \bm{\beta}^*$ 就是最佳逼近，垂线长度就是偏差。
+这和线性代数中 $\mathbf{X}(\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top \mathbf{y}$ 是 $\mathbf{y}$ 向列空间的投影是同一个道理——
+只不过这里的``空间''是无穷维的函数空间，内积是 $\E[\,\cdot\,]$ 而非 $\mathbf{a}^\top \mathbf{b}$。
+
+\textbf{为什么线性函数不完备？}
+线性子空间 $\mathcal{L}$ 的维度仅为 $p+1$，而 $\mathcal{L}^2(P_X)$ 是无穷维的。
+因此 $\mathcal{L}$ 中的有限个基函数 $\{1, X_1, \dots, X_p\}$ 无法张成整个函数空间——
+它们构成的是一个\textbf{不完备的基}。
+这意味着：除非 $f^*$ 恰好落在 $\mathcal{L}$ 内（即真实关系恰为线性），
+否则投影永远有非零残差，这正是偏差的来源。
+
+反过来看，这正是全书后续章节的推进逻辑——\textbf{逐步扩充基函数集合，让不完备逼近完备}：
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{c|c|c}
+\toprule
+\textbf{方法} & \textbf{扩充方式} & \textbf{子空间维度} \\
+\midrule
+线性回归 & $\{1, X_1, \dots, X_p\}$ & $p+1$（有限） \\
+多项式回归 & 加 $X_1^2,\; X_1 X_2,\; X_2^2, \dots$ & 有限，可增大 \\
+样条（第 5 章） & 加截断幂基 $h_j(X)$ & 有限，可控 \\
+核方法（第 6 章） & 每个训练点一个基 $\to$ RKHS & \textbf{无穷维（完备！）} \\
+神经网络（第 11 章） & 万能逼近定理：宽网络可稠密 & 渐近完备 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+其中核方法使用的 RKHS（再生核希尔伯特空间）是完备的——
+其基函数族的闭包就是整个 $\mathcal{L}^2$，因此理论上可以逼近任意光滑的 $f^*$。
+偏差-方差权衡中的``偏差''一侧，
+本质上就是不完备基无法表示 $f^*$ 所带来的\textbf{结构误差}。
+
+\subsubsection{两种策略对比}
+
+\[
+\begin{array}{c|c|c}
+\toprule
+& \textbf{线性回归} & \textbf{$k$-近邻} \\
+\midrule
+\text{对 $f^*$ 的逼近方式} & \text{全局线性参数化} & \text{局部样本平均} \\
+\text{预测函数} & \hat{f}(\mathbf{x}) = \mathbf{x}^\top \hat{\bm{\beta}} & \hat{f}(\mathbf{x}) = \frac{1}{k} \sum_{i \in \mathcal{N}_k(\mathbf{x})} y_i \\
+\text{假设强度} & \text{强（线性）} & \text{弱（仅光滑性）} \\
+\text{来源} & \text{参数方法传统} & \text{非参数 / 局部方法传统} \\
+\bottomrule
+\end{array}
+\]
+
+两种方法的共同目标都是逼近同一个 $f^*(\mathbf{x}) = \E[Y \mid X = \mathbf{x}]$。
+差异在于\textbf{用什么结构来约束这个逼近}：
+线性回归用全局线性结构（偏差换方差），
+k-NN 用局部常数结构（方差换偏差）。
+后续章节的所有方法——Ridge、Lasso、样条、核方法、树、神经网络——
+都可以理解为在这两种极端之间寻找更优的偏差-方差折中。
+
+\subsection{统计学习 vs 经典统计：两种推理框架}
+
+本章建立的数学框架与之前在"统计学基础"部分使用的框架有本质区别。
+两者并不矛盾，但\textbf{出发点和核心关切截然不同}。
+
+\subsubsection{经典统计框架（推断范式）}
+
+经典统计的核心目标是\textbf{推断 (inference)}——理解数据背后的生成机制：
+\[
+\text{数据} \;\longrightarrow\; \text{假设分布族（正态、二项等）}
+\;\longrightarrow\; \text{估计参数 } \theta \;\longrightarrow\; \text{检验假设、构建置信区间}.
+\]
+
+典型问题：
+\begin{itemize}
+    \item ``$\beta_1$ 显著不为零吗？它的 95\% 置信区间是什么？''
+    \item ``这批药的效果是否显著优于安慰剂？''
+    \item ``哪个自变量对因变量有显著影响？''
+\end{itemize}
+好坏的度量：$p$ 值、置信区间、无偏性、有效性、功效。
+
+\subsubsection{统计学习框架（预测范式）}
+
+统计学习的核心目标是\textbf{预测 (prediction)}——对未见过的输入做出准确判断：
+\[
+\text{数据} \;\longrightarrow\; \text{选定损失函数 } L
+\;\longrightarrow\; \text{学一个函数 } f \;\longrightarrow\; \text{在新数据上评估误差}.
+\]
+
+典型问题：
+\begin{itemize}
+    \item ``给定这个用户的行为，他明天会不会流失？准确率多少？''
+    \item ``这张图片里是什么物体？''
+    \item ``这个病人五年内存活的概率是多少？''
+\end{itemize}
+好坏的度量：测试误差、交叉验证误差、AUC。
+
+\subsubsection{核心对比}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{p{3cm}|p{5.5cm}|p{5.5cm}}
+\toprule
+& \textbf{经典统计（推断）} & \textbf{统计学习（预测）} \\
+\midrule
+\textbf{核心问题} & 数据是怎么生成的？ & 对新数据能预测多准？ \\
+\textbf{核心对象} & 参数 $\theta$（$\beta$, $\mu$, $\sigma^2$） & 函数 $f: \mathcal{X} \to \mathcal{Y}$ \\
+\textbf{必需假设} & 分布族（正态、二项…） & 仅需损失函数（不一定要分布） \\
+\textbf{模型角色} & 用于\textbf{解释}（哪个变量重要？） & 用于\textbf{预测}（准确率够不够上线？） \\
+\textbf{好坏标准} & $p$ 值、置信区间、无偏性 & 测试误差、交叉验证误差 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{两者并非对立}
+
+统计学习中大量使用经典统计的工具，但\textbf{目的变了}：
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{c|c|c}
+\toprule
+\textbf{统计工具} & \textbf{在经典统计中的角色} & \textbf{在统计学习中的角色} \\
+\midrule
+MLE & 参数推断（估计 $\beta$ 的标准误） & Logistic 回归的参数估计（§4.4） \\
+正态假设 & 推导 $t$ 检验、$F$ 检验 & 线性回归的噪声模型（§3.2） \\
+偏差-方差分解 & —（经典统计少有此视角） & 模型选择的核心工具（§2.5, §7.3） \\
+Bootstrap & 估计标准误 & 模型评估与 Bagging（§8.2, §8.7） \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{本质区别：} 在统计学习中，即使模型参数在统计意义上不显著、无法给出置信区间，
+只要它能让预测误差降低，它就是有用的——这在经典统计中是不可接受的。
+一切以\textbf{预测性能}为最终裁判，而非以\textbf{统计显著性}为裁判。
+
+% ============ §2 无监督学习 ============
+\section{无监督学习的数学框架}
+
+\subsection{基本设定}
+
+\begin{definition}[无监督学习的构成要素]
+无监督学习仅有输入而没有输出标签：
+\begin{enumerate}[label=(\roman*)]
+    \item \textbf{输入空间} $\mathcal{X} \subseteq \R^p$；
+    \item \textbf{数据} $\mathcal{D} = \{\mathbf{x}_1, \dots, \mathbf{x}_N\}$，
+    其中 $\mathbf{x}_i \stackrel{\mathrm{i.i.d.}}{\sim} P(X)$；
+    \item \textbf{目标}：从无标签数据中发现结构——聚类、降维、密度估计、生成建模等。
+\end{enumerate}
+\end{definition}
+
+\subsection{聚类}
+
+\begin{definition}[聚类问题]
+给定 $N$ 个数据点 $\{\mathbf{x}_1, \dots, \mathbf{x}_N\}$ 和聚类数 $K$，将数据划分为 $K$ 个互不相交的子集（簇）$C_1, \dots, C_K$，使得簇内相似度高、簇间相似度低。
+
+形式化地，\textbf{$K$-means} 的目标是最小化簇内平方和：
+\begin{equation}\label{eq:kmeans}
+    W(C) = \sum_{k=1}^{K} \sum_{i \in C_k} \norm{\mathbf{x}_i - \bm{\mu}_k}^2,
+\end{equation}
+其中 $\bm{\mu}_k = \frac{1}{|C_k|} \sum_{i \in C_k} \mathbf{x}_i$ 为第 $k$ 簇的质心。
+\end{definition}
+
+\subsection{密度估计}
+
+\begin{definition}[密度估计]
+给定 $\mathbf{x}_1, \dots, \mathbf{x}_N \stackrel{\mathrm{i.i.d.}}{\sim} P$（密度为 $p(\mathbf{x})$），
+密度估计的目标是构造 $\hat{p}(\mathbf{x})$ 来逼近未知的真实密度 $p(\mathbf{x})$。
+
+\textbf{核密度估计 (KDE)}：
+\begin{equation}\label{eq:kde}
+    \hat{p}(\mathbf{x}) = \frac{1}{N h^p} \sum_{i=1}^{N} K\!\left(\frac{\norm{\mathbf{x} - \mathbf{x}_i}}{h}\right),
+\end{equation}
+其中 $K(\cdot)$ 为核函数，$h > 0$ 为带宽参数。
+\end{definition}
+
+\subsection{降维}
+
+\begin{definition}[降维问题]
+给定 $\mathbf{X} \in \R^{N \times p}$，降维的目标是找到低维表示 $\mathbf{Z} \in \R^{N \times q}$（$q < p$），
+使得 $\mathbf{Z}$ 尽可能保留原始数据的结构信息。
+\end{definition}
+
+\begin{definition}[主成分分析 (PCA)]
+PCA 寻找数据方差最大的方向。形式化地，第 $j$ 个主成分方向 $\mathbf{v}_j$ 满足：
+\begin{equation}\label{eq:pca}
+    \mathbf{v}_j = \argmax_{\norm{\mathbf{v}} = 1,\; \mathbf{v} \perp \mathbf{v}_1, \dots, \mathbf{v}_{j-1}}
+                   \Var(\mathbf{X} \mathbf{v}).
+\end{equation}
+
+等价地，$\mathbf{v}_1, \dots, \mathbf{v}_q$ 是样本协方差矩阵 $\widehat{\bm{\Sigma}} = \frac{1}{N} \mathbf{X}^\top \mathbf{X}$（中心化后）的前 $q$ 个特征向量。
+\end{definition}
+
+% ============ §3 监督 vs 无监督 对比 ============
+\section{监督学习与无监督学习的对比}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{p{3cm}|p{6cm}|p{6cm}}
+\toprule
+& \textbf{监督学习} & \textbf{无监督学习} \\
+\midrule
+\textbf{数据}    & $\{(\mathbf{x}_i, y_i)\}_{i=1}^{N}$ & $\{\mathbf{x}_i\}_{i=1}^{N}$ \\
+\textbf{目标}    & 学习映射 $f: \mathcal{X} \to \mathcal{Y}$ & 发现 $\mathcal{X}$ 的内在结构 \\
+\textbf{数学核心} & 条件分布 $P(Y \mid X)$ & 边缘分布 $P(X)$ \\
+\textbf{优化对象} & $\min_f \E[L(Y, f(X))]$ & 取决于任务（聚类、降维等） \\
+\textbf{典型任务} & 回归、分类 & 聚类、降维、密度估计、关联规则 \\
+\textbf{评估难度} & 有标签，可计算准确率/MSE & 无标签，评估更主观 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\textbf{补充：半监督学习 (Semi-supervised Learning)}
+\begin{itemize}
+    \item 数据：少量有标签 $\{(\mathbf{x}_i, y_i)\}_{i=1}^{\ell}$ + 大量无标签 $\{\mathbf{x}_j\}_{j=\ell+1}^{N}$.
+    \item 核心思想：利用 $P(X)$ 的信息来改善对 $P(Y \mid X)$ 的估计.
+    \item 常见方法：自训练 (self-training)、一致性正则化 (consistency regularization)、生成模型.
+\end{itemize}
+
+% ============ § 维数灾难 ============
+\section{维数灾难与高维空间中的局部方法}
+
+维数灾难（Curse of Dimensionality）是 Bellman (1961) 提出的概念，
+在统计学习中特指：随着输入维度 $p$ 增大，基于局部邻域的方法（如 $k$-NN、核平滑）
+会遭遇样本稀疏性的指数级恶化。
+本节用 ESL \S 2.5 的经典分析来量化这一现象。
+
+\subsection{单位超立方体中的邻域}
+
+考虑 $p$ 维单位超立方体 $[0,1]^p$ 中均匀分布的数据。
+对任意点 $x_0$，我们希望捕获其周围占总数据比例 $r$ 的邻域。
+
+\textbf{问题：} 要覆盖 $r$ 比例的数据，邻域在每个维度上的边长 $e_p(r)$ 是多少？
+
+\begin{equation}\label{eq:ep_r}
+    e_p(r) = r^{1/p}.
+\end{equation}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{c|c|c|c}
+\toprule
+$r$ & $p=1$ & $p=3$ & $p=10$ \\
+\midrule
+$1\%$  & $0.01$   & $0.22$  & \textbf{$0.63$} \\
+$10\%$ & $0.10$   & $0.46$  & \textbf{$0.80$} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+在 $p=10$ 维空间中，要覆盖仅 $1\%$ 的数据就需要在每个维度上扩展 $63\%$ 的边长——
+几乎覆盖了整个范围。这意味着在十维空间中，\textbf{不存在真正意义上的"局部"邻域}：
+要么邻域几乎是全局的，要么里面几乎没有点。
+
+\subsection{期望邻域边长}
+
+$N$ 个点均匀分布在 $[0,1]^p$ 中，为在 $x_0$ 处捕获 $k$ 个最近邻，
+所需超立方体邻域的期望边长为：
+\begin{equation}\label{eq:d_pN}
+    d(p, N) = \Big(1 - 2^{-1/N}\Big)^{1/p}.
+\end{equation}
+
+典型数值（ESL Exercise 2.3）：
+\[
+N = 500,\; p = 10 \;\Longrightarrow\; d(p, N) \approx 0.52.
+\]
+即需要覆盖每个维度上 $52\%$ 的范围来形成邻域——这已是全局尺度，不再"局部"。
+
+\subsection{1-NN 的偏差-方差分解（高维示例）}
+
+ESL \S 2.5 用一个具体例子展示维数灾难如何影响预测性能。
+
+\textbf{设定.}
+\begin{itemize}
+    \item $N = 1000$ 个训练点 $x_i$ 均匀分布在 $[-1, 1]^p$ 中；
+    \item 真实函数：$Y = f(X) = e^{-8\|X\|^2}$（$x_0 = \mathbf{0}$ 处 $f(0) = 1$）；
+    \item 在 $x_0 = \mathbf{0}$ 处用 1-NN 预测 $\hat{y}_0$。
+\end{itemize}
+
+1-NN 的预测 $\hat{y}_0$ 就是离原点最近的训练点的 $y$ 值。
+在 $x_0 = \mathbf{0}$ 处，MSE 分解为：
+\begin{equation}\label{eq:mse_decomp}
+    \mathrm{MSE}(x_0) = \E_{\mathcal{T}}\big[(\hat{y}_0 - f(x_0))^2\big]
+    = \Var_{\mathcal{T}}(\hat{y}_0) + \bias^2(\hat{y}_0),
+\end{equation}
+其中 $\mathcal{T}$ 表示对训练集的随机性取期望。
+
+\textbf{偏差-方差分解 (Bias-Variance Decomposition).}
+这是频率学派框架下分析模型性能的核心工具（ESL 第 7 章将系统展开）。
+设真实函数为 $f(x_0)$，$\hat{f}(x_0)$ 为基于训练集 $\mathcal{T}$ 的估计，$\varepsilon$ 为不可约噪声（$\E[\varepsilon]=0,\;\Var(\varepsilon)=\sigma^2$），则：
+\[
+\E_{\mathcal{T}}\big[(y_0 - \hat{f}(x_0))^2\big]
+= \underbrace{\big(\E_{\mathcal{T}}[\hat{f}(x_0)] - f(x_0)\big)^2}_{\text{偏差}^2}
++ \underbrace{\E_{\mathcal{T}}\big[(\hat{f}(x_0) - \E_{\mathcal{T}}[\hat{f}(x_0)])^2\big]}_{\text{方差}}
++ \underbrace{\sigma^2}_{\text{不可约噪声}}.
+\]
+\begin{itemize}
+    \item \textbf{偏差 (Bias)：} 即使有无限多训练集，模型的平均预测离真实值有多远——衡量模型族本身的表达能力是否足够；
+    \item \textbf{方差 (Variance)：} 换一组训练集，预测值波动多大——衡量模型对训练数据的敏感度；
+    \item \textbf{不可约噪声：} 数据本身固有的随机性，与模型无关。
+\end{itemize}
+偏差和方差通常不可兼得：简单模型低方差高偏差（欠拟合），复杂模型低偏差高方差（过拟合）。
+这里的 $\E_{\mathcal{T}}[\cdot]$ 是对不同训练集的重复抽样取期望——典型的频率学派视角。
+
+\textbf{本例中的表现.}
+随着 $p$ 增大：
+\begin{itemize}
+    \item \textbf{偏差增大：} 最近邻离原点越来越远（因为高维中数据稀疏），
+    其 $y$ 值随 $\|x\|$ 增大而衰减（$f(x) = e^{-8\|x\|^2}$），导致 $\hat{y}_0$ 系统性低于 $f(0)=1$；
+    \item \textbf{方差增大：} 最近邻位置的高度可变性导致 $\hat{y}_0$ 波动剧烈。
+\end{itemize}
+
+\subsection{线性模型 vs 1-NN：高维下的 EPE 对比}
+
+ESL 进一步对比了线性回归（最小二乘）和 1-NN 在 $p$ 增大时的表现。
+
+\textbf{线性模型的设定.}
+假设真实模型为 $Y = X^\top \beta + \varepsilon$，$\varepsilon \sim \mathcal{N}(0, \sigma^2)$，
+用最小二乘拟合 $\hat{\beta}$。对 $x_0$ 的预测：
+\[
+\hat{y}_0 = x_0^\top \hat{\beta} = x_0^\top \beta + \sum_{i=1}^{N} \ell_i(x_0)\,\varepsilon_i,
+\]
+其中 $\ell_i(x_0)$ 为 $x_0$ 在帽子矩阵 $\mathbf{H} = \mathbf{X}(\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top$ 中的对应元素。
+
+在模型正确设定下，对 $x_0$ 取期望后：
+\begin{equation}\label{eq:epe_linear}
+    \E_{x_0}\,\mathrm{EPE}(x_0) \approx \sigma^2 \frac{p}{N} + \sigma^2.
+\end{equation}
+第一项 $\sigma^2 p/N$ 来自估计 $\beta$ 的方差，随 $p$ 线性增长；
+第二项 $\sigma^2$ 是不可约噪声。
+
+\textbf{1-NN 的 EPE 行为.}
+在高维空间中，1-NN 最近邻的距离随 $p$ 急剧增大，
+导致偏差和方差均随 $p$ 爆炸，EPE 远高于线性模型（在真实模型为线性的条件下）。
+
+\textbf{核心教训.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{c|c|c}
+\toprule
+\textbf{方法} & \textbf{EPE 在高维下的行为} & \textbf{根本原因} \\
+\midrule
+线性回归 & $\approx \sigma^2(p/N) + \sigma^2$，随 $p$ 线性增长 & 需要估计 $p$ 个参数，方差 $\propto p$ \\
+1-NN & 随 $p$ 指数恶化 & 邻域在高维中不再"局部" \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+在高维设置中，\textbf{即使真实函数是非线性的，参数方法（如线性回归）往往优于非参数局部方法}——
+因为非参数方法的方差代价在高维中变得不可接受。
+这一反直觉的结论是理解现代高维统计学习的基石，
+也是为什么 Ridge、Lasso、正则化等方法如此重要的原因。
+
+\subsection{维数灾难的形式化定义与启示}
+
+\begin{definition}[维数灾难 (Curse of Dimensionality)]
+设 $p$ 为输入维度，$\varepsilon$ 为邻域半径的相对大小。
+为在 $p$ 维空间中保持相同的局部数据密度（以覆盖固定比例的数据），
+所需样本量 $N$ 随 $p$ 指数增长：
+\begin{equation}\label{eq:cod}
+    N \propto \varepsilon^{-p} \quad \text{或等价地} \quad \varepsilon \propto N^{-1/p}.
+\end{equation}
+\end{definition}
+
+\textbf{启示.}
+\begin{enumerate}[label=(\arabic*)]
+    \item 基于局部邻域的方法（$k$-NN、核平滑、局部回归）仅在\textbf{低维}（$p \le 4$-$5$）中有效；
+    \item 在高维问题中，必须引入\textbf{结构性假设}（线性、稀疏性、光滑性、低秩等）来规避维数灾难；
+    \item 维数灾难并非诅咒一切方法——它主要打击的是\textbf{非参数局部方法}，
+    而参数方法和正则化方法可以通过假设结构来绕开它。
+\end{enumerate}
+
+% ============================================================
+\section{统计学习的基本框架：从模型到估计}
+\label{sec:stat-learning-framework}
+
+本节系统梳理统计学习的核心概念链条——从加性误差模型出发，
+经过损失函数与期望预测误差，到达监督学习的参数估计方法（最小二乘与极大似然），
+最终揭示这些方法在函数逼近视角下的统一性。
+
+% ---------- 1. 加性误差模型 ----------
+\subsection{加性误差模型与条件期望}
+
+统计学习最基本的出发点是假设输入 $X \in \R^p$ 与输出 $Y \in \R$ 之间存在如下关系：
+
+\begin{equation}\label{eq:additive-model}
+    Y = f(X) + \varepsilon,
+\end{equation}
+
+其中：
+\begin{itemize}
+    \item $f(X)$ 是 $X$ 对 $Y$ 的\emph{系统性}影响——一个未知但确定性的函数；
+    \item $\varepsilon$ 是\emph{随机误差项}，满足
+    \begin{equation}
+        \E[\varepsilon] = 0,\quad \varepsilon \perp X;
+    \end{equation}
+    \item 独立性假设 $\varepsilon \perp X$ 意味着误差的分布不依赖于 $X$ 的取值。
+\end{itemize}
+
+在式 (\ref{eq:additive-model}) 两边对 $X = x$ 取条件期望：
+
+\begin{equation}\label{eq:cond-mean}
+    \E[Y \mid X = x] = f(x) + \E[\varepsilon \mid X = x] = f(x).
+\end{equation}
+
+因此 $f(x)$ 的统计含义就是\emph{条件期望}（回归函数）：
+\begin{equation}
+    \boxed{f(x) = \E[Y \mid X = x]}.
+\end{equation}
+
+这正是回归分析的核心目标——在任意输入点 $x$ 处，用条件均值作为 $Y$ 的最佳预测。
+
+\begin{remark}[回归函数 $\equiv$ 条件均值：是定义还是推导？]
+初学者常有的困惑是：书中似乎"跳过"了损失函数的选择，直接宣称
+$f(x) = \E[Y \mid X = x]$ 是回归函数。这背后的逻辑需要澄清。
+
+\textbf{两条汇合的推理路径.}
+
+\emph{路径一（定义先行，ESL 的叙述方式）：}
+\begin{center}
+"回归函数"在统计学中有历史定义 $\longrightarrow$ $f(x) = \E[Y \mid X = x]$
+$\longrightarrow$ 后来发现平方损失恰好以它为目标
+\end{center}
+
+\emph{路径二（从损失出发，你的推理方式）：}
+\begin{center}
+选择损失函数 $L$ $\longrightarrow$ 最小化 $\mathrm{EPE}(f) = \E[L(f(X), Y)]$
+$\longrightarrow$ 解出最优 $f^*$ $\longrightarrow$ 若 $L$ 是平方损失，$f^*$ 恰好是条件均值
+\end{center}
+
+两条路径最终汇合，但\emph{因果关系不同}。ESL 选择路径一，是因为
+"回归"(regression) 一词的\emph{历史起源}就是条件均值——
+Galton (1886) 研究父子身高时发现了"向均值回归"(regression toward the mean) 现象，
+此后统计学便以 regression function 指代 $\E[Y \mid X]$。
+并非"因为选了平方损失所以最优是条件均值"，
+而是"回归函数的定义本就是条件均值，平方损失恰好以它为目标"。
+
+\textbf{不同损失函数导出不同的最优 $f^*$.}
+你关于损失函数决定最优预测器的理解完全正确。以下是常见对应：
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{c|c|c}
+\toprule
+\textbf{损失 $L(y, f)$} & \textbf{最优 $f^*(x)$} & \textbf{名称} \\
+\midrule
+$(y - f)^2$ & $\E[Y \mid X = x]$ & 条件均值（回归函数） \\
+$|y - f|$ & $\mathrm{median}(Y \mid X = x)$ & 条件中位数 \\
+$\mathbf{1}_{\{g \neq f\}}$（0-1 分类损失） & $\argmax_g P(G = g \mid X = x)$ & 贝叶斯分类器 \\
+$\rho_\tau(y - f)$（分位数损失） & $Q_\tau(Y \mid X = x)$ & 条件 $\tau$ 分位数 \\
+Huber 损失 & \multicolumn{2}{c}{介于均值和截断均值之间（对异常值稳健）} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{"回归"总是指均值吗？}
+
+在\emph{经典统计学}中——是。"回归函数"严格定义为条件期望 $\E[Y \mid X]$。
+这一术语自 Galton 起已沿用百余年。教科书（包括 ESL）中未加修饰的"回归"默认指对条件均值的建模。
+
+但在\emph{现代机器学习}中——不完全如此。"回归"常被宽松地用来指任何输出为连续量的预测任务，
+不一定以均值为目标：
+\begin{itemize}
+    \item 用 MAE 训练的网络仍被称为"回归模型"，尽管它估计的是条件中位数而非均值；
+    \item 分位数回归 (quantile regression) 估计条件分位数，名称中仍带"回归"二字；
+    \item 实践中大多默认使用平方损失/MSE，因此多数"回归"确实在估计条件均值——
+    但这更多是\emph{惯例}而非\emph{必然}。
+\end{itemize}
+
+\textbf{区分方式：} 严格写作时用"均值回归"(mean regression) 或"条件期望估计"；
+宽松语境下，"回归"$\approx$"预测连续量"，具体目标取决于所用的损失函数。
+本书此后提及"回归函数"，除非特别说明，均指 $\E[Y \mid X]$。
+\end{remark}
+
+% ---------- 2. 条件方差 ----------
+\subsection{条件方差：为什么可以不是常数}
+
+定义条件方差：
+\begin{equation}\label{eq:cond-var}
+    \Var(Y \mid X = x) 
+    = \E\big[(Y - f(x))^2 \mid X = x\big]
+    = \E[\varepsilon^2 \mid X = x]
+    =: \sigma^2(x).
+\end{equation}
+
+\textbf{关键点：} 模型仅假设了 $\E[\varepsilon \mid X] = 0$（一阶矩为零），
+对二阶矩 $\sigma^2(x)$ \textbf{没有任何约束}。因此 $\sigma^2(x)$ 完全可以依赖于 $x$，
+不需要是常数——这称为\emph{异方差性}（heteroscedasticity）。
+
+\begin{example}[二分类问题的条件方差]
+当 $Y \in \{0, 1\}$ 为二分类变量时，设 $p(x) = P(Y = 1 \mid X = x)$，
+则 $Y \mid X = x \sim \mathrm{Bernoulli}(p(x))$：
+\begin{equation}
+    \Var(Y \mid X = x) = p(x)\big[1 - p(x)\big].
+\end{equation}
+方差在 $p = 0.5$ 处最大，在 $p \to 0$ 或 $p \to 1$ 时趋于零——明显依赖于 $x$。
+\end{example}
+
+\begin{example}[泊松计数数据]
+若 $Y \mid X \sim \mathrm{Poisson}(\lambda(x))$，则
+$\Var(Y \mid X = x) = \lambda(x) = \E[Y \mid X = x]$——方差等于均值，随 $x$ 变化。
+\end{example}
+
+% ---------- 3. 期望预测误差 ----------
+\subsection{期望预测误差与最优预测器}
+
+为了评价一个预测函数的好坏，引入\emph{期望预测误差}（Expected Prediction Error, EPE）：
+
+\begin{equation}\label{eq:epe}
+    \mathrm{EPE}(f) = \E\big[(Y - f(X))^2\big].
+\end{equation}
+
+在平方损失下，可以证明\textbf{条件期望是最优预测器}：
+
+\begin{theorem}[最优预测器]
+在加性误差模型 (\ref{eq:additive-model}) 和平方损失下，条件期望 $f(x) = \E[Y \mid X = x]$ 
+最小化期望预测误差：
+\begin{equation}
+    \argmin_{g}\; \E\big[(Y - g(X))^2\big] = \E[Y \mid X].
+\end{equation}
+\end{theorem}
+
+\begin{proof}[推导]
+对任意函数 $g$，在 $X = x$ 处展开：
+\begin{align}
+    \E[(Y - g(X))^2 \mid X = x]
+    &= \E[(Y - f(x) + f(x) - g(x))^2 \mid X = x] \nonumber\\
+    &= \underbrace{\E[(Y - f(x))^2 \mid X = x]}_{\sigma^2(x)}
+       + (f(x) - g(x))^2 \nonumber\\
+    &\ge \sigma^2(x),
+\end{align}
+等号成立当且仅当 $g(x) = f(x)$。对所有 $x$ 取期望即得结论。
+\end{proof}
+
+\textbf{平方误差的分解：}
+\begin{equation}
+    \E[(Y - \hat{f}(X))^2]
+    = \underbrace{\E[(f(X) - \hat{f}(X))^2]}_{\text{可约误差}}
+    + \underbrace{\E[\sigma^2(X)]}_{\text{不可约噪声}}.
+\end{equation}
+
+第一项取决于模型 $\hat{f}$ 的好坏（可通过改进模型减小），
+第二项 $\sigma^2(x) = \Var(Y \mid X = x)$ 是数据固有的随机性（$\ge 0$，无法消除）。
+
+当 $Y$ 是定性变量（类别 $G$）时，平方损失替换为 0-1 损失或其他分类损失，
+最优分类器为 $\argmax_g P(G = g \mid X = x)$。
+
+% ---------- 4. 监督学习 ----------
+\subsection{监督学习的数学表述}
+
+\begin{definition}[监督学习]
+给定训练集 $\mathcal{T} = \{(x_1, y_1), (x_2, y_2), \dots, (x_N, y_N)\}$，
+其中 $(x_i, y_i)$ 来自某个未知的联合分布 $P(X, Y)$ 的独立抽样。
+\emph{学习算法}是一个映射 $\mathcal{A}: \mathcal{T} \mapsto \hat{f}$，
+输出一个函数 $\hat{f}: \R^p \to \R$（或 $\R^p \to \mathcal{G}$ 用于分类），
+使得 $\hat{f}(x)$ 在未见过的 $x$ 上也能较好地预测 $y$。
+\end{definition}
+
+核心挑战是\emph{泛化}（generalization）——在训练集上表现好是容易的，
+在未知数据上也表现好才是学习的目标。这引出了偏差-方差权衡、正则化、模型选择等核心议题。
+
+% ---------- 5. 函数逼近 ----------
+\subsection{函数逼近视角}
+
+将 $(X, Y)$ 看作 $\R^{p+1}$ 空间中的点，学习 $f$ 就是在这个空间中拟合一个曲面。
+参数化方法将 $f$ 限制在某个函数族 $\{f_\theta : \theta \in \Theta\}$ 中。
+
+\subsubsection{线性模型}
+
+最简单的参数化是线性模型：
+\begin{equation}\label{eq:linear-model}
+    f(x) = x^\top \beta = \sum_{j=1}^{p} x_j \beta_j.
+\end{equation}
+
+模型关于\emph{参数 $\beta$ 是线性的}，但 $x$ 本身可以是原始输入变量的任意变换。
+
+\subsubsection{线性基展开}
+
+更一般地，可以用 $K$ 个基函数 $\{h_k(x)\}_{k=1}^K$ 的线性组合来表示 $f$：
+\begin{equation}\label{eq:basis-expansion}
+    f_\theta(x) = \sum_{k=1}^{K} h_k(x)\,\theta_k.
+\end{equation}
+
+模型关于参数 $\theta = (\theta_1, \dots, \theta_K)^\top$ 仍然是线性的，
+但基函数 $h_k(x)$ 可以是非线性的。常见选择：
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{c|c|c}
+\toprule
+\textbf{基函数类型} & \textbf{$h_k(x)$ 的形式} & \textbf{示例} \\
+\midrule
+多项式   & $h_k(x) = x_1^2,\; x_1x_2,\; x_2^2, \dots$ & 二次回归 \\
+三角函数 & $h_k(x) = \cos(\omega_k^\top x),\; \sin(\omega_k^\top x)$ & 傅里叶基 \\
+样条基   & $h_k(x)$ 为分段多项式 & 光滑样条 \\
+Sigmoid  & $h_k(x) = \dfrac{1}{1 + \exp(-x^\top \beta_k)}$ & 神经网络隐层 \\
+径向基   & $h_k(x) = \exp\big(-\gamma \|x - c_k\|^2\big)$ & RBF 网络 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{关键洞察：} 线性基展开 (\ref{eq:basis-expansion}) 在数学形式上
+与线性模型 (\ref{eq:linear-model}) 完全一致——只需将 $x$ 替换为 $h(x) = (h_1(x), \dots, h_K(x))^\top$。
+这意味着所有针对线性模型开发的估计理论和算法（最小二乘、正则化等）
+都可以直接应用于基展开模型——只需先做一次特征变换。
+
+当 $h_k(x) = 1/(1 + \exp(-x^\top \beta_k))$ 且 $\beta_k$ 本身也参与学习时，
+式 (\ref{eq:basis-expansion}) 就是单隐层前馈神经网络——这是深度学习的基础构件。
+
+% ---------- 6. 最小二乘估计 ----------
+\subsection{参数估计 I：最小二乘法}
+
+对于参数化模型 $f_\theta(x)$，最自然的估计方法是最小化训练集上的\emph{残差平方和}（Residual Sum of Squares, RSS）：
+
+\begin{equation}\label{eq:rss}
+    \mathrm{RSS}(\theta) = \sum_{i=1}^{N} \big(y_i - f_\theta(x_i)\big)^2,
+\end{equation}
+
+其中 $r_i = y_i - f_\theta(x_i)$ 称为第 $i$ 个观测的\emph{残差}（residual）——
+模型预测值与真实值之间的差距。RSS 将所有残差的平方累加，度量模型在训练集上的总拟合误差。
+
+最小二乘估计量为：
+\begin{equation}
+    \hat{\theta}_{\mathrm{LS}} = \argmin_\theta \mathrm{RSS}(\theta).
+\end{equation}
+
+在加性误差模型和线性基展开 $f_\theta(x) = h(x)^\top \theta$ 下，
+$\mathrm{RSS}(\theta)$ 是关于 $\theta$ 的二次函数，有显式解（假设 $\mathbf{H}^\top\mathbf{H}$ 可逆）：
+\begin{equation}
+    \hat{\theta}_{\mathrm{LS}} = (\mathbf{H}^\top\mathbf{H})^{-1} \mathbf{H}^\top \mathbf{y},
+\end{equation}
+其中 $\mathbf{H}$ 是 $N \times K$ 的设计矩阵，第 $i$ 行为 $h(x_i)^\top$。
+
+\textbf{几何解释：} 最小二乘将 $\mathbf{y}$ 正交投影到 $\mathbf{H}$ 的列空间上，
+$\hat{\mathbf{y}} = \mathbf{H}\hat{\theta}$ 是该空间中最接近 $\mathbf{y}$ 的点。
+
+% ---------- 7. 极大似然估计 ----------
+\subsection{参数估计 II：极大似然估计}
+
+最小二乘只关心 $f_\theta$ 本身。更一般的框架是\emph{极大似然估计}（MLE），
+它对整个条件分布 $\Pr(Y \mid X)$ 建模。
+
+\subsubsection{条件似然}
+
+设条件分布 $\Pr(Y \mid X)$ 的参数为 $\theta$，则对数似然为：
+\begin{equation}\label{eq:loglik}
+    \ell(\theta) = \sum_{i=1}^{N} \log \Pr\nolimits_\theta(y_i \mid x_i).
+\end{equation}
+
+极大似然估计量：
+\begin{equation}
+    \hat{\theta}_{\mathrm{MLE}} = \argmax_\theta \ell(\theta).
+\end{equation}
+
+\subsubsection{正态误差下的 MLE $\Leftrightarrow$ 最小二乘}
+
+这是连接两种方法的关键桥梁。假设 $Y \mid X \sim \mathcal{N}(f_\theta(X), \sigma^2)$，
+即正态分布的位置参数由 $f_\theta$ 决定，尺度参数 $\sigma^2$ 为常数。
+
+对数条件密度：
+\begin{align}
+    \log \Pr(y_i \mid x_i, \theta)
+    &= -\frac{1}{2}\log(2\pi\sigma^2) - \frac{(y_i - f_\theta(x_i))^2}{2\sigma^2}.
+\end{align}
+
+忽略与 $\theta$ 无关的项（仅 $\sigma^2$ 已知时成立；若 $\sigma^2$ 也未知则需联合估计），
+最大化对数似然等价于最小化 $\sum (y_i - f_\theta(x_i))^2$：
+\begin{equation}
+    \boxed{\hat{\theta}_{\mathrm{MLE}} = \argmax_\theta \ell(\theta)
+           = \argmin_\theta \sum_{i=1}^{N} (y_i - f_\theta(x_i))^2
+           = \hat{\theta}_{\mathrm{LS}}}.
+\end{equation}
+
+\textbf{结论：} 正态误差假设下，MLE 与最小二乘\emph{完全等价}。
+
+若放宽到 $\Var(Y \mid X = x) = \sigma^2(x)$（异方差），
+最小二乘仍然给出 $\theta$ 的一致估计（在温和条件下），但不再是有效的 MLE。
+此时需用加权最小二乘（WLS）——对方差小的点赋予更大权重。
+
+\subsubsection{分类问题：多项似然 $\Leftrightarrow$ 交叉熵}
+
+当 $Y = G$ 是 $K$ 类定性变量时，用多项分布（multinomial）建模条件概率
+$p_{g,\theta}(x) = P_\theta(G = g \mid X = x)$。
+
+对数似然为：
+\begin{equation}\label{eq:multinom-loglik}
+    \ell(\theta) = \sum_{i=1}^{N} \log p_{g_i,\,\theta}(x_i),
+\end{equation}
+
+其中 $g_i$ 是第 $i$ 个样本的真实类别。
+
+最大化 (\ref{eq:multinom-loglik}) 等价于\emph{最小化交叉熵损失}（cross-entropy loss）：
+\begin{equation}
+    \mathrm{CE}(\theta) = -\sum_{i=1}^{N} \sum_{g=1}^{K} \mathbf{1}_{\{g_i = g\}} \log p_{g,\theta}(x_i).
+\end{equation}
+
+\textbf{结论：} 交叉熵损失 = 分类问题中 MLE 的等价形式。
+
+% ---------- 8. ERM 与 EPE ----------
+\subsection{参数估计 III：从 EPE 到 ERM}
+
+前面讨论了 LS 和 MLE 两种参数估计方法。在将它们与统计学习理论衔接时，
+有一个关键区别需要澄清。
+
+\subsubsection{EPE vs.\ ERM}
+
+平方损失下的期望预测误差（EPE）是对\emph{真实分布}的期望：
+\begin{equation}
+    \mathrm{EPE}(f) = \E_{(X,Y)}\big[(Y - f(X))^2\big].
+\end{equation}
+
+但真实的联合分布 $P(X,Y)$ 未知，EPE 无法直接计算。实际中，我们用训练集上的经验平均来近似它，
+得到\emph{经验风险最小化}（Empirical Risk Minimization, ERM）：
+\begin{equation}
+    \widehat{\mathrm{EPE}}(f) = \frac{1}{N}\sum_{i=1}^{N} (y_i - f(x_i))^2.
+\end{equation}
+
+最小二乘就是 ERM 在平方损失下的具体形式：
+\begin{equation}
+    \boxed{\hat{f}_{\mathrm{LS}} = \argmin_{f} \frac{1}{N}\sum_{i=1}^{N} (y_i - f(x_i))^2}.
+\end{equation}
+
+由大数定律，当 $N \to \infty$ 时 $\widehat{\mathrm{EPE}}(f) \xrightarrow{P} \mathrm{EPE}(f)$，
+因此 ERM 的解在样本量足够大时会逼近 EPE 的最优解。
+
+\textbf{但问题来了：} 大数定律的收敛需要 $f$ 被固定（或至少来自一个不太复杂的函数族）。
+如果允许 $f$ 是\emph{任意}函数，ERM 会直接崩溃——这就是下一节的主题。
+
+\medskip
+\textbf{LS、ERM、EPE、MLE 四者关系总结：}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{c|c|c|c}
+\toprule
+\textbf{概念} & \textbf{目标函数} & \textbf{对什么取平均} & \textbf{能否直接计算} \\
+\midrule
+EPE  & $\E_{(X,Y)}[L(Y, f(X))]$ & 真实分布 $P(X,Y)$ & $\times$ 未知 \\
+ERM  & $\frac{1}{N}\sum_{i=1}^N L(y_i, f(x_i))$ & 训练样本 & $\checkmark$ 可计算 \\
+LS   & $\sum_{i=1}^N (y_i - f(x_i))^2$ & 训练样本（平方损失） & $\checkmark$ ERM 的特例 \\
+MLE  & $\sum_{i=1}^N \log P(y_i \mid x_i, \theta)$ & 训练样本（对数似然） & $\checkmark$ 等价于 ERM + KL 散度 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+MLE 与 ERM 的联系：在条件分布建模下，
+最大化对数似然等价于最小化模型分布与经验分布之间的 KL 散度，
+因此 MLE 本质上是 ERM 在概率建模框架下的对应物。
+
+% ---------- 9. 无约束最小化的困境 ----------
+\subsection{无约束最小化的根本困境}
+
+到目前为止，我们假设 $f_\theta$ 属于某个参数化的函数族
+（如线性模型 $f_\theta(x) = x^\top\beta$ 或基展开 $f_\theta(x) = \sum_k h_k(x)\theta_k$），
+参数个数 $K$ 远小于样本量 $N$。但如果我们\emph{不对 $f$ 施加任何限制}，
+直接最小化 $\mathrm{RSS}(f) = \sum_{i=1}^N (y_i - f(x_i))^2$，会发生什么？
+
+\subsubsection{无穷多完美解}
+
+\textbf{任何}经过所有 $N$ 个训练点 $(x_i, y_i)$ 的函数 $f$ 都满足 $\mathrm{RSS}(f) = 0$——
+完美拟合训练数据。但这样的函数有无穷多个：
+
+\begin{itemize}
+    \item 用折线依次连接所有数据点（按 $x$ 排序）；
+    \item 用一个 $N-1$ 次多项式恰好穿过所有 $N$ 个点（Lagrange 插值）；
+    \item 在训练点之外任取任意值，只要在 $x_i$ 处取值 $y_i$ 即可。
+\end{itemize}
+
+这无穷多个解中，绝大多数在训练集之外的泛化性能\emph{极差}——
+它们没有从数据中学到任何"规律"，只是在"背诵"训练点。
+
+\begin{center}
+\fbox{%
+\begin{minipage}{0.88\textwidth}
+\textbf{核心困境：} 
+\[
+\text{无限制的灵活性} \;+\; \text{有限的数据} \;=\; \text{RSS}=0 \text{ 有无穷多解，全都没有泛化能力}
+\]
+从函数逼近的角度看，问题不在于"找不到函数穿过数据点"，
+而在于\emph{在无穷多穿过数据点的函数中，哪一个在未知点上表现好}。
+\end{minipage}}
+\end{center}
+
+\subsubsection{出路：对解空间施加限制}
+
+要获得有意义的解，必须\emph{缩小}候选函数的范围。限制的强弱决定了模型的复杂度：
+
+\begin{itemize}
+    \item \textbf{限制太强}（如只允许线性函数）：偏差大，可能漏掉数据的真实结构——\emph{欠拟合}；
+    \item \textbf{限制太弱}（如允许任意光滑函数）：方差大，模型被噪声牵着走——\emph{过拟合}；
+    \item \textbf{合适的限制}：在偏差和方差之间找到平衡。
+\end{itemize}
+
+限制可以通过多种方式实现，下面介绍两类最经典的方法：
+粗糙惩罚（正则化）和核方法（局部平均）。
+
+% ---------- 10. 受限制的估计量 ----------
+\subsection{受限制的估计量：几类经典方法}
+
+\subsubsection{粗糙惩罚与平滑样条}
+
+\textbf{核心思想：} 在 RSS 上添加一个惩罚项，惩罚 $f$ 的"粗糙程度"——
+越粗糙（波动越剧烈）的函数被罚得越重。
+
+带惩罚的残差平方和（Penalized RSS）：
+\begin{equation}\label{eq:prss}
+    \mathrm{PRSS}(f; \lambda) = \underbrace{\sum_{i=1}^{N} \big(y_i - f(x_i)\big)^2}_{\text{对数据的拟合度}}
+                              + \lambda \cdot \underbrace{J(f)}_{\text{对粗糙度的惩罚}}.
+\end{equation}
+
+其中：
+\begin{itemize}
+    \item $J(f)$ 是衡量 $f$ 粗糙度的泛函——$J(f)$ 越大，$f$ 越"不光滑"；
+    \item $\lambda \ge 0$ 是\emph{平滑参数}，控制拟合度与光滑度之间的权衡：
+    \begin{itemize}
+        \item $\lambda = 0$：无惩罚，退化为无约束 RSS 最小化（过拟合）；
+        \item $\lambda \to \infty$：无限惩罚，强制 $J(f)=0$，即 $f$ 必须是线性函数（欠拟合）；
+        \item $\lambda$ 取中间值：在数据拟合和函数光滑之间找到平衡。
+    \end{itemize}
+\end{itemize}
+
+\begin{example}[三次平滑样条 (Cubic Smoothing Spline)]
+在一维输入 $x \in \R$ 的情形下，一个经典选择是惩罚 $f$ 的\emph{二阶导数的平方积分}：
+\begin{equation}
+    J(f) = \int \big[f''(x)\big]^2 \,dx.
+\end{equation}
+
+带惩罚的目标函数为：
+\begin{equation}\label{eq:smoothing-spline}
+    \mathrm{PRSS}(f; \lambda) = \sum_{i=1}^{N} \big(y_i - f(x_i)\big)^2
+                              + \lambda \int \big[f''(x)\big]^2 \,dx.
+\end{equation}
+
+这个问题的解是一个\emph{自然三次样条}（natural cubic spline）——
+在所有具有绝对连续一阶导数和平方可积二阶导数的函数中，
+式 (\ref{eq:smoothing-spline}) 的极小值点是一个节点恰好在所有训练点 $x_i$ 处的三次样条。
+
+\textbf{直觉：} 
+\begin{itemize}
+    \item $f''(x)$ 度量 $f$ 的\emph{曲率}——函数"拐弯"的剧烈程度；
+    \item $\int [f'']^2$ 累积了整条曲线的总弯曲量；
+    \item 惩罚此项意味着：倾向于选择"尽可能直"但仍能拟合数据的曲线。
+\end{itemize}
+\end{example}
+
+\medskip
+\textbf{贝叶斯解释.} 粗糙惩罚有一个优雅的贝叶斯对应：
+
+\[
+\underbrace{\mathrm{PRSS}(f; \lambda)}_{\text{频率学派：惩罚最小二乘}}
+\;\longleftrightarrow\;
+\underbrace{-\log P(f \mid \text{数据})}_{\text{贝叶斯：负对数后验}}
+\]
+
+具体地，$\lambda J(f)$ 对应负对数先验 $-\log P(f)$：
+\begin{itemize}
+    \item 惩罚 $\int [f'']^2$ 对应\emph{高斯过程先验}：假定 $f$ 是一个具有特定协方差结构的高斯过程；
+    \item $\lambda$ 控制先验的强度——等价于贝叶斯框架中"你对 $f$ 光滑的信念有多强"。
+\end{itemize}
+
+这正是正则化与贝叶斯方法的深层联系：
+\textbf{Ridge 回归的 $L_2$ 惩罚 $\leftrightarrow$ 高斯先验，
+Lasso 的 $L_1$ 惩罚 $\leftrightarrow$ 拉普拉斯先验，
+平滑样条的 $\int [f'']^2$ $\leftrightarrow$ 高斯过程先验。}
+
+\subsubsection{核方法与局部回归}
+
+\textbf{核心思想：} 在预测 $x_0$ 处的 $f(x_0)$ 时，只使用 $x_0$ \emph{附近}的训练点，
+而且离 $x_0$ 越近的点权重越大。这通过一个\emph{核函数} $K_\lambda(x_0, x)$ 来实现。
+
+\medskip
+\textbf{核函数.} $K_\lambda(x_0, x)$ 衡量输入点 $x$ 对目标点 $x_0$ 的"相关性"或"影响力"：
+\begin{itemize}
+    \item 当 $x$ 离 $x_0$ 很近时，$K_\lambda(x_0, x)$ 取较大值；
+    \item 当 $x$ 离 $x_0$ 很远时，$K_\lambda(x_0, x)$ 衰减到零；
+    \item $\lambda$ 是\emph{带宽参数}，控制"附近"的范围：
+    $\lambda$ 越小 $\to$ 邻域越窄 $\to$ 模型越灵活（更局部）；
+    $\lambda$ 越大 $\to$ 邻域越宽 $\to$ 模型越光滑（更全局）。
+\end{itemize}
+
+\begin{example}[高斯核 (Gaussian Kernel)]
+最常用的核函数之一：
+\begin{equation}\label{eq:gaussian-kernel}
+    K_\lambda(x_0, x) = \frac{1}{\lambda} \exp\!\left(-\frac{\|x - x_0\|^2}{2\lambda}\right).
+\end{equation}
+带宽 $\lambda$ 控制高斯函数的宽度，决定了有效邻域的范围。
+\end{example}
+
+\medskip
+\textbf{Nadaraya--Watson 估计量.} 最简单的核回归估计量是加权平均：
+\begin{equation}\label{eq:nadaraya-watson}
+    \boxed{\hat{f}(x_0) = \frac{\sum_{i=1}^{N} K_\lambda(x_0, x_i) \, y_i}
+                              {\sum_{i=1}^{N} K_\lambda(x_0, x_i)}}.
+\end{equation}
+
+这就是 \textbf{Nadaraya--Watson 核加权平均}——$\hat{f}(x_0)$ 是周围训练点 $y$ 值的加权平均，
+权重由核函数决定。分母确保所有权重之和为 1，使估计量成为真正的加权平均。
+
+\textbf{直觉：}
+\begin{itemize}
+    \item 预测 $x_0$ 处的值 = 看看周围的数据点标签是什么，取加权平均；
+    \item 离得近的多参考，离得远的少参考；
+    \item $\lambda$ 控制"周围"的范围——这是偏差-方差权衡的旋钮。
+\end{itemize}
+
+\medskip
+\textbf{局部多项式回归.} Nadaraya--Watson 等价于在每个 $x_0$ 处拟合一个\emph{局部常数}模型。
+更一般地，可以在 $x_0$ 的邻域内拟合\emph{局部多项式}：
+\begin{equation}
+    \min_{\beta_0, \dots, \beta_d} \sum_{i=1}^{N} K_\lambda(x_0, x_i)
+    \left(y_i - \beta_0 - \beta_1(x_i - x_0) - \cdots - \beta_d (x_i - x_0)^d\right)^2.
+\end{equation}
+
+当 $d = 0$ 时退化为 Nadaraya--Watson（局部常数）；
+$d = 1$ 为局部线性回归（能更好地处理边界效应）；
+更高阶的 $d$ 能捕捉更复杂的局部结构。
+
+\medskip
+\textbf{$k$-最近邻 ($k$-NN).} 核方法的另一种变体是 $k$-NN：
+\begin{equation}
+    \hat{f}(x_0) = \frac{1}{k} \sum_{x_i \in \mathcal{N}_k(x_0)} y_i,
+\end{equation}
+其中 $\mathcal{N}_k(x_0)$ 是 $x_0$ 的 $k$ 个最近邻构成的集合。
+
+\textbf{$k$-NN 与核方法的区别：}
+\begin{itemize}
+    \item 核方法：固定带宽 $\lambda$（固定距离范围），邻域内的点数随位置变化；
+    \item $k$-NN：固定邻域点数 $k$，邻域半径随位置和数据密度自适应调整。
+\end{itemize}
+在数据密度不均匀的区域，$k$-NN 的适应性更好（密集区域邻域小，稀疏区域邻域大）。
+
+\medskip
+\textbf{局部方法的共同局限：维数灾难.} 所有基于邻域的方法（核平滑、局部回归、$k$-NN）
+在高维空间中都会遭遇维数灾难——
+为保持相同的局部数据密度，所需样本量随维度指数增长。
+这正是为什么在高维问题中，必须借助结构性假设（线性、稀疏性、可加性等）来规避这一问题。
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{c|c|c|c}
+\toprule
+\textbf{方法} & \textbf{限制方式} & \textbf{复杂度旋钮} & \textbf{数学形式} \\
+\midrule
+粗糙惩罚/样条 & 惩罚 $f$ 的曲率 & $\lambda$（平滑参数） & $\mathrm{RSS} + \lambda J(f)$ \\
+核平滑 & 局部加权平均 & $\lambda$（带宽） & $\sum K_\lambda(x_0, x_i) y_i / \sum K_\lambda$ \\
+$k$-NN & 固定邻域点数 & $k$（邻居数） & $\frac{1}{k}\sum_{x_i \in \mathcal{N}_k(x_0)} y_i$ \\
+局部多项式 & 局部多项式拟合 & $\lambda$（带宽）+ $d$（阶数） & 加权最小二乘 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{基函数与字典方法}
+
+第三类限制估计量的策略是：将 $f$ 表示为一组\emph{基函数}的线性组合，
+从而把无限维的函数空间限制在有限维的线性空间中。
+
+\textbf{线性基展开（回顾）.}
+如 §5 所述，参数化模型的最一般形式是：
+\begin{equation}\label{eq:basis-expansion-2}
+    f_\theta(x) = \sum_{m=1}^{M} \theta_m \, h_m(x),
+\end{equation}
+其中 $\{h_m(x)\}_{m=1}^M$ 是预先选定的一组基函数（或称为\emph{字典}）。
+模型关于参数 $\theta$ 是线性的，因此可以用最小二乘直接求解。
+复杂度由基函数的个数 $M$ 控制：
+$M$ 太小 $\to$ 欠拟合（高偏差），$M$ 太大 $\to$ 过拟合（高方差）。
+
+\medskip
+\textbf{多项式样条（Polynomial Splines）.}
+一维输入时，一种经典的基函数选择是\emph{截断幂基}（truncated power basis）。
+将输入域用 $M-2$ 个节点（knots）$t_1, \dots, t_{M-2}$ 划分，
+构造如下基函数：
+\begin{align}
+    h_1(x) &= 1, \nonumber\\
+    h_2(x) &= x, \nonumber\\
+    h_{m+2}(x) &= (x - t_m)_{+}, \quad m = 1, \dots, M-2,
+\end{align}
+其中 $(x - t)_+ = \max(0, x - t)$ 是\emph{截断幂函数}——在节点 $t$ 之前为零，
+在节点 $t$ 之后线性增长。每个节点处的"弯折"由对应的基函数贡献。
+
+这类基函数产生的 $f_\theta$ 是一个分段多项式：
+在相邻节点之间是低阶多项式，在节点处具有某种连续阶数。
+例如，上述构造产生的是\emph{线性样条}（一阶，节点处连续但导数不连续）。
+若加入二次项 $x^2$ 和截断二次项 $(x-t_m)_+^2$，则得到二次样条（一阶导数也连续）；
+更常用的是三次样条（基函数包含 $1, x, x^2, x^3$ 及 $(x-t_m)_+^3$，
+在节点处直到二阶导数都连续）。
+
+\textbf{样条与粗糙惩罚的关系.} 三次平滑样条（§10 粗糙惩罚部分）可以证明
+等价于将所有 $N$ 个训练点都作为节点的三次样条，
+加上对系数的特定 $L_2$ 型惩罚——两种视角殊途同归。
+
+\medskip
+\textbf{径向基函数（Radial Basis Functions, RBF）.}
+对于多维输入，一个自然的选择是\emph{径向基函数}——
+它们的值只依赖于输入点到某个中心 $\mu_m$ 的距离：
+\begin{equation}\label{eq:rbf}
+    f_\theta(x) = \sum_{m=1}^{M} K_{\lambda_m}(\mu_m, x) \, \theta_m,
+\end{equation}
+其中 $K_{\lambda_m}(\mu_m, x)$ 是关于 $\|x - \mu_m\|$ 对称的核函数
+（如高斯核 $K_\lambda(\mu, x) = \exp(-\|x-\mu\|^2 / 2\lambda)$）。
+
+中心 $\mu_m$ 和尺度 $\lambda_m$ 需要预先选定（如通过聚类确定中心位置），
+然后 $\theta_m$ 用最小二乘估计。RBF 网络在低维插值和函数逼近中非常有效，
+但在高维中同样受制于维数灾难。
+
+\medskip
+\textbf{自适应基函数：单隐层前馈神经网络.}
+前述所有方法的基函数 $\{h_m\}$ 都是\emph{在见到数据之前}预先选定的。
+神经网络的突破性思想是：\emph{让基函数本身也由数据决定}——即基函数含可学习的参数。
+
+单隐层前馈神经网络的形式为：
+\begin{equation}\label{eq:neural-net}
+    f_\theta(x) = \sum_{m=1}^{M} \beta_m \, \sigma\big(\alpha_m^\top x + b_m\big),
+\end{equation}
+其中：
+\begin{itemize}
+    \item $\sigma(\cdot)$ 是\emph{激活函数}，经典选择是 \textbf{sigmoid}：
+    \begin{equation}
+        \sigma(v) = \frac{1}{1 + e^{-v}};
+    \end{equation}
+    \item $\alpha_m \in \R^p$ 和 $b_m \in \R$ 控制第 $m$ 个基函数的形状和位置——
+    它们是\emph{从数据中学习的}，而非预先固定；
+    \item $\beta_m$ 是输出层的权重，与基展开中的 $\theta_m$ 角色相同。
+\end{itemize}
+
+将式 (\ref{eq:neural-net}) 与线性基展开 (\ref{eq:basis-expansion-2}) 对比：
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{c|c|c}
+\toprule
+& \textbf{固定基展开} & \textbf{神经网络} \\
+\midrule
+基函数 & $h_m(x)$ 预先选定 & $\sigma(\alpha_m^\top x + b_m)$，$\alpha_m, b_m$ 可学习 \\
+参数 & 仅 $\theta_m$（线性） & $\alpha_m, b_m, \beta_m$（非线性） \\
+优化 & 最小二乘有显式解 & 需迭代优化（反向传播） \\
+复杂度控制 & 基函数个数 $M$ & $M$ + 正则化（权重衰减、早停等） \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+神经网络的代价是：由于基函数本身含可学习参数，目标函数不再是 $\theta$ 的二次函数，
+无法显式求解，需要迭代数值优化（梯度下降及其变体）。
+但收益是巨大的——只需适量的 $M$，神经网络就能逼近非常复杂的函数，
+因为每个基函数可以根据数据自适应地调整形状和位置。
+
+\textbf{限制方法的总览：}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{c|c|c|c}
+\toprule
+\textbf{方法} & \textbf{限制方式} & \textbf{复杂度旋钮} & \textbf{数学形式} \\
+\midrule
+粗糙惩罚/样条 & 惩罚 $f$ 的曲率 & $\lambda$（平滑参数） & $\mathrm{RSS} + \lambda J(f)$ \\
+核平滑 & 局部加权平均 & $\lambda$（带宽） & $\sum K_\lambda(x_0, x_i) y_i / \sum K_\lambda$ \\
+$k$-NN & 固定邻域点数 & $k$（邻居数） & $\frac{1}{k}\sum_{x_i \in \mathcal{N}_k(x_0)} y_i$ \\
+基展开 & 限定在 $\{h_m\}$ 张成的空间 & $M$（基函数个数） & $\sum_{m=1}^M \theta_m h_m(x)$ \\
+神经网络 & 自适应基函数 & $M$ + 权重衰减 & $\sum \beta_m \sigma(\alpha_m^\top x + b_m)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ---------- 12. 模型选择与偏差-方差权衡 ----------
+\subsection{模型选择与偏差-方差权衡}
+
+所有限制估计量方法都有一个\emph{复杂度参数}
+（$\lambda$, $k$, $M$ 等），它控制着模型的灵活度。
+如何选择这个参数的最优值，是模型选择的核心问题。
+
+\subsubsection{偏差-方差分解}
+
+在进入 ML 语境下的偏差-方差分解之前，先看一个更基础的\emph{概率恒等式}——
+全方差公式（Law of Total Variance）。
+它不仅本身重要，更是理解"预测误差为什么能拆成偏差和方差"的钥匙。
+
+\begin{theorem}[全方差公式 (Law of Total Variance)]\label{thm:total-variance}
+对任意随机变量 $X$ 和 $Y$：
+\begin{equation}\label{eq:total-variance}
+    \Var(X) = \E\big[\Var(X \mid Y)\big] + \Var\big(\E[X \mid Y]\big).
+\end{equation}
+\end{theorem}
+
+\textbf{三项的含义（与 ML 的对照将在后面展开）：}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{c|c|c}
+\toprule
+\textbf{项} & \textbf{公式} & \textbf{直觉} \\
+\midrule
+总方差 & $\Var(X)$ & $X$ 本身的全部不确定性 \\
+组内方差（期望） & $\E[\Var(X \mid Y)]$ & 知道了 $Y$ 之后，$X$ 还剩多少波动？\\
+组间方差 & $\Var(\E[X \mid Y])$ & 不同 $Y$ 取值下，$X$ 的均值差异有多大？\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{直觉：} 全方差公式说的是——$X$ 的不确定性来自两个来源：
+（1）即使你知道 $Y$，$X$ 仍然有随机波动（组内方差，不可消除）；
+（2）不同 $Y$ 下 $X$ 的均值不同（组间方差，这是"规律"部分的差异）。
+
+\begin{example}[一个具体例子]
+设 $X$ 是某学生的考试成绩。$Y$ 是他所属的班级（A 班或 B 班）。
+\begin{itemize}
+    \item $\E[\Var(X \mid Y)]$：班级确定后，学生在班内的成绩波动——如 A 班内部有人考 70 有人考 90；
+    \item $\Var(\E[X \mid Y])$：两个班\emph{平均分}之间的差异——如 A 班平均 80，B 班平均 72。
+\end{itemize}
+全班学生成绩的总方差 = 班内波动的平均 + 班间均值的方差。
+\end{example}
+
+\medskip
+\textbf{全方差公式 $\to$ 偏差-方差分解的桥梁.}
+
+现在做一步类比替换，全方差公式立刻变成 ML 中的偏差-方差分解：
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{c|c|c}
+\toprule
+\textbf{全方差公式中的量} & \textbf{替换为 ML 中的量} & \textbf{得到} \\
+\midrule
+$X$（被研究的随机变量） & $Y - \hat{f}(x_0)$（预测误差） & 总预测误差的方差 \\
+$Y$（条件变量） & $\mathcal{T}$（训练集） & 以训练集为条件 \\
+$\E[X \mid Y]$ & $\E_{\mathcal{T}}[Y - \hat{f}(x_0)]$ & 平均预测误差 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+代入全方差公式：
+\begin{align}
+    \Var(Y - \hat{f}(x_0))
+    &= \underbrace{\E_{\mathcal{T}}\big[\Var(Y - \hat{f}(x_0) \mid \mathcal{T})\big]}_{\text{给定训练集后，预测误差的波动}}
+     + \underbrace{\Var_{\mathcal{T}}\big(\E[Y - \hat{f}(x_0) \mid \mathcal{T}]\big)}_{\text{不同训练集下，平均预测误差的差异}}.
+\end{align}
+
+给定训练集 $\mathcal{T}$ 后，$\hat{f}(x_0)$ 是固定的（模型已经训练好了），
+而 $Y = f(x_0) + \varepsilon$，$\varepsilon$ 与 $\mathcal{T}$ 独立。
+于是第一项展开就是 $\sigma^2$，第二项展开后分解为 $\text{Bias}^2 + \text{Var}$。
+
+下面给出 ML 语境下的标准形式。\textbf{推导分两步：先走全方差路径得到 $\Var(Y - \hat{f})$，
+再补上均值平方得到 $\E[(Y - \hat{f})^2]$。}
+
+\medskip
+\textbf{第一步：全方差公式分解 $\Var(Y - \hat{f}(x_0))$.}
+
+回忆全方差公式 (\ref{eq:total-variance})，令 $X = Y - \hat{f}(x_0)$，条件变量为 $\mathcal{T}$：
+\begin{equation}
+    \Var(Y - \hat{f}(x_0))
+    = \underbrace{\E_{\mathcal{T}}\big[\Var(Y - \hat{f}(x_0) \mid \mathcal{T})\big]}_{\textcircled{1}}
+    + \underbrace{\Var_{\mathcal{T}}\big(\E[Y - \hat{f}(x_0) \mid \mathcal{T}]\big)}_{\textcircled{2}}.
+\end{equation}
+
+分别化简两项：
+
+\medskip
+\noindent\textbf{化简 \textcircled{1} —— 给定 $\mathcal{T}$ 后的条件方差.}
+给定训练集 $\mathcal{T}$，$\hat{f}(x_0)$ 是一个\emph{固定的数}（模型已训练好）。
+而 $Y = f(x_0) + \varepsilon$，其中 $\varepsilon$ 与 $\mathcal{T}$ 独立，$\Var(\varepsilon) = \sigma^2$：
+\begin{equation}
+    \Var(Y - \hat{f}(x_0) \mid \mathcal{T})
+    = \Var(f(x_0) + \varepsilon - \hat{f}(x_0) \mid \mathcal{T})
+    = \Var(\varepsilon \mid \mathcal{T})
+    = \sigma^2.
+\end{equation}
+
+因此 \textcircled{1} $= \E_{\mathcal{T}}[\sigma^2] = \boxed{\sigma^2}$ —— 这就是\emph{不可约噪声}。
+
+\medskip
+\noindent\textbf{化简 \textcircled{2} —— 不同训练集下的均值波动.}
+先求内层期望。$f(x_0)$ 是常数，$\E[\varepsilon]=0$：
+\begin{equation}
+    \E[Y - \hat{f}(x_0) \mid \mathcal{T}]
+    = f(x_0) + \E[\varepsilon] - \hat{f}(x_0)
+    = f(x_0) - \hat{f}(x_0).
+\end{equation}
+
+于是 \textcircled{2} 化为 $\hat{f}(x_0)$ 的方差（$f(x_0)$ 是常数，不影响方差）：
+\begin{equation}
+    \textcircled{2} = \Var_{\mathcal{T}}\big(f(x_0) - \hat{f}(x_0)\big)
+    = \Var_{\mathcal{T}}\big(\hat{f}(x_0)\big).
+\end{equation}
+
+综上，全方差公式给出：
+\begin{equation}\label{eq:var-decomp}
+    \boxed{\Var(Y - \hat{f}(x_0)) = \sigma^2 + \Var_{\mathcal{T}}(\hat{f}(x_0))}.
+\end{equation}
+
+\medskip
+\textbf{第二步：从方差到期望平方误差.}
+
+方差和期望平方误差之间差了一个"均值平方"：
+\begin{equation}
+    \E[(Y - \hat{f})^2] = \underbrace{\big(\E[Y - \hat{f}]\big)^2}_{\text{均值}^2} + \Var(Y - \hat{f}).
+\end{equation}
+
+先算均值（对训练集的期望 $+$ 对 $Y$ 的期望）：
+\begin{equation}
+    \E[Y - \hat{f}(x_0)] = \E_{\mathcal{T}}\big[\E[Y - \hat{f}(x_0) \mid \mathcal{T}]\big]
+    = \E_{\mathcal{T}}\big[f(x_0) - \hat{f}(x_0)\big]
+    = f(x_0) - \E_{\mathcal{T}}[\hat{f}(x_0)].
+\end{equation}
+
+均值平方项恰好是偏差$^2$：
+\begin{equation}
+    \big(\E[Y - \hat{f}]\big)^2 = \big(f(x_0) - \E_{\mathcal{T}}[\hat{f}(x_0)]\big)^2 = \text{偏差}^2.
+\end{equation}
+
+\medskip
+\textbf{合并两步：}
+
+\begin{align}
+    \E_{\mathcal{T}}\big[(Y - \hat{f}(x_0))^2 \mid X = x_0\big]
+    &= \big(f(x_0) - \E_{\mathcal{T}}[\hat{f}(x_0)]\big)^2
+     + \Var(Y - \hat{f}(x_0)) \nonumber\\
+    &= \big(f(x_0) - \E_{\mathcal{T}}[\hat{f}(x_0)]\big)^2
+     + \sigma^2 + \Var_{\mathcal{T}}(\hat{f}(x_0)) \nonumber\\
+    &= \text{偏差}^2 + \sigma^2 + \text{方差}.
+\end{align}
+
+\textbf{推导的核心链条：}
+\[
+\underbrace{\Var(Y - \hat{f})}_{\text{全方差分解}}
+= \underbrace{\E[\Var(\cdot \mid \mathcal{T})]}_{=\;\sigma^2}
++ \underbrace{\Var(\E[\cdot \mid \mathcal{T}])}_{=\;\Var(\hat{f})}
+\quad\xrightarrow{\;+\;(\E[Y-\hat{f}])^2\;}\quad
+\underbrace{\E[(Y-\hat{f})^2]}_{\text{EPE}}
+= \underbrace{(f - \E[\hat{f}])^2}_{\text{偏差}^2}
++ \underbrace{\Var(\hat{f})}_{\text{方差}}
++ \underbrace{\sigma^2}_{\text{噪声}}.
+\]
+
+\begin{theorem}[偏差-方差分解]\label{thm:bias-variance}
+设 $Y = f(X) + \varepsilon$，$\E[\varepsilon]=0$，$\Var(\varepsilon)=\sigma^2$。
+对于在训练集 $\mathcal{T}$ 上拟合的模型 $\hat{f}(x_0)$，在测试点 $x_0$ 处的期望预测误差为：
+\begin{equation}\label{eq:bias-variance}
+    \E_{\mathcal{T}}\big[(Y - \hat{f}(x_0))^2 \mid X = x_0\big]
+    = \underbrace{\big(f(x_0) - \E_{\mathcal{T}}[\hat{f}(x_0)]\big)^2}_{\text{偏差}^2}
+    + \underbrace{\E_{\mathcal{T}}\big[(\hat{f}(x_0) - \E_{\mathcal{T}}[\hat{f}(x_0)])^2\big]}_{\text{方差}}
+    + \underbrace{\sigma^2}_{\text{不可约噪声}}.
+\end{equation}
+\end{theorem}
+
+其中 $\E_{\mathcal{T}}[\cdot]$ 是对不同训练集（从同一分布重复抽样）取期望——
+典型的频率学派视角。三项的含义：
+
+\begin{itemize}
+    \item \textbf{偏差（Bias$^2$）：} 即使有无穷多训练集，模型平均预测与真实值差多远。
+    衡量模型族本身的\emph{表达能力是否足够}；
+    \item \textbf{方差（Variance）：} 换一组训练集，预测值波动多大。
+    衡量模型对训练数据的\emph{敏感度}；
+    \item \textbf{不可约噪声（$\sigma^2$）：} 数据本身固有的随机性，与模型无关，
+    是任何预测器的误差下界。
+\end{itemize}
+
+\textbf{偏差与方差不可兼得：}
+\begin{itemize}
+    \item 简单模型（高偏差，低方差）：模型族不够灵活，系统地偏离真实函数，
+    但对训练数据的扰动不敏感——\emph{欠拟合}；
+    \item 复杂模型（低偏差，高方差）：模型族足够灵活，可以逼近任意函数，
+    但不同训练集会给出差异很大的估计——\emph{过拟合}。
+\end{itemize}
+
+\subsubsection{$k$-NN 的偏差-方差分析}
+
+$k$-最近邻回归为偏差-方差分解提供了一个清晰的实例。
+在 $x_0$ 处，$\hat{f}_k(x_0) = \frac{1}{k}\sum_{\ell=1}^{k} y_{(\ell)}$，
+其中 $y_{(\ell)}$ 是 $x_0$ 的第 $\ell$ 近邻的标签。假设 $y_i = f(x_i) + \varepsilon_i$，
+$\varepsilon_i$ 独立且 $\Var(\varepsilon_i)=\sigma^2$：
+
+\begin{align}
+    \mathrm{EPE}_k(x_0)
+    &= \E\big[(Y - \hat{f}_k(x_0))^2 \mid X = x_0\big] \nonumber\\
+    &= \sigma^2 + \underbrace{\left(f(x_0) - \frac{1}{k}\sum_{\ell=1}^{k} f(x_{(\ell)})\right)^2}_{\text{偏差}^2}
+       + \underbrace{\frac{\sigma^2}{k}}_{\text{方差}}.
+    \label{eq:knn-bias-variance}
+\end{align}
+
+这个分解非常直观：
+\begin{itemize}
+    \item \textbf{偏差：} $\hat{f}_k(x_0)$ 的期望是 $k$ 个近邻真实函数值的平均。
+    若 $f$ 在该邻域内不是常数，这个平均值偏离 $f(x_0)$——$k$ 越大，
+    邻域越大，$f$ 在邻域内变化越大，偏差越大；
+    \item \textbf{方差：} $k$ 个独立噪声的平均，方差为 $\sigma^2/k$——
+    $k$ 越大，平均越多，方差越小。
+\end{itemize}
+
+\textbf{$k$ 的角色：}
+\begin{itemize}
+    \item $k$ 小（如 $k=1$）：偏差小（只用最近邻，其 $f$ 值最接近 $f(x_0)$），
+    但方差大（$\sigma^2/1 = \sigma^2$，没有任何平均）——\emph{过拟合}；
+    \item $k$ 大（如 $k=N$）：方差小（$\sigma^2/N \approx 0$），
+    但偏差大（所有点的平均 $\approx \E[Y]$，与 $f(x_0)$ 无关）——\emph{欠拟合}；
+    \item 最优的 $k$ 在两者之间取得平衡。
+\end{itemize}
+
+\medskip
+\textbf{对照全方差公式解读 $k$-NN 的分解.}
+将式 (\ref{eq:knn-bias-variance}) 与全方差公式 (\ref{eq:total-variance}) 逐项对照：
+
+\[
+\Var(Y - \hat{f}_k(x_0))
+= \underbrace{\E_{\mathcal{T}}\big[\Var(Y - \hat{f}_k(x_0) \mid \mathcal{T})\big]}_{=\;\sigma^2}
++ \underbrace{\Var_{\mathcal{T}}\big(\E[Y - \hat{f}_k(x_0) \mid \mathcal{T}]\big)}_{=\;\text{Bias}^2 + \frac{\sigma^2}{k}}.
+\]
+
+\begin{itemize}
+    \item \textbf{组内方差 $\E[\Var(\cdot \mid \mathcal{T})] = \sigma^2$：}
+    给定训练集（即固定了 $k$ 个近邻的位置）后，预测误差的唯一随机来源是
+    $Y = f(x_0) + \varepsilon$ 中的 $\varepsilon$——其方差为 $\sigma^2$。
+    这就是"\emph{不可约噪声}"——与 $k$ 无关、与模型无关；
+    
+    \item \textbf{组间方差 $\Var(\E[\cdot \mid \mathcal{T}]) = \text{Bias}^2 + \frac{\sigma^2}{k}$：}
+    不同训练集会选出不同的 $k$ 个近邻，导致 $\hat{f}_k(x_0)$ 的平均值发生变化。
+    这个变化来自两个来源：
+    \begin{itemize}
+        \item 偏差部分：不同训练集的 $k$ 个近邻位置不同，其 $f$ 值的平均也不同——
+        离 $f(x_0)$ 的平均距离就是偏差；
+        \item 方差部分：不同训练集的 $\varepsilon_i$ 不同，导致 $\frac{1}{k}\sum \varepsilon_i$ 波动——
+        这就是 $\frac{\sigma^2}{k}$。
+    \end{itemize}
+\end{itemize}
+
+\textbf{$k$ 控制组间方差的结构：}
+\begin{itemize}
+    \item $k$ 很小：$\frac{\sigma^2}{k}$ 很大（噪声平均不够），组间方差主要由噪声主导 → 过拟合；
+    \item $k$ 很大：$\frac{\sigma^2}{k} \to 0$（噪声被充分平均），但偏差部分增大（邻域太大，
+    邻近的 $f$ 值不再与 $f(x_0)$ 接近）→ 欠拟合。
+\end{itemize}
+
+全方差公式在这里的作用是：\textbf{把"为什么 $k$ 太大或太小都不好"这个直觉，
+精确地分解为两个可量化部分——组内（不可消除的噪声）和组间（偏差 $+$ 方差）}。
+
+\subsubsection{训练误差 vs.\ 测试误差}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=1.2]
+    % Axes
+    \draw[->] (0,0) -- (7,0) node[right] {模型复杂度};
+    \draw[->] (0,0) -- (0,4.5) node[above] {预测误差};
+    
+    % Test error curve (U-shaped, red)
+    \draw[thick, red!70!black, domain=0.8:6.2, samples=100, smooth]
+        plot (\x, {1.8 + 0.12*(\x-2)^2});
+    \node[red!70!black, font=\small] at (5.5, 3.2) {测试误差};
+    
+    % Training error curve (decreasing, blue)
+    \draw[thick, blue!60!black, domain=0.8:6.2, samples=100, smooth]
+        plot (\x, {3.5 - 0.45*\x + 0.02*\x*\x});
+    \node[blue!60!black, font=\small] at (5.2, 1.2) {训练误差};
+    
+
+    % Optimal complexity marker
+    \draw[dashed, gray, thick] (3.5, 0) -- (3.5, {1.8+0.12*(3.5-2)^2});
+    \node[font=\small\sffamily] at (3.5, -0.35) {最优复杂度};
+    
+    % Irreducible error line
+    \draw[dotted, gray, thick] (0.5, 1.2) -- (6.5, 1.2);
+    \node[font=\footnotesize, gray] at (6.2, 0.95) {$\sigma^2$（不可约噪声）};
+    
+\end{tikzpicture}
+\caption{训练误差与测试误差随模型复杂度的典型变化。训练误差（蓝色）随复杂度增加单调递减——
+越复杂的模型越能拟合训练数据。测试误差（红色）呈 U 形曲线：
+模型太简单时高偏差主导（欠拟合），模型太复杂时高方差主导（过拟合），
+最优复杂度在两者之间。虚线 $\sigma^2$ 是不可约噪声的下界。}
+\label{fig:bias-variance-tradeoff}
+\end{figure}
+
+\textbf{关键观察：}
+\begin{itemize}
+    \item \textbf{训练误差}随模型复杂度增加而\emph{单调递减}——
+    不能单独用训练误差选择模型（否则永远选最复杂的）；
+    \item \textbf{测试误差}呈 U 形——这是模型选择的核心依据；
+    \item 测试误差的最低点对应\emph{最优模型复杂度}——
+    在偏差和方差之间取得最佳平衡。
+\end{itemize}
+
+\subsubsection{模型选择的实践方法}
+
+直接使用测试集来选模型会导致对测试误差的乐观估计
+（因为你本质上是用测试集来"训练"超参数）。
+实践中常用以下方法：
+
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{留出法（Hold-out）：} 将数据划分为训练集和验证集，
+    用验证集选择复杂度参数，最后在测试集上报告性能；
+    \item \textbf{$K$ 折交叉验证（$K$-fold CV）：} 将数据分为 $K$ 份，
+    每次用 $K-1$ 份训练、1 份验证，轮换 $K$ 次后取平均；
+    \item \textbf{信息准则：} AIC、BIC 等在训练误差上加一项对复杂度的惩罚，
+    避免需要单独的验证集（但这些准则通常依赖特定的概率模型假设）。
+\end{enumerate}
+
+\medskip
+\textbf{核心教训：}
+\[
+\boxed{\text{训练集上的表现 } \neq \text{ 泛化能力}}
+\]
+泛化能力——在未见过的数据上的表现——才是统计学习的终极目标。
+偏差-方差分解为理解和诊断泛化问题提供了数学框架，
+而复杂度参数的选择（$\lambda$, $k$, $M$ 等）正是控制偏差-方差权衡的旋钮。
+
+% ---------- 13. 统一总结 ----------
+\subsection{总结：从模型到估计的统一框架}
+
+下图总结了统计学习从建模、估计到模型选择的完整逻辑链条：
+
+\begin{center}
+\fbox{%
+\begin{minipage}{0.92\textwidth}
+\[
+\underbrace{Y = f(X) + \varepsilon}_{\text{加性误差模型}}
+\;\xrightarrow{\E[\cdot \mid X]}\;
+\underbrace{f(x) = \E[Y \mid X = x]}_{\text{条件期望是最优预测}}
+\;\xrightarrow{\text{参数化}}\;
+\underbrace{f_\theta(x) = \sum_{k=1}^{K} h_k(x)\,\theta_k}_{\text{基展开 / 函数逼近}}
+\]
+\[
+\downarrow\; \text{如何估计 } \theta \text{？}
+\]
+\[
+\begin{cases}
+\text{LS (ERM):} & 
+\displaystyle \min_\theta \underbrace{\frac{1}{N}\sum_{i=1}^{N} (y_i - f_\theta(x_i))^2}_{\text{经验风险 }\approx\text{ EPE}} \\[12pt]
+\text{MLE:} & 
+\displaystyle \max_\theta \underbrace{\sum_{i=1}^{N} \log \Pr\nolimits_\theta(y_i \mid x_i)}_{\text{条件对数似然}}
+\end{cases}
+\]
+\[
+\downarrow\; \text{LS 与 MLE 的关系}
+\]
+\[
+\begin{array}{c|c}
+\text{正态误差} & \text{MLE } \Leftrightarrow \text{ 最小二乘} \\
+\hline
+\text{多项分布（分类）} & \text{MLE } \Leftrightarrow \text{ 交叉熵}
+\end{array}
+\]
+\[
+\downarrow\; \text{无约束 RSS 最小化的困境}
+\]
+\[
+\boxed{\text{RSS}=0 \text{ 有无穷多解，全都没有泛化能力}}
+\;\xrightarrow{\text{必须限制}}\;
+\text{对 } f \text{ 施加约束}
+\]
+\[
+\downarrow\; \text{三类限制方法}
+\]
+\[
+\begin{cases}
+\text{粗糙惩罚:} & \min_f \mathrm{RSS}(f) + \lambda J(f) \quad (\lambda \text{ 控制光滑度}) \\[8pt]
+\text{核/局部方法:} & \hat{f}(x_0) = \dfrac{\sum K_\lambda(x_0, x_i) y_i}{\sum K_\lambda(x_0, x_i)} \quad (\lambda \text{ 控制邻域大小}) \\[8pt]
+\text{基展开/字典:} & f_\theta(x) = \sum_{m=1}^{M} \theta_m h_m(x) \quad (M \text{ 控制模型容量})
+\end{cases}
+\]
+\[
+\downarrow\; \text{如何选择复杂度参数？}
+\]
+\[
+\boxed{\mathrm{EPE} = \underbrace{\mathrm{Bias}^2}_{\text{模型太简单 } \uparrow} + \underbrace{\mathrm{Var}}_{\text{模型太复杂 } \uparrow} + \underbrace{\sigma^2}_{\text{不可约}}}
+\;\xrightarrow{\text{权衡}}\;
+\text{交叉验证 / 信息准则选择 } \lambda, k, M
+\]
+\end{minipage}}
+\end{center}
+
+\medskip
+\textbf{核心要点：}
+
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{加性误差模型} $Y = f(X) + \varepsilon$（$\E[\varepsilon]=0,\ \varepsilon \perp X$）
+    是统计学习最基本的建模假设，$f(x) = \E[Y \mid X = x]$ 是平方损失下的最优预测器；
+    
+    \item \textbf{条件方差} $\Var(Y \mid X = x) = \sigma^2(x)$ 可以依赖于 $x$，
+    模型只约束了一阶矩，对二阶矩没有限制；
+    
+    \item \textbf{监督学习} 的本质是从训练集 $\mathcal{T} = \{(x_i, y_i)\}$ 中学出一个函数 $\hat{f}$，
+    使其在未知数据上也能良好泛化；
+    
+    \item \textbf{函数逼近} 将学习问题视为在 $\R^{p+1}$ 空间中拟合曲面。
+    线性基展开 $f_\theta(x) = \sum_k h_k(x)\,\theta_k$ 是连接线性模型与神经网络等复杂模型的桥梁；
+    
+    \item \textbf{LS 是 ERM，不是直接最小化 EPE。} 
+    $\mathrm{RSS}(\theta) = \sum (y_i - f_\theta(x_i))^2$ 是训练集上的经验平均，
+    $N \to \infty$ 时收敛到真实的 $\mathrm{EPE}$。MLE 在正态误差下与 LS 等价，
+    在分类问题中与交叉熵等价——\textbf{MLE 是比 LS 更统一的参数估计框架}；
+    
+    \item \textbf{无约束最小化 RSS 必然失败。}
+    任何穿过所有训练点的函数都满足 $\mathrm{RSS}=0$，但这样的函数有无穷多个且全无泛化能力。
+    \textbf{必须限制候选函数的范围}——这是所有正则化方法的根本动机；
+    
+    \item \textbf{三类经典的限制方法：}
+    \begin{itemize}
+        \item \textbf{粗糙惩罚}（$\mathrm{RSS} + \lambda J(f)$）：惩罚函数的曲率，$\lambda$ 控制光滑度，
+        等价于贝叶斯框架中的先验分布；
+        \item \textbf{核方法与局部回归}：用邻域内的加权平均做预测，带宽/邻居数控制局部范围；
+        \item \textbf{基展开与字典方法}：将 $f$ 限制在一组基函数张成的空间中，
+        神经网络将固定基推广为自适应基（基函数本身也由数据学习）。
+    \end{itemize}
+    
+    \item \textbf{偏差-方差权衡是模型选择的核心。}
+    $\mathrm{EPE} = \mathrm{Bias}^2 + \mathrm{Var} + \sigma^2$。
+    简单模型高偏差低方差（欠拟合），复杂模型低偏差高方差（过拟合）。
+    复杂度参数（$\lambda$, $k$, $M$）正是控制这一权衡的旋钮，
+    最优值通过交叉验证等方法选取；
+    
+    \item \textbf{泛化能力是终极目标。}
+    训练误差随模型复杂度单调递减，不能用于模型选择。
+    测试误差呈 U 形曲线——统计学习的核心挑战是在偏差和方差之间找到最优平衡点。
+\end{enumerate}
+
+% ============================================================
+%  Ch11. 线性回归模型与最小二乘法 (ESL §3.2)
+% ============================================================

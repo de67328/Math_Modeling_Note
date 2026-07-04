@@ -1,0 +1,869 @@
+\chapter{方差分析及回归分析}
+
+方差分析（ANOVA）和回归分析是统计建模中两类核心方法：
+\begin{itemize}
+    \item \textbf{方差分析}：比较多个总体的均值是否有显著差异（$t$ 检验的推广）；
+    \item \textbf{回归分析}：建模自变量与因变量之间的数量关系。
+\end{itemize}
+两者在数学上同源——都可以纳入\textbf{一般线性模型}的框架。
+
+% ============================================================
+\section{单因素试验的方差分析}
+
+\subsection{问题的提出}
+
+前面学过的两样本 $t$ 检验只能比较\textbf{两个}总体的均值。当需要比较三个或更多总体时（如比较 A、B、C 三种教学法的效果），若逐对做 $t$ 检验会累积第一类错误。方差分析（Analysis of Variance, ANOVA）为此提供了一次性检验多个均值是否全相等的框架。
+
+\begin{definition}[单因素方差分析模型]
+设因素 $A$ 有 $r$ 个水平，第 $i$ 个水平下有 $n_i$ 个观测值：
+\begin{equation}
+    X_{ij} = \mu_i + \varepsilon_{ij}, \quad i = 1,\dots,r,\; j = 1,\dots,n_i,
+\end{equation}
+其中 $\varepsilon_{ij} \stackrel{\mathrm{i.i.d.}}{\sim} \mathcal{N}(0, \sigma^2)$。
+
+检验假设：
+\begin{equation}
+    H_0: \mu_1 = \mu_2 = \cdots = \mu_r \quad \text{vs.} \quad H_1: \text{至少有两个 } \mu_i \text{ 不等}.
+\end{equation}
+\end{definition}
+
+\textbf{ANOVA 的三个前提条件（单因素、双因素均适用）：}
+\begin{enumerate}
+    \item \textbf{独立性}：各观测值相互独立——由随机抽样或随机分配保证；
+    \item \textbf{正态性}：各组数据来自正态总体——用 Q-Q 图或 Shapiro-Wilk 检验诊断；
+    \item \textbf{方差齐性}：各组总体方差相等 $\sigma_1^2 = \cdots = \sigma_r^2$——用 Levene 检验或 Bartlett 检验诊断。
+\end{enumerate}
+ANOVA 对正态性偏离有一定鲁棒性，但对方差严重不等较为敏感。
+
+\begin{remark}[模型的另一种参数化]
+单因素模型也可等价地写成与双因素统一的形式：
+\begin{equation}
+    X_{ij} = \mu + \alpha_i + \varepsilon_{ij}, \quad \sum_{i=1}^{r} \alpha_i = 0,
+\end{equation}
+其中 $\mu$ 为总均值（grand mean），$\alpha_i = \mu_i - \mu$ 为第 $i$ 组偏离总均值的效应量。
+
+这揭示了一种统一的视角：\textbf{每个观测值 = 总均值 + 该组效应 + 随机误差}。
+单因素用 $\mu_i$ 更简洁，双因素因格子均值同时受两个因素影响，
+拆成 $\mu + \alpha_i + \beta_j$ 更自然——但两者本质相同。
+\end{remark}
+
+\subsection{平方和分解}
+
+\textbf{核心思想：} 将总变异分解为\textbf{组间变异}（因素引起）和\textbf{组内变异}（随机误差引起），比较两者的相对大小。
+
+记总均值 $\bar{X} = \frac{1}{n}\sum_{i=1}^{r}\sum_{j=1}^{n_i} X_{ij}$，第 $i$ 组均值为 $\bar{X}_{i\cdot} = \frac{1}{n_i}\sum_{j=1}^{n_i} X_{ij}$。
+
+\textbf{分解的核心恒等式（对每个观测值）：}
+\begin{equation}
+    \boxed{X_{ij} - \bar{X} = (\bar{X}_{i\cdot} - \bar{X}) + (X_{ij} - \bar{X}_{i\cdot})}.
+\end{equation}
+
+即：\textbf{总离差 = 组间离差 + 组内离差}。两边平方再对所有 $i,j$ 求和，交叉项恰好为零：
+\begin{equation}
+    \boxed{\underbrace{\sum_{i,j}(X_{ij} - \bar{X})^2}_{SS_T}
+           = \underbrace{\sum_{i} n_i(\bar{X}_{i\cdot} - \bar{X})^2}_{SS_A}
+           + \underbrace{\sum_{i,j}(X_{ij} - \bar{X}_{i\cdot})^2}_{SS_E}}.
+\end{equation}
+
+\begin{center}
+\begin{tabular}{c|c|c}
+    \toprule
+    符号 & 名称 & 含义 \\
+    \midrule
+    $SS_T$ & 总平方和 & 所有数据围绕总均值的总变异 \\
+    $SS_A$ & 组间平方和 & 各组均值之间的差异（因素效应） \\
+    $SS_E$ & 组内平方和（误差） & 组内个体差异（随机误差） \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+对应自由度分解：$n-1 = (r-1) + (n-r)$。
+
+\subsection{$F$ 检验}
+
+均方（Mean Square）：
+\begin{equation}
+    MS_A = \frac{SS_A}{r-1}, \quad MS_E = \frac{SS_E}{n-r}.
+\end{equation}
+
+\begin{theorem}[ANOVA $F$ 检验]
+在 $H_0$ 为真且正态假设下：
+\begin{equation}
+    F = \frac{MS_A}{MS_E} \sim F(r-1,\; n-r).
+\end{equation}
+若 $F \ge F_{\alpha}(r-1,\; n-r)$，则拒绝 $H_0$。
+\end{theorem}
+
+\textbf{直观理解：} 若 $H_0$ 成立，组间差异仅由随机误差造成，$MS_A$ 与 $MS_E$ 应大小接近，$F \approx 1$；若因素效应存在，$MS_A$ 会显著偏大，$F \gg 1$。
+
+\begin{center}
+\textbf{单因素 ANOVA 表}
+\begin{tabular}{c|c|c|c|c}
+    \toprule
+    来源 & 平方和 & 自由度 & 均方 & $F$ 值 \\
+    \midrule
+    组间 (A) & $SS_A$ & $r-1$ & $MS_A = SS_A/(r-1)$ & $F = MS_A/MS_E$ \\
+    组内 (E) & $SS_E$ & $n-r$ & $MS_E = SS_E/(n-r)$ & \\
+    \midrule
+    总和    & $SS_T$ & $n-1$ & & \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+\begin{example}[三种教学法的比较]
+比较三种教学法（A、B、C）对学生成绩的影响。每种方法随机分配 5 名学生，成绩如下：
+
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+    \toprule
+    教学法 & \multicolumn{4}{c}{成绩} & 均值 \\
+    \midrule
+    A & 78 & 82 & 75 & 80 & 85 & $\bar{X}_{1\cdot} = 80$ \\
+    B & 88 & 85 & 90 & 86 & 91 & $\bar{X}_{2\cdot} = 88$ \\
+    C & 72 & 76 & 70 & 74 & 73 & $\bar{X}_{3\cdot} = 73$ \\
+    \bottomrule
+    \multicolumn{6}{c}{总均值 $\bar{X} = 80.33$} \\
+\end{tabular}
+\end{center}
+
+\textbf{计算：}
+\begin{align}
+    SS_A &= 5 \times (80-80.33)^2 + 5 \times (88-80.33)^2 + 5 \times (73-80.33)^2 \\
+         &= 5 \times 0.11 + 5 \times 58.78 + 5 \times 53.78 = 563.33, \\
+    SS_E &= \text{各组内部离差平方和} = 58 + 26 + 20 = 104, \\
+    MS_A &= \frac{563.33}{2} = 281.67, \quad
+    MS_E = \frac{104}{12} = 8.67, \\
+    F    &= \frac{281.67}{8.67} = 32.50.
+\end{align}
+
+$F_{0.05}(2, 12) = 3.89$。$F = 32.50 > 3.89$，拒绝 $H_0$，三种教学法效果有显著差异。
+\end{example}
+
+\subsection{多重比较}
+
+ANOVA 只告诉我们"至少有两个均值不等"，但不告诉我们\textbf{哪些}不等。若 ANOVA 显著，还需做\textbf{多重比较}（multiple comparisons）来找出差异来源。
+
+\begin{itemize}
+    \item \textbf{Tukey HSD（Honestly Significant Difference）：} 控制全部配对比较的总体错误率（family-wise error rate）；
+    \item \textbf{Bonferroni 校正：} 将显著性水平调整为 $\alpha / m$（$m$ 为比较次数），最简单但保守。
+\end{itemize}
+
+% ============================================================
+\section{双因素试验的方差分析}
+
+实际问题中，响应变量常受\textbf{多个因素}同时影响。双因素 ANOVA 同时考察两个因素的主效应及其交互作用。
+
+\subsection{无交互作用的双因素 ANOVA}
+
+\textbf{模型：}
+\begin{equation}
+    X_{ij} = \mu + \alpha_i + \beta_j + \varepsilon_{ij},
+\end{equation}
+其中 $\alpha_i$ 为因素 A 的第 $i$ 水平效应，$\beta_j$ 为因素 B 的第 $j$ 水平效应，
+且满足约束 $\sum_{i}\alpha_i = 0$，$\sum_{j}\beta_j = 0$（否则模型不可识别）。
+
+\textbf{平方和分解（与单因素同理）：}
+
+对每个观测值，离差可拆为三部分：
+\begin{equation}
+    \boxed{X_{ij} - \bar{X} = (\bar{X}_{i\cdot} - \bar{X}) + (\bar{X}_{\cdot j} - \bar{X}) + (X_{ij} - \bar{X}_{i\cdot} - \bar{X}_{\cdot j} + \bar{X})}.
+\end{equation}
+
+平方求和后交叉项为零：
+\begin{equation}
+    \boxed{SS_T = SS_A + SS_B + SS_E}.
+\end{equation}
+
+\begin{center}
+\textbf{无交互作用的双因素 ANOVA 表}
+\begin{tabular}{c|c|c|c|c}
+    \toprule
+    来源 & 平方和 & 自由度 & 均方 & $F$ 值 \\
+    \midrule
+    因素 A & $SS_A$ & $r-1$ & $MS_A$ & $F_A = MS_A / MS_E$ \\
+    因素 B & $SS_B$ & $s-1$ & $MS_B$ & $F_B = MS_B / MS_E$ \\
+    误差   & $SS_E$ & $(r-1)(s-1)$ & $MS_E$ & \\
+    \midrule
+    总和   & $SS_T$ & $rs-1$ & & \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+\begin{example}[无交互作用的双因素 ANOVA 完整演示]
+某教育研究比较三种教学法（因素 A：$A_1$ 讲授式、$A_2$ 讨论式、$A_3$ 翻转课堂）
+在不同学校（因素 B：$B_1, B_2, B_3, B_4$ 四所学校）的效果。
+在每个学校各随机抽取一个班，共 $3 \times 4 = 12$ 个班，期末平均成绩如下（满分 100）：
+
+\begin{center}
+\begin{tabular}{c|cccc|c}
+    \toprule
+    教学法 & $B_1$ & $B_2$ & $B_3$ & $B_4$ & 行均值 $\bar{X}_{i\cdot}$ \\
+    \midrule
+    $A_1$（讲授）  & 72 & 75 & 70 & 78 & 73.75 \\
+    $A_2$（讨论）  & 80 & 83 & 78 & 85 & 81.50 \\
+    $A_3$（翻转）  & 88 & 90 & 85 & 92 & 88.75 \\
+    \midrule
+    列均值 $\bar{X}_{\cdot j}$ & 80.0 & 82.67 & 77.67 & 85.0 & 总均值 $\bar{X}=81.33$ \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{注：} 每种组合只有一个观测值（无重复），无法估计交互作用，
+因此假定教学法与学校之间无交互效应。
+
+\medskip
+\textbf{步骤 1：计算各平方和}
+
+\begin{align}
+    SS_T &= \sum_{i=1}^{3}\sum_{j=1}^{4} (X_{ij} - 81.33)^2 \\
+         &= (72-81.33)^2 + (75-81.33)^2 + \cdots + (92-81.33)^2 \\
+         &= 87.11 + 40.11 + 128.44 + 11.11 \\
+         &\quad + 1.78 + 2.78 + 11.11 + 13.44 \\
+         &\quad + 44.44 + 75.11 + 13.44 + 113.78 = 542.67, \\[4pt]
+    SS_A &= 4 \times \bigl[(73.75-81.33)^2 + (81.50-81.33)^2 + (88.75-81.33)^2\bigr] \\
+         &= 4 \times [57.40 + 0.03 + 55.05] = 4 \times 112.48 = 449.92, \\[4pt]
+    SS_B &= 3 \times \bigl[(80.00-81.33)^2 + (82.67-81.33)^2 + (77.67-81.33)^2 + (85.00-81.33)^2\bigr] \\
+         &= 3 \times [1.78 + 1.78 + 13.44 + 13.44] = 3 \times 30.44 = 91.33, \\[4pt]
+    SS_E &= SS_T - SS_A - SS_B = 542.67 - 449.92 - 91.33 = 1.42.
+\end{align}
+
+\textbf{步骤 2：填写 ANOVA 表}
+
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c}
+    \toprule
+    来源 & $SS$ & $df$ & $MS$ & $F$ & $F_{0.05}$ \\
+    \midrule
+    教学法 (A) & 449.92 & 2   & 224.96 & $F_A = 952.8$ & $F_{0.05}(2,6)=5.14$ \\
+    学校 (B)   & 91.33  & 3   & 30.44  & $F_B = 128.9$ & $F_{0.05}(3,6)=4.76$ \\
+    误差       & 1.42   & 6   & 0.236  & & \\
+    \midrule
+    总和       & 542.67 & 11  & & & \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{步骤 3：做出结论}
+
+\begin{itemize}
+    \item 教学法：$F_A = 952.8 > 5.14$，拒绝 $H_0$，三种教学法效果有极显著差异；
+    \item 学校：$F_B = 128.9 > 4.76$，拒绝 $H_0$，不同学校间成绩存在显著差异。
+\end{itemize}
+
+\textbf{方差分析的解释：}
+\begin{itemize}
+    \item $SS_A = 449.92$ 占总变异的 $82.9\%$，教学法是成绩差异的主要来源；
+    \item $SS_B = 91.33$ 占 $16.8\%$，学校间差异次之；
+    \item $SS_E = 1.42$ 仅占 $0.26\%$，随机误差极小，模型拟合非常好。
+\end{itemize}
+\end{example}
+
+\subsection{有交互作用的双因素 ANOVA}
+
+当两个因素可能相互影响时（如肥料 A 和灌溉量 B 对产量的\textbf{联合}效果），需引入\textbf{交互效应}项 $(\alpha\beta)_{ij}$：
+
+\textbf{模型：}
+\begin{equation}
+    X_{ijk} = \mu + \alpha_i + \beta_j + (\alpha\beta)_{ij} + \varepsilon_{ijk},
+\end{equation}
+其中 $k = 1,\dots,c$（每种处理组合至少有 $c \ge 2$ 次重复）。
+
+\begin{center}
+\textbf{有交互作用的双因素 ANOVA 表}
+\begin{tabular}{c|c|c|c|c}
+    \toprule
+    来源 & 平方和 & 自由度 & 均方 & $F$ 值 \\
+    \midrule
+    因素 A     & $SS_A$  & $r-1$          & $MS_A$  & $F_A = MS_A/MS_E$ \\
+    因素 B     & $SS_B$  & $s-1$          & $MS_B$  & $F_B = MS_B/MS_E$ \\
+    交互 $A\!\times\!B$ & $SS_{AB}$ & $(r-1)(s-1)$ & $MS_{AB}$ & $F_{AB} = MS_{AB}/MS_E$ \\
+    误差       & $SS_E$  & $rs(c-1)$      & $MS_E$  & \\
+    \midrule
+    总和       & $SS_T$  & $rsc-1$        & & \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{分析策略：} 先检验交互作用。若交互显著，主效应的分析需谨慎——因素 A 的效果可能依赖于因素 B 的水平，应做\textbf{简单效应分析}或分水平讨论。
+
+\begin{example}[有交互作用的双因素 ANOVA 完整演示]
+某农业试验研究两种肥料（因素 A：$A_1$ 有机肥、$A_2$ 化肥）和三种灌溉量
+（因素 B：$B_1$ 低、$B_2$ 中、$B_3$ 高）对作物产量的影响。
+每种处理组合设置 3 个重复小区，共 $2 \times 3 \times 3 = 18$ 个小区。
+产量数据（kg/小区）如下：
+
+\begin{center}
+\begin{tabular}{cc|ccc|c}
+    \toprule
+    肥料 & 灌溉 & \multicolumn{3}{c|}{重复观测值} & 单元格均值 \\
+    \midrule
+    $A_1$ & $B_1$ & 42 & 45 & 39 & 42.0 \\
+    $A_1$ & $B_2$ & 55 & 58 & 52 & 55.0 \\
+    $A_1$ & $B_3$ & 50 & 53 & 47 & 50.0 \\
+    \midrule
+    $A_2$ & $B_1$ & 48 & 51 & 45 & 48.0 \\
+    $A_2$ & $B_2$ & 70 & 73 & 67 & 70.0 \\
+    $A_2$ & $B_3$ & 80 & 84 & 76 & 80.0 \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{步骤 1：计算各水平均值}
+
+\begin{center}
+\begin{tabular}{c|ccc|c}
+    \toprule
+    & $B_1$（低） & $B_2$（中） & $B_3$（高） & 行均值 \\
+    \midrule
+    $A_1$（有机） & 42.0 & 55.0 & 50.0 & 49.0 \\
+    $A_2$（化肥） & 48.0 & 70.0 & 80.0 & 66.0 \\
+    \midrule
+    列均值 & 45.0 & 62.5 & 65.0 & 总均值 $\bar{X} = 57.5$ \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{步骤 2：计算各平方和（使用单元格均值 $\bar{X}_{ij\cdot}$）}
+
+\begin{align}
+    SS_A &= 3 \times 3 \times \bigl[(49.0-57.5)^2 + (66.0-57.5)^2\bigr] \\
+         &= 9 \times [72.25 + 72.25] = 9 \times 144.5 = 1300.5, \\[4pt]
+    SS_B &= 2 \times 3 \times \bigl[(45.0-57.5)^2 + (62.5-57.5)^2 + (65.0-57.5)^2\bigr] \\
+         &= 6 \times [156.25 + 25.0 + 56.25] = 6 \times 237.5 = 1425.0, \\[4pt]
+    SS_{AB} &= 3 \times \bigl[(42.0 - 49.0 - 45.0 + 57.5)^2 + (55.0 - 49.0 - 62.5 + 57.5)^2 \\
+            &\qquad\; + (50.0 - 49.0 - 65.0 + 57.5)^2 + (48.0 - 66.0 - 45.0 + 57.5)^2 \\
+            &\qquad\; + (70.0 - 66.0 - 62.5 + 57.5)^2 + (80.0 - 66.0 - 65.0 + 57.5)^2\bigr] \\
+         &= 3 \times [30.25 + 1.0 + 42.25 + 30.25 + 1.0 + 42.25] \\
+         &= 3 \times 147.0 = 441.0, \\[4pt]
+    SS_E &= \text{原始 18 个观测值对各自单元格均值的离差平方和} \\
+         &= \bigl[(42-42)^2+(45-42)^2+(39-42)^2\bigr] + \cdots + \bigl[(80-80)^2+(84-80)^2+(76-80)^2\bigr] \\
+         &= 18 + 18 + 18 + 18 + 18 + 32 = 122, \\[4pt]
+    SS_T &= 1300.5 + 1425.0 + 441.0 + 122 = 3288.5.
+\end{align}
+
+验证（直接从原始数据算 $SS_T$）：
+$SS_T = \sum_{k=1}^{18}(X_k - 57.5)^2 = 3288.5$。$\checkmark$
+
+\textbf{步骤 3：填写 ANOVA 表}
+
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c}
+    \toprule
+    来源 & $SS$ & $df$ & $MS$ & $F$ & $F_{0.05}$ \\
+    \midrule
+    肥料 (A)       & 1300.5 & 1   & 1300.5 & $F_A = 128.0$   & $F_{0.05}(1,12)=4.75$ \\
+    灌溉 (B)       & 1425.0 & 2   & 712.5  & $F_B = 70.1$    & $F_{0.05}(2,12)=3.89$ \\
+    交互 $A\!\times\!B$ & 441.0  & 2   & 220.5  & $F_{AB} = 21.7$ & $F_{0.05}(2,12)=3.89$ \\
+    误差           & 122.0  & 12  & 10.17  & & \\
+    \midrule
+    总和           & 3288.5 & 17  & & & \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{步骤 4：做出结论}
+
+\begin{enumerate}
+    \item \textbf{交互作用：} $F_{AB} = 21.7 > 3.89$，交互作用极显著。
+    肥料的效果\textbf{依赖于}灌溉水平——不能简单地讨论"哪种肥料更好"。
+
+    \item \textbf{简单效应分析（分灌溉水平看肥料差异）：}
+    \begin{itemize}
+        \item 低灌溉 ($B_1$)：有机 42.0 vs 化肥 48.0，化肥略好；
+        \item 中灌溉 ($B_2$)：有机 55.0 vs 化肥 70.0，化肥明显更好；
+        \item 高灌溉 ($B_3$)：有机 50.0 vs 化肥 80.0，化肥优势最大。
+    \end{itemize}
+    结论：化肥在高灌溉条件下增产效果最突出，有机肥产量随灌溉量变化不大。
+
+    \item \textbf{交互效应图（概念描述）：}
+    若将两条折线画在同一坐标系中（横轴为灌溉量，纵轴为产量），
+    化肥的线随灌溉量急剧上升（48 $\to$ 70 $\to$ 80），
+    有机肥的线相对平坦（42 $\to$ 55 $\to$ 50，中灌溉后反而略降）。
+    两条线\textbf{不平行}，这正是交互作用存在的直观证据。
+\end{enumerate}
+
+\textbf{与无交互情形的对比：} 若忽略交互项而强行拟合无交互模型，
+交互的变异（$SS_{AB}=441.0$）会被错误地归入误差，
+导致 $MS_E$ 膨胀、$F$ 检验不敏感、结论可能完全错误。
+这就是为什么\textbf{有重复时必须检验交互}。
+\end{example}
+
+\begin{remark}[本例如何满足 ANOVA 的三个前提条件]
+以肥料 $\times$ 灌溉的试验为例，逐一检查：
+
+\begin{enumerate}
+    \item \textbf{独立性：} 试验设计层面保证——18 个小区随机分配 6 种处理组合，
+    各小区的产量互不影响。独立性主要靠\textbf{随机化}（randomization）来确保，
+    而非事后检验。
+
+    \item \textbf{正态性：} ANOVA 要求的是\textbf{残差}（$X_{ijk} - \bar{X}_{ij\cdot}$，
+    即每个观测值减去其所在处理组合的均值）服从正态分布，而非原始数据本身。
+    本例共 18 个残差（6 个处理组合 $\times$ 3 个重复），可做 Q-Q 图检验。
+    实践中 ANOVA 对中等程度的正态偏离是鲁棒的（中心极限定理的作用）。
+
+    \item \textbf{方差齐性：} 要求 6 个处理组合的总体方差相等。
+    从样本方差看：
+    \begin{center}
+    \begin{tabular}{c|c|c}
+        \toprule
+        处理组合 & 单元格数据 & 样本方差 \\
+        \midrule
+        $A_1B_1$ & 42, 45, 39 & $s^2 = 9.0$ \\
+        $A_1B_2$ & 55, 58, 52 & $s^2 = 9.0$ \\
+        $A_1B_3$ & 50, 53, 47 & $s^2 = 9.0$ \\
+        $A_2B_1$ & 48, 51, 45 & $s^2 = 9.0$ \\
+        $A_2B_2$ & 70, 73, 67 & $s^2 = 9.0$ \\
+        $A_2B_3$ & 80, 84, 76 & $s^2 = 16.0$ \\
+        \bottomrule
+    \end{tabular}
+    \end{center}
+    前五组方差均为 9.0，仅 $A_2B_3$ 略高（16.0）。最大方差比 $16/9 \approx 1.78$，
+    在每组仅 3 个观测的情况下属于可接受范围。
+    若方差差异悬殊（如最大/最小 $> 4$），则需考虑数据变换（如对数变换）或改用 Welch 型校正。
+\end{enumerate}
+
+\textbf{实用口诀：} 独立性靠设计、正态性看残差、方差齐性比组内。三者中独立性最重要且不可补救，\textbf{违反独立性 = 结论无效}。
+\end{remark}
+
+% ============================================================
+\section{一元线性回归}
+
+回归分析研究变量之间的\textbf{数量关系}，是机器学习中监督学习的基础。
+
+\subsection{模型与假设}
+
+\begin{definition}[一元线性回归模型]
+\begin{equation}
+    Y_i = \beta_0 + \beta_1 x_i + \varepsilon_i, \quad i = 1,\dots,n,
+\end{equation}
+其中：
+\begin{itemize}
+    \item $x_i$ 为自变量（解释变量），视为非随机；
+    \item $\varepsilon_i \stackrel{\mathrm{i.i.d.}}{\sim} \mathcal{N}(0, \sigma^2)$。
+\end{itemize}
+\end{definition}
+
+\subsection{最小二乘估计 (OLS)}
+
+目标：找 $\hat{\beta}_0, \hat{\beta}_1$ 使残差平方和最小：
+\begin{equation}
+    Q(\beta_0, \beta_1) = \sum_{i=1}^{n} (Y_i - \beta_0 - \beta_1 x_i)^2.
+\end{equation}
+
+令偏导为零，得正规方程：
+\begin{align}
+    \hat{\beta}_1 &= \frac{\sum_{i=1}^{n} (x_i - \bar{x})(Y_i - \bar{Y})}
+                          {\sum_{i=1}^{n} (x_i - \bar{x})^2}
+                   = \frac{S_{xy}}{S_{xx}}, \\
+    \hat{\beta}_0 &= \bar{Y} - \hat{\beta}_1 \bar{x}.
+\end{align}
+
+\subsection{拟合优度：$R^2$}
+
+\begin{definition}[决定系数]
+\begin{equation}
+    R^2 = \frac{SS_R}{SS_T}
+         = 1 - \frac{SS_E}{SS_T}
+         = 1 - \frac{\sum (Y_i - \hat{Y}_i)^2}{\sum (Y_i - \bar{Y})^2}.
+\end{equation}
+$R^2 \in [0,1]$ 度量了 $x$ 对 $Y$ 变异性的解释比例。$R^2$ 越接近 1，拟合越好。
+\end{definition}
+
+\textbf{平方和分解（与 ANOVA 同源）：}
+\begin{equation}
+    \underbrace{\sum (Y_i - \bar{Y})^2}_{SS_T}
+    = \underbrace{\sum (\hat{Y}_i - \bar{Y})^2}_{SS_R}
+    + \underbrace{\sum (Y_i - \hat{Y}_i)^2}_{SS_E}.
+\end{equation}
+
+\subsection{回归系数的假设检验}
+
+\begin{itemize}
+    \item \textbf{$t$ 检验：} 检验 $H_0: \beta_1 = 0$（即 $x$ 对 $Y$ 无线性影响）。
+    \begin{equation}
+        T = \frac{\hat{\beta}_1}{SE(\hat{\beta}_1)} \sim t(n-2),
+        \quad SE(\hat{\beta}_1) = \sqrt{\frac{MS_E}{S_{xx}}}.
+    \end{equation}
+
+    \item \textbf{$F$ 检验：} 等价于 ANOVA 框架下的整体显著性检验。
+    \begin{equation}
+        F = \frac{MS_R}{MS_E} = \frac{SS_R/1}{SS_E/(n-2)} \sim F(1, n-2).
+    \end{equation}
+    对于一元回归，$F = T^2$，两种检验等价。
+\end{itemize}
+
+\subsection{置信区间与预测区间}
+
+\begin{itemize}
+    \item \textbf{均值 $E[Y\mid x_0]$ 的置信区间：}
+    \begin{equation}
+        \hat{Y}_0 \pm t_{\alpha/2}(n-2) \cdot s \sqrt{\frac{1}{n} + \frac{(x_0 - \bar{x})^2}{S_{xx}}}.
+    \end{equation}
+
+    \item \textbf{新观测值 $Y_{\text{new}}$ 的预测区间：}
+    \begin{equation}
+        \hat{Y}_0 \pm t_{\alpha/2}(n-2) \cdot s \sqrt{1 + \frac{1}{n} + \frac{(x_0 - \bar{x})^2}{S_{xx}}}.
+    \end{equation}
+    其中 $s = \sqrt{MS_E}$。
+
+    预测区间比置信区间宽（多了根号内的 $1$），因为新观测值含有额外的随机误差。
+\end{itemize}
+
+\begin{example}[一元线性回归完整演示]
+研究学习时间（$x$，小时）与考试成绩（$Y$，分）的关系，数据如下：
+
+\begin{center}
+\begin{tabular}{c|cccccc}
+    \toprule
+    学习时间 $x_i$ & 1 & 2 & 3 & 4 & 5 & 6 \\
+    \midrule
+    考试成绩 $Y_i$ & 52 & 58 & 65 & 70 & 78 & 85 \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{步骤 1：计算基本统计量}
+\begin{align}
+    \bar{x} &= 3.5, \quad \bar{Y} = 68, \\
+    S_{xx} &= \sum (x_i - 3.5)^2 = 17.5, \\
+    S_{xy} &= \sum (x_i - 3.5)(Y_i - 68) = 115.
+\end{align}
+
+\textbf{步骤 2：估计回归系数}
+\begin{equation}
+    \hat{\beta}_1 = \frac{S_{xy}}{S_{xx}} = \frac{115}{17.5} = 6.571,
+    \quad
+    \hat{\beta}_0 = 68 - 6.571 \times 3.5 = 45.0.
+\end{equation}
+
+回归方程：$\hat{Y} = 45.0 + 6.571 x$。即每多学 1 小时，成绩预期提高约 6.6 分。
+
+\textbf{步骤 3：检验 $\beta_1 = 0$}
+
+先计算 $SS_E = \sum (Y_i - \hat{Y}_i)^2 = 18.86$，$MS_E = 18.86/4 = 4.714$。
+\begin{equation}
+    SE(\hat{\beta}_1) = \sqrt{\frac{4.714}{17.5}} = 0.519,
+    \quad
+    T = \frac{6.571}{0.519} = 12.66.
+\end{equation}
+$t_{0.025}(4) = 2.776$。$|T| = 12.66 > 2.776$，拒绝 $H_0$，学习时间对成绩有显著线性影响。
+
+$R^2 = 1 - 18.86/698 = 0.973$，学习时间解释了 97.3\% 的成绩变异。
+\end{example}
+
+% ============================================================
+\section{多元线性回归}
+
+当影响因素不止一个时，需要引入多个自变量。
+
+\subsection{模型与矩阵形式}
+
+\begin{definition}[多元线性回归模型]
+\begin{equation}
+    Y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip} + \varepsilon_i,
+    \quad \varepsilon_i \stackrel{\mathrm{i.i.d.}}{\sim} \mathcal{N}(0, \sigma^2).
+\end{equation}
+\end{definition}
+
+\textbf{矩阵形式：}
+\begin{equation}
+    \bm{Y} = \bm{X}\bm{\beta} + \bm{\varepsilon},
+\end{equation}
+其中 $\bm{Y}$ 为 $n \times 1$ 响应向量，$\bm{X}$ 为 $n \times (p+1)$ 设计矩阵（第一列全为 1），
+$\bm{\beta}$ 为 $(p+1) \times 1$ 系数向量，$\bm{\varepsilon} \sim \mathcal{N}(\bm{0}, \sigma^2 \bm{I})$。
+
+\subsection{最小二乘估计}
+
+正规方程：$\bm{X}^{\mathsf{T}}\bm{X}\hat{\bm{\beta}} = \bm{X}^{\mathsf{T}}\bm{Y}$。
+
+当 $\bm{X}^{\mathsf{T}}\bm{X}$ 可逆时：
+\begin{equation}
+    \boxed{\hat{\bm{\beta}} = (\bm{X}^{\mathsf{T}}\bm{X})^{-1} \bm{X}^{\mathsf{T}}\bm{Y}}.
+\end{equation}
+
+$\hat{\bm{\beta}}$ 的协方差矩阵：$\Var(\hat{\bm{\beta}}) = \sigma^2 (\bm{X}^{\mathsf{T}}\bm{X})^{-1}$。
+
+\begin{remark}[OLS 与极大似然估计 (MLE) 的关系]
+OLS 是 MLE 在\textbf{正态误差假设}下的特例。由模型 $\bm{\varepsilon} \sim \mathcal{N}(\bm{0}, \sigma^2 \bm{I})$，
+似然函数为：
+\begin{equation}
+    L(\bm{\beta}, \sigma^2) = (2\pi\sigma^2)^{-n/2}
+    \exp\!\left(-\frac{\|\bm{Y} - \bm{X}\bm{\beta}\|^2}{2\sigma^2}\right).
+\end{equation}
+
+取对数似然：
+\begin{equation}
+    \ell(\bm{\beta}, \sigma^2) = -\frac{n}{2}\ln(2\pi) - \frac{n}{2}\ln\sigma^2
+                                - \frac{\|\bm{Y} - \bm{X}\bm{\beta}\|^2}{2\sigma^2}.
+\end{equation}
+
+对 $\bm{\beta}$ 求最大——前两项不含 $\bm{\beta}$，第三项分子是残差平方和，负号意味着：
+\begin{equation}
+    \boxed{\arg\max_{\bm{\beta}} \;\ell(\bm{\beta}, \sigma^2)
+           = \arg\min_{\bm{\beta}} \;\|\bm{Y} - \bm{X}\bm{\beta}\|^2}.
+\end{equation}
+
+\textbf{最大化似然 $\iff$ 最小化残差平方和}，因此：
+\begin{equation}
+    \boxed{\hat{\bm{\beta}}_{\text{OLS}} = \hat{\bm{\beta}}_{\text{MLE}} = (\bm{X}^{\mathsf{T}}\bm{X})^{-1}\bm{X}^{\mathsf{T}}\bm{Y}}.
+\end{equation}
+
+\textbf{注意：} 若误差分布不是正态（如 Laplace），MLE 的解将不再是 OLS——
+例如 Laplace 误差下 MLE 等价于最小化绝对偏差（LAD / 分位数回归）。
+OLS 本身是几何/优化方法，无需概率假设即可使用；概率假设赋予其 MLE 的优良渐近性质。
+\end{remark}
+
+\subsection{显著性检验}
+
+\textbf{整体显著性检验（$F$ 检验）：}
+\begin{equation}
+    H_0: \beta_1 = \beta_2 = \cdots = \beta_p = 0.
+\end{equation}
+\begin{equation}
+    F = \frac{SS_R / p}{SS_E / (n-p-1)} \sim F(p,\; n-p-1).
+\end{equation}
+
+\textbf{单个系数的检验（$t$ 检验）：}
+\begin{equation}
+    H_0: \beta_j = 0, \quad
+    T_j = \frac{\hat{\beta}_j}{SE(\hat{\beta}_j)} \sim t(n-p-1),
+\end{equation}
+其中 $SE(\hat{\beta}_j) = s \sqrt{(\bm{X}^{\mathsf{T}}\bm{X})^{-1}_{jj}}$，$s = \sqrt{MS_E}$。
+
+\textbf{调整 $R^2$：} 普通 $R^2$ 随变量增加而单调不减（即使加入噪声变量），调整 $R^2$ 引入自由度惩罚：
+\begin{equation}
+    R^2_{\text{adj}} = 1 - \frac{SS_E/(n-p-1)}{SS_T/(n-1)}
+                     = 1 - (1-R^2) \frac{n-1}{n-p-1}.
+\end{equation}
+
+\subsection{多重共线性}
+
+当自变量间高度相关时，$\bm{X}^{\mathsf{T}}\bm{X}$ 接近奇异，导致：
+\begin{itemize}
+    \item $\hat{\beta}_j$ 的方差极大，估计不稳定；
+    \item 系数符号可能与直觉相反；
+    \item $t$ 检验不显著但 $F$ 检验显著（矛盾现象）。
+\end{itemize}
+
+\textbf{诊断方法：} 方差膨胀因子（VIF），$VIF_j = \frac{1}{1 - R_j^2}$，其中 $R_j^2$ 为 $x_j$ 对其余 $p-1$ 个自变量回归的决定系数。通常 $VIF > 10$ 表明严重共线性，$VIF > 5$ 需要关注。
+
+\subsection{回归诊断：假设验证}
+
+OLS 回归的 $t$ 检验和 $F$ 检验依赖于三个核心假设。建模后必须逐条诊断——
+不能跳过这一步直接报告 $p$ 值。
+
+\subsubsection{正态性检验：Shapiro-Wilk 检验与 Q-Q 图}
+
+回归要求的是\textbf{残差} $\varepsilon_i = Y_i - \hat{Y}_i$ 服从正态分布（不是 $X$ 或 $Y$ 本身）。
+
+\begin{definition}[Shapiro-Wilk 检验]
+$H_0$：数据来自正态分布。检验统计量 $W \in [0,1]$，越接近 1 越像正态。
+
+\begin{itemize}
+    \item 若 $p > 0.05$：不拒绝 $H_0$，可以认为残差满足正态性；
+    \item 若 $p \le 0.05$：拒绝 $H_0$，残差显著不正态，$t$ 检验和 $p$ 值不可靠。
+\end{itemize}
+\end{definition}
+
+\textbf{Shapiro-Wilk 的局限：} 样本量很大时（$n > 5000$），微小的偏离也会导致 $p < 0.05$。
+此时应\textbf{以 Q-Q 图为主}——只要散点大致沿对角线，轻微的系统偏离可以接受。
+
+\textbf{正态性不满足时的补救：}
+\begin{itemize}
+    \item Box-Cox 变换：$Y^{(\lambda)} = \begin{cases} (Y^\lambda - 1)/\lambda, & \lambda \neq 0 \\ \ln Y, & \lambda = 0 \end{cases}$
+    \item 改用第 4 章的秩和检验等非参数方法
+    \item 大样本下（$n \ge 30$），由 CLT，$t$ 检验对正态偏离有一定鲁棒性
+\end{itemize}
+
+\subsubsection{方差齐性（Homoscedasticity）}
+
+\textbf{含义：} 不同 $X$ 取值下，$Y$ 的波动幅度应该大致相同。即 $\Var(\varepsilon_i) = \sigma^2$（常数），
+不随 $\hat{Y}_i$ 变化。
+
+\textbf{诊断方法：} 画残差 vs 拟合值散点图：
+\begin{itemize}
+    \item 正常：残差随机散布在零线上下，无明显的宽窄变化
+    \item 违反正：残差随拟合值增大而发散（漏斗形）→ \textbf{异方差（Heteroscedasticity）}
+\end{itemize}
+
+\textbf{异方差的后果：} $SE(\hat{\beta}_j)$ 的估计不准确 → $t$ 检验和置信区间无效，
+即使系数估计本身仍然无偏。
+
+\textbf{补救：}
+\begin{itemize}
+    \item 对 $Y$ 做对数变换（最常用）：$Y' = \ln Y$
+    \item 使用加权最小二乘（WLS），给波动大的点更小的权重
+    \item 使用异方差稳健标准误（Huber-White / sandwich estimator）
+\end{itemize}
+
+\subsubsection{异常值与影响力点}
+
+\begin{itemize}
+    \item \textbf{Cook's distance}：度量删除某个观测后回归系数变化的大小。经验阈值：$D_i > 4/n$
+    \item 高 Cook's distance 的点需要检查——可能是录入错误，也可能是真正有信息量的极端案例
+\end{itemize}
+
+\subsection{混合效应模型简介}
+
+前述回归模型假设所有观测独立同分布。但在实际数据中，经常出现\textbf{重复测量}或\textbf{嵌套结构}：
+
+\begin{itemize}
+    \item NIPT 数据：同一孕妇在不同孕周检测多次 $\to$ 同一个人数据天然相似
+    \item 教育数据：同一学校的学生成绩相关 $\to$ 数据嵌套在学校内
+    \item 医学试验：同一患者多次随访 $\to$ 数据嵌套在患者内
+\end{itemize}
+
+如果用普通回归处理这类数据，相当于把 $n$ 个不完全独立的数据当成 $n$ 个完全独立的数据，
+\textbf{标准误会被严重低估}，$p$ 值虚低。
+
+\medskip
+\textbf{模型形式：}
+
+\begin{equation}
+    Y_{ij} = \underbrace{\alpha + \beta X_{ij}}_{\text{固定效应}} \;+\; \underbrace{u_i}_{\text{随机效应}} \;+\; \varepsilon_{ij},
+\end{equation}
+
+其中 $i$ 表示第 $i$ 个组（如第 $i$ 个孕妇），$j$ 表示组内第 $j$ 次测量。
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{c|c|c}
+\toprule
+& \textbf{固定效应} & \textbf{随机效应} \\
+\midrule
+含义 & 对所有组都一样的规律 & 各组独有的偏移 \\
+变量 & $\alpha, \beta$（待估参数） & $u_i \sim \mathcal{N}(0, \tau^2)$（方差待估） \\
+例子 & BMI 每增加 1，Y 浓度降低 0.008 & 张三天生 Y 浓度偏高 0.01 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\textbf{两种 $R^2$（这正是 NIPT 官方解法的核心洞察）：}
+
+\begin{itemize}
+    \item \textbf{Marginal $R^2$}：仅固定效应解释的变异比例——通常很低（如 3\%），因为个体差异被排除在外
+    \item \textbf{Conditional $R^2$}：固定效应 + 随机效应共同解释的变异比例——通常很高（如 83\%），因为"谁是这个孕妇"本身就携带大量信息
+\end{itemize}
+
+二者的巨大差距揭示了一个重要事实：\textbf{Y 染色体浓度的变异主要来自个体差异，而非 BMI 或孕周。}
+这正是需要按 BMI 分组、制定个性化检测时点的统计依据。
+
+\subsection{分位数回归（Quantile Regression）}
+
+普通最小二乘（OLS）估计的是\textbf{条件均值} $\E[Y \mid X]$——回答"在 $X$ 这个水平下，$Y$ 平均是多少"。
+但在许多实际问题中，我们关心的不是均值，而是\textbf{分布的不同位置}。
+
+\medskip
+\textbf{动机：} NIPT 问题 2 要求"最早达标时间"——即 Y 染色体浓度达到 4\% 时的孕周。
+用 OLS 估计"平均何时达标"意味着约一半人会早于、一半人会晚于这个时间——
+这太乐观了。临床需要的是"确保大多数人都已达标"的保守时点。
+
+\subsubsection{基本概念}
+
+分位数回归估计的是\textbf{条件分位数} $Q_\tau(Y \mid X)$，其中 $\tau \in (0,1)$ 是分位水平：
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{c|c|c}
+\toprule
+$\tau$ & 含义 & 对应的统计量 \\
+\midrule
+0.50 & 条件中位数 & 一半人高于、一半人低于此值 \\
+0.25 & 条件下四分位数 & 25\% 的人低于此值 \\
+0.75 & 条件上四分位数 & 75\% 的人低于此值 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{与 OLS 的对比：}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{p{3cm}|p{4.5cm}|p{4.5cm}}
+\toprule
+& \textbf{OLS（均值回归）} & \textbf{分位数回归} \\
+\midrule
+估计目标 & $\E[Y \mid X]$ & $Q_\tau(Y \mid X)$ \\
+损失函数 & $\sum (y_i - \hat{y}_i)^2$ & $\sum \rho_\tau(y_i - \hat{y}_i)$ \\
+异常值影响 & 敏感（平方放大偏差） & 稳健（$\tau=0.5$ 即为中位数回归） \\
+假设 & 残差正态、方差齐性 & 无需分布假设 \\
+输出 & 一条线（均值） & 可画多条线（不同分位） \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{损失函数：检查函数（Check Function）}
+
+分位数回归最小化的是\textbf{非对称绝对损失}：
+
+\begin{equation}
+    \rho_\tau(u) = u \cdot (\tau - \mathbf{1}_{\{u < 0\}})
+    = \begin{cases}
+        \tau \cdot u,      & u \ge 0 \;\;(\text{高估的惩罚}) \\
+        (\tau - 1) \cdot u, & u < 0 \;\;(\text{低估的惩罚})
+    \end{cases}
+\end{equation}
+
+\begin{itemize}
+    \item $\tau = 0.50$：$\rho_{0.5}(u) = 0.5|u|$，高估和低估惩罚对称 → 退化为中位数回归
+    \item $\tau = 0.30$：低估的惩罚（$0.70|u|$）$\gg$ 高估的惩罚（$0.30|u|$）→ 回归线被\emph{往下拉}，给出保守估计
+\end{itemize}
+
+目标函数：
+\begin{equation}
+    \hat{\bm{\beta}}_\tau = \argmin_{\bm{\beta}} \sum_{i=1}^{n} \rho_\tau(y_i - \mathbf{x}_i^\top \bm{\beta}).
+\end{equation}
+
+\subsubsection{模型形式}
+
+与 OLS 形式完全相同，但系数依赖于 $\tau$：
+
+\begin{equation}
+    Q_\tau(Y \mid X) = \beta_0(\tau) + \beta_1(\tau) X_1 + \cdots + \beta_p(\tau) X_p.
+\end{equation}
+
+不同 $\tau$ 给出不同的 $\hat{\beta}_j(\tau)$——例如 BMI 对 Y 浓度的影响可能在低分位（体重轻的人）和高分位（体重大的人）不同。
+
+\subsubsection{NIPT 中的应用}
+
+对每组 BMI，用分位数回归估计 $Q_{0.30}(Y \mid \mathrm{GA})$，然后解：
+
+\begin{equation}
+    \hat{\alpha}_{g,0.30} + \hat{\gamma}_{g,0.30} \cdot \widehat{\mathrm{GA}}_{g,0.30} = 0.04
+    \quad\Longrightarrow\quad
+    \widehat{\mathrm{GA}}_{g,0.30} = \frac{0.04 - \hat{\alpha}_{g,0.30}}{\hat{\gamma}_{g,0.30}}.
+\end{equation}
+
+取 $\tau = 0.30$ 的含义：估计的是"至少 30\% 的该 BMI 组孕妇在此孕周已达 Y 浓度 4\%"——比均值回归更保守、更符合临床对"安全时点"的要求。
+
+\subsection{模型选择}
+
+选择最优子集自变量的常用准则：
+\begin{itemize}
+    \item \textbf{AIC（赤池信息准则）：} $AIC = n\ln(SS_E/n) + 2p$，越小越好；
+    \item \textbf{BIC（贝叶斯信息准则）：} $BIC = n\ln(SS_E/n) + p\ln n$，对变量数惩罚更重；
+    \item \textbf{逐步回归：} 前向选择、后向剔除、逐步回归——实用但需谨慎解释。
+\end{itemize}
+
+% ============================================================
+%  小结
+% ============================================================
+\section*{本章小结}
+
+本章涵盖了两个紧密关联的统计建模主题：
+
+\begin{enumerate}
+    \item \textbf{单因素 ANOVA}：将总变异分解为组间 + 组内，通过 $F$ 检验判断多个均值是否全等；
+    \item \textbf{双因素 ANOVA}：同时考察两个因素及其交互作用，平方和分解更复杂但思想相同；
+    \item \textbf{一元线性回归}：最小二乘估计 $\hat{\beta}_0, \hat{\beta}_1$，$R^2$ 评价拟合，$t$/$F$ 检验显著性；
+    \item \textbf{多元线性回归}：矩阵形式 $\hat{\bm{\beta}} = (\bm{X}^{\mathsf{T}}\bm{X})^{-1}\bm{X}^{\mathsf{T}}\bm{Y}$，多重共线性诊断与模型选择。
+\end{enumerate}
+
+\textbf{ANOVA 与回归的统一视角：} 两者都是\textbf{一般线性模型}的特例——ANOVA 的自变量是分类变量（通过虚拟变量编码），回归的自变量是连续变量。在机器学习中，线性回归是最简单的监督学习模型，而 ANOVA 的思想体现在特征重要性和模型比较的 $F$ 检验中。
+
+\textbf{回归诊断与混合效应：} 建立回归模型后，必须进行诊断——残差正态性（Shapiro-Wilk 检验、Q-Q 图）、方差齐性（残差 vs 拟合值图）、多重共线性（VIF）。当数据存在重复测量或嵌套结构时，需引入混合效应模型，用随机效应（$u_i$）区分个体差异与系统性效应，避免标准误低估。
+
+% ============================================================
+%  第 10 章：Bootstrap 方法
+% ============================================================

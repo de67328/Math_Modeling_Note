@@ -1,0 +1,360 @@
+\part{机器学习}
+
+\chapter{矩阵运算与张量记号}
+
+本章为进入机器学习核心内容做数学准备。假设读者已学过线性代数（向量空间、矩阵乘法、行列式、特征值），
+但未系统学过矩阵微积分。本章聚焦\textbf{推导中高频使用的矩阵操作}，
+并引入张量分析的指标记号（Einstein 求和约定），
+便于在后续章节中简洁地表达梯度和优化问题。
+
+% ============ §1 迹运算 ============
+\section{迹运算}
+
+迹运算是矩阵求导的核心工具——几乎所有标量对矩阵的求导都可以通过迹来统一处理。
+
+\begin{definition}[迹]
+$n \times n$ 方阵 $A$ 的迹是其主对角线元素之和：
+\begin{equation}
+    \mathrm{tr}(A) = \sum_{i=1}^{n} a_{ii}.
+\end{equation}
+\end{definition}
+
+\begin{proposition}[迹的基本性质]
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{线性性：} $\mathrm{tr}(\alpha A + \beta B) = \alpha\,\mathrm{tr}(A) + \beta\,\mathrm{tr}(B)$；
+    \item \textbf{转置不变：} $\mathrm{tr}(A^\top) = \mathrm{tr}(A)$；
+    \item \textbf{循环性（核心）：} $\mathrm{tr}(AB) = \mathrm{tr}(BA)$，推广为
+    \begin{equation}\label{eq:trace-cyclic}
+        \mathrm{tr}(ABC) = \mathrm{tr}(BCA) = \mathrm{tr}(CAB);
+    \end{equation}
+    \item \textbf{标量即迹：} 若 $x^\top A x$ 是标量，则 $x^\top A x = \mathrm{tr}(x^\top A x) = \mathrm{tr}(A x x^\top)$。
+\end{enumerate}
+\end{proposition}
+
+\textbf{迹技巧的本质：} 把标量表达式塞进 $\mathrm{tr}(\cdot)$，利用循环性质把要求导的变量移到最右侧，
+然后利用 $\frac{\partial}{\partial X}\mathrm{tr}(AX) = A^\top$ 一步得出结果。
+这是推导 OLS、Ridge、MLE 中矩阵梯度的标准方法。
+
+% ============ §2 正定与半正定矩阵 ============
+\section{正定与半正定矩阵}
+
+\begin{definition}[正定与半正定]
+设 $A$ 为 $n \times n$ 实对称矩阵：
+\begin{itemize}
+    \item $A$ \textbf{正定}（$A \succ 0$）：对所有 $x \neq 0$，$x^\top A x > 0$；
+    \item $A$ \textbf{半正定}（$A \succeq 0$）：对所有 $x$，$x^\top A x \ge 0$。
+\end{itemize}
+\end{definition}
+
+\begin{proposition}[等价条件]
+\begin{enumerate}[label=(\arabic*)]
+    \item $A \succ 0$ $\iff$ 所有特征值 $\lambda_i > 0$；
+    \item $A \succeq 0$ $\iff$ 所有特征值 $\lambda_i \ge 0$；
+    \item $A \succeq 0$ $\iff$ 存在 $B$ 使得 $A = B^\top B$（如 Cholesky 分解 $A = LL^\top$）。
+\end{enumerate}
+\end{proposition}
+
+\textbf{在 ML 中的意义：}
+\begin{itemize}
+    \item 协方差矩阵 $\Sigma$ 总是半正定——这是它能做 Cholesky 分解的原因；
+    \item 设计矩阵乘积 $X^\top X$ 是半正定的。当 $p > N$ 时，$X^\top X$ 奇异（不可逆）——
+    Ridge 回归通过加 $\lambda I$ 使其变为正定，从而可逆；
+    \item Hessian 矩阵正定 $\implies$ 目标函数是凸函数 $\implies$ 驻点即全局最优。
+\end{itemize}
+
+% ============ §3 矩阵求导 ============
+\section{矩阵求导}
+
+矩阵求导是梯度下降、正规方程推导、MLE 的必要工具。
+本节以\emph{分子布局}（numerator layout）为约定，即标量对列向量求导得到行向量。
+
+\subsection{标量对向量的导数}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.8}
+\begin{tabular}{c|c|c}
+\toprule
+\textbf{表达式 $f(x)$} & \textbf{梯度 $\nabla_x f$} & \textbf{出现场景} \\
+\midrule
+$a^\top x$ & $a^\top$ & 线性函数求导 \\
+$x^\top A x$ & $x^\top (A + A^\top)$ & 二次型的一般形式 \\
+$x^\top A x$（$A$ 对称） & $2x^\top A$ & RSS、马氏距离 \\
+$\|Ax - b\|^2$ & $2(Ax - b)^\top A$ & 最小二乘损失 \\
+$\|x\|^2 = x^\top x$ & $2x^\top$ & $L_2$ 正则化 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{example}[OLS 正规方程的推导]
+最小二乘的损失函数 $J(\beta) = \|X\beta - y\|^2$：
+\begin{align}
+    J(\beta) &= (X\beta - y)^\top (X\beta - y) \nonumber\\
+    \nabla_\beta J &= 2(X\beta - y)^\top X = 0 \nonumber\\
+    &\implies X^\top X \beta = X^\top y \quad \text{（正规方程）}.
+\end{align}
+\end{example}
+
+\subsection{标量对矩阵的导数}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.8}
+\begin{tabular}{c|c|c}
+\toprule
+\textbf{表达式 $f(X)$} & \textbf{导数 $\frac{\partial f}{\partial X}$} & \textbf{出现场景} \\
+\midrule
+$\log\det X$ & $X^{-\top}$（或 $X^{-1}$） & 多元正态 MLE 中 $\Sigma$ 估计 \\
+$\mathrm{tr}(AX)$ & $A^\top$ & 迹求导基础公式 \\
+$a^\top X b$ & $a b^\top$ & 双线性形式 \\
+$\mathrm{tr}(X^\top A X)$ & $(A + A^\top)X$ & 加权最小二乘 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{向量对向量的导数（雅可比矩阵）}
+
+\begin{equation}
+    \frac{\partial y}{\partial x} =
+    \begin{bmatrix}
+        \frac{\partial y_1}{\partial x_1} & \cdots & \frac{\partial y_1}{\partial x_n} \\
+        \vdots & \ddots & \vdots \\
+        \frac{\partial y_m}{\partial x_1} & \cdots & \frac{\partial y_m}{\partial x_n}
+    \end{bmatrix},
+    \qquad
+    \frac{\partial Ax}{\partial x} = A.
+\end{equation}
+
+% ============ §4 张量分析记号 ============
+\section{张量分析的指标记号}
+
+矩阵语言在处理二阶及以上的求导时会变得非常臃肿。
+张量分析的指标记号（index notation）提供了一套并行使用的简洁语言，
+特别适用于表达元素的偏导数关系和 Hessian 结构。
+
+\subsection{Einstein 求和约定}
+
+\textbf{核心规则：} 在同一项中，若一个指标出现两次（一上一下，或两下标），
+则默认对该指标的所有可能取值求和。求和号 $\sum$ 被省略。
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{c|c|c}
+\toprule
+\textbf{矩阵记号} & \textbf{Einstein 记号} & \textbf{含义} \\
+\midrule
+$y = Ax$ & $y_i = A_{ij} x_j$ & $y_i = \sum_{j} A_{ij} x_j$ \\
+$c = a^\top b$ & $c = a_i b_i$ & $\sum_i a_i b_i$（内积） \\
+$C = AB$ & $C_{ik} = A_{ij} B_{jk}$ & $C_{ik} = \sum_j A_{ij} B_{jk}$ \\
+$\mathrm{tr}(A)$ & $A_{ii}$ & $\sum_i A_{ii}$ \\
+$x^\top A x$ & $x_i A_{ij} x_j$ & $\sum_{i,j} x_i A_{ij} x_j$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{关键约定：}
+\begin{itemize}
+    \item \textbf{哑指标（dummy index）：} 出现两次、被求和的指标（如 $j$ 在 $A_{ij}B_{jk}$ 中），
+    字母可任意更换——$A_{ij}B_{jk} = A_{ik}B_{kl}$ 并不成立，但 $A_{ij}B_{jk} = A_{im}B_{mk}$；
+    \item \textbf{自由指标（free index）：} 只出现一次、不被求和的指标（如 $i$ 和 $k$）——
+    这些指标在等式两边必须一致出现。
+\end{itemize}
+
+\subsection{Kronecker $\delta$ 符号}
+
+\begin{equation}
+    \delta_{ij} =
+    \begin{cases}
+        1, & i = j, \\
+        0, & i \neq j.
+    \end{cases}
+\end{equation}
+
+在指标记号中，$\delta_{ij}$ 就是单位矩阵 $I$ 的 $(i,j)$ 元素。
+其核心功能是\textbf{指标的替换}：
+\begin{equation}
+    \delta_{ij} a_j = a_i, \qquad
+    \delta_{ij} A_{jk} = A_{ik}.
+\end{equation}
+
+\begin{example}[迹的循环性在指标记号下是显然的]
+\begin{equation}
+    \mathrm{tr}(AB) = (AB)_{ii} = A_{ij} B_{ji} = B_{ji} A_{ij} = (BA)_{jj} = \mathrm{tr}(BA).
+\end{equation}
+不需要任何技巧——指标记号的交换直接揭示了循环性。
+\end{example}
+
+\subsection{偏导数的指标写法}
+
+将向量偏导写成指标形式，能大幅简化 Hessian 的分析：
+
+\begin{center}
+\renewcommand{\arraystretch}{1.8}
+\begin{tabular}{c|c|c}
+\toprule
+\textbf{对象} & \textbf{矩阵写法} & \textbf{指标写法} \\
+\midrule
+标量对向量的梯度 & $\nabla_x f$ & $\displaystyle\frac{\partial f}{\partial x_i}$ \\
+向量对向量的雅可比 & $\displaystyle\frac{\partial y}{\partial x}$ & $\displaystyle\frac{\partial y_i}{\partial x_j}$ \\
+标量的 Hessian & $\nabla^2_x f$ & $\displaystyle\frac{\partial^2 f}{\partial x_i \partial x_j}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{example}[二次型的梯度与 Hessian]
+设 $f(x) = \frac{1}{2}x^\top A x$（$A$ 对称）：
+\begin{align}
+    \text{指标形式：}\quad f &= \frac{1}{2} x_i A_{ij} x_j, \\
+    \frac{\partial f}{\partial x_k}
+    &= \frac{1}{2}(\delta_{ik} A_{ij} x_j + x_i A_{ij} \delta_{jk})
+     = \frac{1}{2}(A_{kj} x_j + A_{ik} x_i)
+     = A_{ki} x_i \quad \text{（即 } Ax \text{）.} \\[4pt]
+    \frac{\partial^2 f}{\partial x_k \partial x_\ell}
+    &= A_{k\ell} \quad \text{（Hessian 就是 } A \text{）.}
+\end{align}
+\end{example}
+
+\subsection{矩阵对标量的导数}
+
+当损失函数包含参数矩阵时，需要矩阵对标量求导：
+
+\begin{equation}
+    \frac{\partial L}{\partial W_{ij}} \quad \text{——损失 $L$ 对权重矩阵 $W$ 每个元素的偏导。}
+\end{equation}
+
+这正是反向传播中的 $\nabla_W L$——梯度矩阵与 $W$ 同形状。
+
+\subsection{何时用矩阵记号，何时用指标记号}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{c|c|c}
+\toprule
+\textbf{场景} & \textbf{推荐记号} & \textbf{原因} \\
+\midrule
+OLS 正规方程推导 & 矩阵 & 整体运算紧凑，一步到位 \\
+迹技巧 \& 矩阵求导 & 矩阵 & 查表法最直接 \\
+二次型/线性型梯度 & 矩阵 + 指标 & 矩阵给结果，指标验证细节 \\
+Hessian 的稀疏结构分析 & 指标 & 元素级偏导一目了然 \\
+反向传播推导 & 指标 & 逐元素的链式法则无法用矩阵简洁表达 \\
+$X^\top X$ 不可逆时的分析 & 矩阵（谱分解） & SVD 视角揭示本质 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{实用策略：} 用矩阵记号写算法框架，用指标记号填写推导细节——
+两者互补而非替代。
+
+% ============ §5 谱分解与奇异值分解 ============
+\section{谱分解与奇异值分解 (SVD)}
+
+\subsection{对称矩阵的谱分解}
+
+若 $A$ 是 $n \times n$ 实对称矩阵，则存在正交矩阵 $Q$（$Q^\top Q = I$）和对角矩阵 $\Lambda = \mathrm{diag}(\lambda_1, \dots, \lambda_n)$，使得：
+\begin{equation}\label{eq:spectral}
+    A = Q \Lambda Q^\top = \sum_{i=1}^{n} \lambda_i \, q_i q_i^\top.
+\end{equation}
+
+\textbf{指标形式：} $A_{ij} = \sum_{k} \lambda_k \, Q_{ik} Q_{jk}$。
+
+\textbf{在 ML 中的意义：}
+\begin{itemize}
+    \item 若 $A$ 是协方差矩阵，$\lambda_i$ 是第 $i$ 主成分的方差，$q_i$ 是方向；
+    \item $A^{-1} = Q \Lambda^{-1} Q^\top = \sum \lambda_i^{-1} q_i q_i^\top$——特征值越小，
+    求逆时贡献越大，这也是 $X^\top X$ 接近奇异时 OLS 方差爆炸的根源。
+\end{itemize}
+
+\subsection{奇异值分解（SVD）}
+
+对\emph{任意} $N \times p$ 矩阵 $X$，存在正交矩阵 $U_{N \times N}$、$V_{p \times p}$ 和
+对角矩阵 $D_{N \times p}$（对角元 $\sigma_1 \ge \sigma_2 \ge \dots \ge \sigma_r > 0$），使得：
+\begin{equation}\label{eq:svd}
+    X = U D V^\top.
+\end{equation}
+
+\begin{itemize}
+    \item $\sigma_i$：$X$ 的奇异值（非负）；
+    \item $U$ 的列：左奇异向量 = $X X^\top$ 的特征向量；
+    \item $V$ 的列：右奇异向量 = $X^\top X$ 的特征向量；
+    \item 关系：$X^\top X = V D^\top D V^\top$，$X X^\top = U D D^\top U^\top$。
+\end{itemize}
+
+\textbf{在 ML 中的关键应用：}
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{PCA：} 对去均值后的 $X$ 做 SVD，$V$ 的列就是主成分方向；
+    \item \textbf{伪逆（Moore-Penrose）：} $X^+ = V D^+ U^\top$，其中 $D^+$ 将非零奇异值取倒数。
+    当 $p > N$ 时 OLS 无唯一解，伪逆给出最小范数解；
+    \item \textbf{Ridge 回归的谱形式：}
+    \begin{equation}
+        \hat{\beta}_{\text{ridge}} = (X^\top X + \lambda I)^{-1} X^\top y
+        = V \frac{D}{D^2 + \lambda I} U^\top y
+        = \sum_{j=1}^{r} \frac{\sigma_j}{\sigma_j^2 + \lambda} (u_j^\top y) \, v_j.
+    \end{equation}
+    $\lambda$ 将所有方向上的 $\sigma_j^2$ 上移——小奇异值方向不再爆炸。
+\end{enumerate}
+
+% ============ §6 矩阵范数 ============
+\section{矩阵范数}
+
+\begin{definition}[常用矩阵范数]
+\begin{itemize}
+    \item \textbf{Frobenius 范数：} $\displaystyle\|A\|_F = \sqrt{\sum_{i,j} a_{ij}^2} = \sqrt{\mathrm{tr}(A^\top A)} = \sqrt{\sum \sigma_i^2}$；
+    \item \textbf{谱范数（$L_2$ 范数）：} $\displaystyle\|A\|_2 = \sigma_{\max}(A)$，即最大的奇异值；
+    \item \textbf{核范数：} $\displaystyle\|A\|_* = \sum \sigma_i(A)$（奇异值之和）。
+\end{itemize}
+\end{definition}
+
+\textbf{在 ML 中的角色：}
+\begin{itemize}
+    \item $L_2$ 权重衰减 $\lambda \|w\|^2$ 本质是惩罚向量的 Frobenius 范数平方；
+    \item 谱范数控制 Lipschitz 常数——在 GAN 和对抗训练中用于稳定训练；
+    \item 核范数是秩函数的凸松弛：$\min \mathrm{rank}(A)$ 是 NP-hard，$\min \|A\|_*$ 可凸优化求解——
+    用于矩阵补全（推荐系统）、低秩表示。
+\end{itemize}
+
+% ============ §7 关键恒等式 ============
+\section{关键恒等式}
+
+\subsection{Woodbury 矩阵求逆公式}
+
+\begin{equation}\label{eq:woodbury}
+    (A + U C V)^{-1} = A^{-1} - A^{-1} U (C^{-1} + V A^{-1} U)^{-1} V A^{-1}.
+\end{equation}
+
+\textbf{用途：} 将一个大矩阵的求逆转化为一个小矩阵的求逆。
+在留一法交叉验证中，每次移除一个观测后不需重算整个 $(X^\top X)^{-1}$，
+而是用 Woodbury 公式做 $O(p^2)$ 的更新。
+
+\subsection{矩阵求逆引理（Woodbury 的特例）}
+
+\begin{equation}\label{eq:push-through}
+    (I + AB)^{-1} A = A (I + BA)^{-1}.
+\end{equation}
+
+\textbf{用途：} Ridge 回归的等价变形。当 $p \gg N$ 时：
+\begin{equation}
+    \hat{\beta} = (X^\top X + \lambda I_p)^{-1} X^\top y
+    = X^\top (X X^\top + \lambda I_N)^{-1} y.
+\end{equation}
+左边求逆的是 $p \times p$ 矩阵，右边是 $N \times N$——当 $p \gg N$ 时右边计算量小得多。
+
+\subsection{期望的二次型}
+
+设 $\E[x] = \mu$，$\Var(x) = \Sigma$：
+\begin{equation}\label{eq:quadratic-expectation}
+    \E[x^\top A x] = \mathrm{tr}(A \Sigma) + \mu^\top A \mu.
+\end{equation}
+
+\textbf{推导：}
+\begin{align}
+    \E[x^\top A x] &= \E[\mathrm{tr}(x^\top A x)]
+    = \E[\mathrm{tr}(A x x^\top)]
+    = \mathrm{tr}(A \,\E[x x^\top]) \nonumber\\
+    &= \mathrm{tr}(A (\Sigma + \mu\mu^\top))
+    = \mathrm{tr}(A\Sigma) + \mu^\top A \mu.
+\end{align}
+
+\textbf{用途：} 推导 RSS 的期望（$\E[\|y - X\hat{\beta}\|^2]$），
+计算预测误差的偏差-方差分解的矩阵形式。
+
+% ============================================================
+%  第1章：统计学习导论 (ESL Ch.1--2)
+% ============================================================

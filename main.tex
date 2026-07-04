@@ -1,0 +1,117 @@
+% ============================================================
+%  机器学习笔记：统计 · 机器学习 · 深度学习
+%  Machine Learning Notes: Statistics · ML · DL
+% ============================================================
+
+\documentclass[12pt,a4paper]{ctexbook}
+
+% ---------- 页面设置 ----------
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{hyperref}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tikz}
+\usetikzlibrary{positioning,calc}
+\usepackage{xcolor}
+
+% ---------- 超链接 ----------
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue,
+}
+
+% ---------- 定理环境 ----------
+\theoremstyle{definition}
+\newtheorem{definition}{定义}[chapter]
+\newtheorem{theorem}{定理}[chapter]
+\newtheorem{proposition}{命题}[chapter]
+\newtheorem{lemma}{引理}[chapter]
+\newtheorem{corollary}{推论}[chapter]
+\newtheorem{remark}{注记}[chapter]
+\newtheorem{example}{例}[chapter]
+
+% ---------- 自定义命令 ----------
+\newcommand{\R}{\mathbb{R}}           % 实数集
+\newcommand{\N}{\mathbb{N}}           % 自然数集
+\newcommand{\E}{\mathbb{E}}           % 期望
+\newcommand{\Var}{\mathrm{Var}}       % 方差
+\newcommand{\Cov}{\mathrm{Cov}}       % 协方差
+\newcommand{\bias}{\mathrm{Bias}}     % 偏差
+\newcommand{\mse}{\mathrm{MSE}}       % 均方误差
+\newcommand{\argmin}{\arg\min}        % argmin
+\newcommand{\argmax}{\arg\max}        % argmax
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}     % 范数
+\newcommand{\abs}[1]{\left\lvert#1\right\rvert}      % 绝对值
+\newcommand{\inner}[2]{\langle#1,#2\rangle}           % 内积
+\newcommand{\pdv}[2]{\frac{\partial #1}{\partial #2}} % 偏导
+\newcommand{\sgn}{\mathrm{sgn}}       % 符号函数
+\newcommand{\tr}{\operatorname{tr}}   % 迹
+\newcommand{\Corr}{\mathrm{Corr}}     % 相关系数
+\newcommand{\rank}{\operatorname{rank}} % 秩
+
+% ---------- 页眉页脚 ----------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ============================================================
+\begin{document}
+
+% ---------- 首页 ----------
+\title{\Huge \textbf{机器学习笔记}}
+\author{}
+\date{\today}
+\maketitle
+
+\tableofcontents
+
+% ============================================================
+%  第一部分：统计
+% ============================================================
+% === 概率论回顾 ===
+\input{Chapters/ch_概率论回顾.tex}
+
+% === 样本及抽样分布 ===
+\input{Chapters/ch_样本及抽样分布.tex}
+
+% === 参数估计 ===
+\input{Chapters/ch_参数估计.tex}
+
+% === 假设检验 ===
+\input{Chapters/ch_假设检验.tex}
+
+% === 方差分析及回归分析 ===
+\input{Chapters/ch_方差分析及回归分析.tex}
+
+% === Bootstrap 方法 ===
+\input{Chapters/ch_Bootstrap_方法.tex}
+
+% === 统计实践：从建模到报告 ===
+\input{Chapters/ch_统计实践_从建模到报告.tex}
+
+% === 信息论基础 ===
+\input{Chapters/ch_信息论基础.tex}
+
+% === 矩阵运算与张量记号 ===
+\input{Chapters/ch_矩阵运算与张量记号.tex}
+
+% === 统计学习导论 ===
+\input{Chapters/ch_统计学习导论.tex}
+
+% === 线性回归模型与最小二乘法 ===
+\input{Chapters/ch_线性回归模型与最小二乘法.tex}
+
+% === ESL 第4章：分类的线性方法 ===
+\input{Chapters/ch_分类的线性方法.tex}
+
+\end{document}

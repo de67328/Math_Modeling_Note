@@ -1,0 +1,323 @@
+\chapter{统计实践：从建模到报告}
+
+前面各章分别介绍了假设检验、方差分析、回归分析和 Bootstrap 等统计方法。
+本章将把这些方法串联起来，形成从数据探索到结果报告的完整实践流程，
+并介绍学术写作中的 APA 报告规范。
+
+% ============================================================
+\section{$R^2$ 与 $p$ 值的区别与联系}
+
+$R^2$ 和 $p$ 值是回归输出中最常见的两个数字，但初学者常混淆它们的含义。
+二者来自完全不同的统计框架，回答完全不同的问题。
+
+\subsection{框架对比}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{p{2.5cm}|p{4.5cm}|p{4.5cm}}
+\toprule
+& \textbf{$R^2$（决定系数）} & \textbf{$p$ 值} \\
+\midrule
+所属章节 & 第 9 章：方差分析与回归分析 & 第 4 章：假设检验 \\
+\midrule
+所属框架 & \textbf{方差分析}（ANOVA） & \textbf{假设检验} \\
+\midrule
+回答的问题 & 模型解释了多少变异？ & 效应是真实存在的还是巧合？ \\
+\midrule
+数学定义 & $R^2 = \dfrac{SS_R}{SS_T} = 1 - \dfrac{SS_E}{SS_T}$ & $p = P(|T| \ge |t_{\text{obs}}| \mid H_0)$ \\
+\midrule
+关注的是 & 效应\textbf{大小}（effect size） & 效应是否\textbf{为零}（显著性） \\
+\midrule
+取值范围 & $[0, 1]$（调整 $R^2$ 可为负） & $(0, 1)$ \\
+\midrule
+受样本量影响 & \textbf{不敏感}——$n$ 增大，$R^2$ 趋于稳定 & \textbf{极敏感}——$n$ 越大，越容易显著 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{为什么 $R^2$ 很低但 $p$ 值可以显著？}
+
+这是初学者最困惑的地方，答案藏在\emph{样本量}里。
+
+考虑回归模型 $Y = \beta_0 + \beta_1 X + \varepsilon$，检验 $H_0: \beta_1 = 0$。
+
+检验统计量 $T = \dfrac{\hat{\beta}_1}{SE(\hat{\beta}_1)}$，$SE(\hat{\beta}_1) = \dfrac{s}{\sqrt{S_{xx}}}$ 随着 $n$ 增大而减小。
+而 $s^2 = \dfrac{SS_E}{n-2}$ 度量的是\emph{不能被 $X$ 解释的}那部分变异——即使 $R^2$ 很低，$SS_E$ 也不会随着 $n$ 增大而消失，
+只是我们对 $\hat{\beta}_1$ 的估计越来越精确（$SE$ 越来越小）。
+
+$R^2$ 与 $F$ 检验的精确关系（已在第 9 章推导）：
+\begin{equation}
+    F = \frac{SS_R / 1}{SS_E / (n-2)} = \frac{R^2 / 1}{(1-R^2) / (n-2)}.
+\end{equation}
+
+\begin{itemize}
+    \item 即使 $R^2 = 0.03$，只要 $n$ 足够大，$F = \dfrac{0.03}{(0.97)/(n-2)}$ 仍可超越临界值；
+    \item 例如 $n = 10000$：$F = \dfrac{0.03}{0.97/9998} \approx 309$，$p \ll 0.001$；
+    \item 结论：\textbf{$p$ 值显著只说明效应不为零，不说明效应很大。}
+\end{itemize}
+
+\subsection{用“射击靶子”理解二者}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9]
+    % R²靶子（散布大=低R²）
+    \draw[thick, fill=gray!10] (0,0) circle (2.5cm);
+    \draw[thick, fill=white] (0,0) circle (1.5cm);
+    \draw[thick, fill=red!30] (0,0) circle (0.8cm);
+    \draw[thick, fill=white] (0,0) circle (0.15cm);
+    \node[font=\small\sffamily] at (0,-3.2) {$R^2$ 回答：};
+    \node[font=\small\sffamily] at (0,-3.7) {打得有多准？};
+    \node[font=\small\sffamily] at (0,-4.2) {（效应大小）};
+    
+    % p值靶子（瞄准准=低p值）
+    \begin{scope}[xshift=6.5cm]
+        \draw[thick, fill=gray!10] (0,0) circle (2.5cm);
+        \draw[thick, fill=white] (0,0) circle (1.5cm);
+        \draw[thick, fill=white] (0,0) circle (0.8cm);
+        \draw[thick, fill=red!30] (0,0) circle (0.15cm);
+        \node[font=\small\sffamily] at (0,-3.2) {$p$ 值回答：};
+        \node[font=\small\sffamily] at (0,-3.7) {是不是在瞎打？};
+        \node[font=\small\sffamily] at (0,-4.2) {（效应是否为零）};
+    \end{scope}
+\end{tikzpicture}
+\end{center}
+
+\subsection{四种组合判断表}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{c|c|c|l}
+\toprule
+\textbf{$R^2$} & \textbf{$p$ 值} & \textbf{判断} & \textbf{说明} \\
+\midrule
+高 & 显著 & 理想情况 & 解释力强，效应确凿 \\
+高 & 不显著 & 罕见，需检查 & 可能多重共线性（$F$ 显著但各 $t$ 不显著，见第 9 章 VIF） \\
+低 & 显著 & \textbf{最常见于大样本} & 效应存在但效应量小（如 NIPT 数据） \\
+低 & 不显著 & 模型无效 & 变量可能没有解释力 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{常见误区纠正}
+
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{“$p < 0.05$ 说明效应很大”} $\rightarrow$ 错。$p$ 值只拒绝“效应为零”。大样本下微小效应也能 $p < 0.001$。
+    \item \textbf{“$R^2$ 低说明模型没用”} $\rightarrow$ 错。生物/社会科学中 $R^2 = 0.05 \sim 0.30$ 是常态。关键是 $p$ 值。
+    \item \textbf{“$p > 0.05$ 说明 $H_0$ 为真”} $\rightarrow$ 错。只能说“证据不足”（第 4 章第二类错误 $\beta$）。
+    \item \textbf{“$p$ 值是 $H_0$ 为真的概率”} $\rightarrow$ 错。$p$ 值是 $P(\text{数据} \mid H_0)$，不是 $P(H_0 \mid \text{数据})$。
+\end{enumerate}
+
+% ============================================================
+\section{因素分析的标准流程}
+
+以下结合 NIPT 数据（Y 染色体浓度 $\sim$ 孕周 $+$ BMI）为例，给出因素建模的五步标准流程。
+每一步都在 $R^2$（方差分解，第 9 章）和 $p$ 值（假设检验，第 4 章）之间交替使用。
+
+\subsection{第 1 步：相关性扫描 —— 看方向和显著性}
+
+\begin{itemize}
+    \item 计算 Pearson / Spearman 相关系数矩阵（第 1 章），同时报告 $r$ 和 $p$ 值
+    \item 画散点图矩阵（pairplot），观察非线性关系
+    \item \textbf{目的：} 初步判断哪些变量有关联（$p$ 值）、关联多强（$r$ 或 $r^2$）
+\end{itemize}
+
+\subsection{第 2 步：建立回归模型 —— 量化效应大小}
+
+\begin{itemize}
+    \item 从简单模型开始：$Y \sim X_1$，逐步加入变量（第 9 章多元回归）
+    \item 对每个系数报告：$\hat{\beta}_j$、$SE(\hat{\beta}_j)$、$t$ 值、$p$ 值
+    \item 报告整体 $R^2$、调整 $R^2_{\text{adj}}$、$F$ 统计量及其 $p$ 值
+    \item \textbf{目的：} 量化效应大小（$\hat{\beta}$），判断显著性（$p$），评估解释力（$R^2$）
+\end{itemize}
+
+\subsection{第 3 步：模型诊断 —— 验证假设}
+
+\begin{itemize}
+    \item \textbf{正态性：} 残差的 Q-Q 图（第 4 章），或 Shapiro-Wilk 检验
+    \item \textbf{方差齐性：} 残差 vs 拟合值散点图（不应有漏斗形）
+    \item \textbf{多重共线性：} 计算 VIF（第 9 章），$VIF > 10$ 表明严重共线性
+    \item \textbf{异常值：} Cook's distance 识别高影响力点
+    \item \textbf{假设不满足时：} Box-Cox 变换、加权最小二乘、或改用第 4 章的秩和检验等非参数方法
+\end{itemize}
+
+\subsection{第 4 步：模型改进 —— 从简单到复杂}
+
+当简单线性模型表现不佳（$R^2$ 低但 $p$ 值显著，或残差有结构），考虑：
+
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{加入交互项}：$Y \sim X_1 + X_2 + X_1\!:\!X_2$，检验交互是否显著
+    \item \textbf{加入非线性项}：$Y \sim X + X^2$，或用 GAM（广义可加模型）
+    \item \textbf{分段/分层建模}：按关键变量分组，每组独立拟合，比较各组 $R^2$ 和系数
+    \item \textbf{引入随机效应（混合效应模型）}：当数据有重复测量时（如同一孕妇多次检测），
+    用 $Y_{ij} = \alpha + u_i + \beta X_{ij} + \varepsilon_{ij}$ 区分个体差异（随机效应 $u_i$）和系统性效应（固定效应 $\beta$）
+\end{enumerate}
+
+\subsection{第 5 步：报告与解释 —— 讲好故事}
+
+不能只报数字，要给出\emph{实际含义}。结合第 4 章的 $p$ 值检验法和本章的 APA 规范：
+
+\begin{itemize}
+    \item \textbf{效应报告示例：}\\
+    “孕周每增加 1 周，Y 染色体浓度平均增加 0.0035 个单位（$SE = 0.0004,\; t(9998) = 8.75,\; p < 0.001$）”
+    \item \textbf{$R^2$ 低的解释示例：}\\
+    “BMI 和孕周仅解释 Y 浓度变异的 3\%（$R^2 = 0.030$），但效应方向明确且统计显著（$F(2,9997)=154.6,\; p<0.001$）。
+    剩余变异主要来自个体间差异（条件 $R^2 = 83\%$），这正是需要按 BMI 分组制定个性化检测时点的依据。”
+\end{itemize}
+
+\subsection{完整流程图}
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=1.4cm,
+    box/.style={rectangle, draw, rounded corners, minimum width=3.2cm, minimum height=0.8cm, align=center, font=\small},
+    arrow/.style={->, >=stealth, thick},
+]
+
+\node[box] (step1) {\textbf{Step 1: 相关性扫描}\\ $r$、$p$ 值、散点图};
+\node[box, below of=step1] (step2) {\textbf{Step 2: 建立回归}\\ $\hat{\beta}$、$SE$、$t$、$R^2$};
+\node[box, below of=step2] (step3) {\textbf{Step 3: 模型诊断}\\ Q-Q、VIF、残差分析};
+\node[box, below of=step3] (step4) {\textbf{Step 4: 模型改进}\\ 交互/非线性/分段/混合效应};
+\node[box, below of=step4] (step5) {\textbf{Step 5: 报告与解释}\\ 效应量 + 显著性 + 实际含义};
+
+\draw[arrow] (step1) -- (step2);
+\draw[arrow] (step2) -- (step3);
+\draw[arrow] (step3) -- (step4);
+\draw[arrow] (step4) -- (step5);
+
+\draw[arrow, red!70!black, dashed] (step3.east) to[out=0, in=0] 
+    node[right, font=\footnotesize, text=red!70!black] {假设不满足} (step4.east);
+
+\node[font=\small\sffamily, blue!60!black, right=0.7cm of step1] {$p$ 值主导};
+\node[font=\small\sffamily, blue!60!black, right=0.7cm of step2] {$R^2 + p$ 值};
+\node[font=\small\sffamily, blue!60!black, right=0.7cm of step3] {$p$ 值主导};
+\node[font=\small\sffamily, blue!60!black, right=0.7cm of step4] {比较 $R^2$};
+\node[font=\small\sffamily, blue!60!black, right=0.7cm of step5] {两者并重};
+
+\end{tikzpicture}
+\end{center}
+
+% ============================================================
+\section{APA 学术报告规范}
+
+APA 风格（American Psychological Association）是心理学、教育学、社会科学及生物医学领域
+最广泛使用的学术写作规范。建模竞赛论文虽非正式期刊论文，但遵循 APA 报告统计结果
+能显著提升论文的专业性和可信度。
+
+\subsection{核心原则}
+
+\textbf{不能只报 $p$ 值，必须同时报告效应大小。} $p$ 值只回答“效应是否存在”，
+效应量（$\hat{\beta}$、Cohen's $d$、$R^2$ 等）回答“效应有多大”。
+两者缺一不可——这是 APA 规范最核心的要求。
+
+\subsection{常见统计量的 APA 报告格式}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\small
+\begin{tabular}{p{2.8cm}p{5.5cm}p{4.7cm}}
+\toprule
+\textbf{检验类型} & \textbf{APA 格式} & \textbf{示例} \\
+\midrule
+$t$ 检验（第 4 章） & $t(df) = x.xx,\; p = .xxx$ & $t(24) = 2.14,\; p = .043$ \\
+$F$ 检验（第 9 章 ANOVA） & $F(df_1, df_2) = x.xx,\; p = .xxx$ & $F(2, 97) = 5.43,\; p = .006$ \\
+$\chi^2$ 检验（第 4 章） & $\chi^2(df, N = n) = x.xx,\; p = .xxx$ & $\chi^2(1, N = 200) = 12.5,\; p < .001$ \\
+相关系数（第 1 章） & $r(df) = .xx,\; p = .xxx$ & $r(98) = .34,\; p < .001$ \\
+回归系数（第 9 章） & $b = x.xx,\; SE = .xxx,\; t(df) = x.xx,\; p = .xxx$ & $b = -0.008,\; SE = 0.001,$ \\
+                     & & $t(98) = -7.0,\; p < .001$ \\
+Bootstrap CI（第 10 章） & 95\% CI $[L, U]$ & 95\% CI $[16.50, 34.25]$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{$p$ 值的写法}
+
+\begin{itemize}
+    \item 小数前不加 0：$p = .032$（而非 $p = 0.032$），因为 $p$ 值永远不超过 1
+    \item 极小时不写具体值：$p < .001$（而非 $p = .0003$）
+    \item 报告精确值优先于笼统表述：$p = .032$ 好于 $p < .05$
+\end{itemize}
+
+\subsection{完整报告示例}
+
+以下是一个符合 APA 规范的回归分析报告，综合运用了第 1 章（相关系数）、
+第 4 章（$t$ 检验与 $p$ 值）、第 9 章（回归与 $F$ 检验）的方法：
+
+\begin{quote}
+    \small
+    \textbf{结果}\\
+    首先进行了相关性分析（Pearson 相关系数，第 1 章）。孕周与 Y 染色体浓度呈显著正相关（$r(9998) = .12,\; p < .001$），
+    BMI 与 Y 染色体浓度呈显著负相关（$r(9998) = -.08,\; p < .001$）。
+    
+    随后建立了多元线性回归模型，以 Y 染色体浓度为因变量，孕周和 BMI 为自变量。
+    模型整体显著，$F(2, 9997) = 154.6,\; p < .001$，解释了 Y 浓度变异的 3.0\%
+    （$R^2 = .030$，调整 $R^2 = .030$）。
+    
+    BMI 对 Y 浓度具有显著的负效应（$\hat{\beta} = -0.0084,\; SE = 0.0012,\;
+    t(9997) = -7.00,\; p < .001$），孕周对 Y 浓度具有显著的正效应
+    （$\hat{\beta} = 0.0035,\; SE = 0.0004,\; t(9997) = 8.75,\; p < .001$）。
+    
+    残差的 Q-Q 图表明正态性假设基本满足，VIF 均为 1.02，表明不存在多重共线性问题。
+    
+    \textbf{讨论}\\
+    虽然 $R^2 = .030$ 看似较低，但在生物医学数据中属于常见水平。
+    所有系数的 $p$ 值均远小于 .001，表明效应方向明确且统计可靠。
+    剩余未解释的变异主要来自个体间差异，这支持了按 BMI 分组制定个性化检测时点
+    的必要性。
+\end{quote}
+
+\subsection{建模竞赛论文的 APA 使用要点}
+
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{摘要中必须报告关键数值}：不能只写“模型显著”，要写“$F(2,97)=5.43,\;p=.006,\;R^2=.101$”
+    \item \textbf{每个系数都报告 $\hat{\beta}$、$SE$、$t$、$p$}：最好用表格呈现
+    \item \textbf{效应量和显著性缺一不可}：“$p<.001$ 但不报告 $\hat{\beta}$”是常见扣分点
+    \item \textbf{诊断结果要写出}：“残差正态（Shapiro-Wilk $p=.32$），VIF 均 $<2$”一句话就够了
+    \item \textbf{$p$ 值小时写 APA 格式}：$p = .032$（而非 $p = 0.032$）、$p < .001$（而非 $p = 0.0003$）
+\end{enumerate}
+
+% ============================================================
+\section{方法选择速查表}
+
+将前面各章的方法按其适用场景整理为速查表，方便建模时快速定位。
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\footnotesize
+\begin{tabular}{p{2.8cm}|p{2.5cm}|p{2.5cm}|p{2.5cm}|p{2.5cm}}
+\toprule
+\textbf{你想做什么} & \textbf{数据类型} & \textbf{参数方法} & \textbf{非参数替代} & \textbf{对应章节} \\
+\midrule
+比较两组均值   & 连续, 正态    & 两样本 $t$ 检验        & Wilcoxon 秩和    & 第 4 章 \\
+比较两组均值   & 配对数据      & 配对 $t$ 检验           & Wilcoxon 符号秩  & 第 4 章 \\
+比较三组以上   & 连续, 正态    & 单因素 ANOVA ($F$)     & Kruskal-Wallis   & 第 9 章 \\
+两个因素的比较 & 连续, 正态    & 双因素 ANOVA            & ---              & 第 9 章 \\
+检验方差齐性   & 连续          & $F$ 检验 / Bartlett    & Levene           & 第 4/9 章 \\
+一个 $X \to Y$ & 连续          & 一元线性回归            & ---              & 第 9 章 \\
+多个 $X \to Y$ & 连续          & 多元线性回归            & ---              & 第 9 章 \\
+分类 $Y$       & 二分类        & 逻辑回归                & ---              & 机器学习部分 \\
+分布拟合       & 频数          & Pearson $\chi^2$       & ---              & 第 4 章 \\
+正态性检验     & 连续          & Shapiro-Wilk            & Q-Q 图           & 第 4 章 \\
+标准误/CI（任意统计量）& 任意    & 参数 Bootstrap         & 非参数 Bootstrap & 第 10 章 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ============================================================
+%  小结
+% ============================================================
+\section*{本章小结}
+
+本章作为统计方法部分的收尾，完成了三件事：
+
+\begin{enumerate}
+    \item \textbf{区分 $R^2$ 与 $p$ 值}：$R^2$ 来自第 9 章的方差分解，度量效应大小；
+    $p$ 值来自第 4 章的假设检验，度量统计显著性。二者互补，必须同时报告。
+    \item \textbf{标准化因素分析流程}：相关性扫描 $\to$ 回归建模 $\to$ 模型诊断 $\to$ 模型改进 $\to$ 报告解释，
+    五步将第 2、4、9、10 章的方法串联为可操作的工作流。
+    \item \textbf{规范化学术报告}：介绍了 APA 风格的核心规则——报告效应量 + 显著性、
+    $p$ 值的正确写法、各检验的规范格式，并给出了完整的报告示例。
+\end{enumerate}
+
+掌握这些内容后，面对建模竞赛的数据分析题（如 CUMCM C 题），你就有了从数据探索到
+论文写作的完整方法论工具箱。
+

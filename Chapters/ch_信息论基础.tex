@@ -1,0 +1,40 @@
+\chapter{信息论基础}
+
+\section{基本概念}
+
+\begin{definition}[信息量 / 自信息]
+\begin{equation}
+    I(x) = -\log p(x).
+\end{equation}
+\end{definition}
+
+\begin{definition}[熵]
+随机变量 $X$ 的熵度量其不确定性：
+\begin{equation}
+    H(X) = -\sum_{x} p(x) \log p(x).
+\end{equation}
+\end{definition}
+
+\begin{definition}[KL 散度]
+分布 $P$ 与 $Q$ 之间的 KL 散度：
+\begin{equation}
+    D_{\mathrm{KL}}(P \Vert Q) = \sum_{x} p(x) \log\frac{p(x)}{q(x)}.
+\end{equation}
+非负、非对称，$D_{\mathrm{KL}}(P \Vert Q) = 0 \iff P = Q$。
+\end{definition}
+
+\begin{definition}[交叉熵]
+\begin{equation}
+    H(P, Q) = -\sum_{x} p(x) \log q(x) = H(P) + D_{\mathrm{KL}}(P \Vert Q).
+\end{equation}
+\end{definition}
+
+\begin{definition}[互信息]
+\begin{equation}
+    I(X; Y) = \sum_{x, y} p(x, y) \log\frac{p(x, y)}{p(x)p(y)}.
+\end{equation}
+\end{definition}
+
+% ============================================================
+%  第二部分：机器学习
+% ============================================================
