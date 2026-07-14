@@ -8,6 +8,122 @@
 分类问题中，预测函数 $G(x)$ 取值于离散集合 $\mathcal{G}$，因此可将输入空间划分为对应各类的区域。
 若这些区域的边界是线性的，就称为\textbf{分类的线性方法}。
 
+\subsubsection{基本设定}
+
+设输入空间 $\mathcal{X} \subseteq \R^p$，类别标签集 $\mathcal{G} = \{1, 2, \ldots, K\}$。
+$(X, Y)$ 服从联合分布 $P_{XY}$，其中 $X \in \mathcal{X}$，$Y \in \mathcal{G}$。
+
+\subsubsection{判别函数与分类规则}
+
+一族判别函数 $\{\delta_k\}_{k \in \mathcal{G}}$，$\delta_k : \mathcal{X} \to \R$。
+分类器 $\hat{G} : \mathcal{X} \to \mathcal{G}$ 定义为取最大判别值：
+\begin{equation}\label{eq:discriminant_rule}
+    \hat{G}(x) = \argmax_{k \in \mathcal{G}} \; \delta_k(x).
+\end{equation}
+
+用一阶逻辑精确表述（假设最大值唯一，否则约定取最小的 $k$）：
+\[
+\forall x \in \mathcal{X}, \quad
+\hat{G}(x) = k \;\Longleftrightarrow\;
+\Big( \forall j \in \mathcal{G} \setminus \{k\},\; \delta_k(x) > \delta_j(x) \Big).
+\]
+
+\subsubsection{决策边界}
+
+类别 $k$ 与 $\ell$（$k \neq \ell$）之间的决策边界 $\mathcal{B}_{k\ell}$ 定义为使 $\delta_k$ 与 $\delta_\ell$ 并列最大（且不小于其他任何类）的全体 $x$：
+\begin{equation}\label{eq:decision_boundary}
+    \mathcal{B}_{k\ell} = \Big\{\, x \in \mathcal{X} \;\Big|\;
+    \delta_k(x) = \delta_\ell(x) \;\land\;
+    \forall j \in \mathcal{G} \setminus \{k, \ell\},\; \delta_k(x) \geq \delta_j(x)
+    \Big\}.
+\end{equation}
+
+\subsubsection{线性判别函数的充要条件}
+
+称 $\delta_k$ 是线性的，当且仅当：
+\[
+\forall k \in \mathcal{G},\;
+\exists\, \beta_k \in \R^p,\; \exists\, \beta_{k0} \in \R,\;
+\forall x \in \mathcal{X}: \quad \delta_k(x) = \beta_k^{\mathsf{T}} x + \beta_{k0}.
+\]
+
+此时对任意 $k \neq \ell$，由式 \eqref{eq:decision_boundary}：
+\[
+\mathcal{B}_{k\ell} = \Big\{\, x \in \mathcal{X} \;\Big|\;
+(\beta_k - \beta_\ell)^{\mathsf{T}} x + (\beta_{k0} - \beta_{\ell 0}) = 0
+\Big\},
+\]
+即 $\R^p$ 中的一个超平面（线性决策边界）。
+
+若存在严格单调递增函数 $g : \R \to \R$ 使得 $g \circ \delta_k$ 是线性的，则决策边界仍是线性的，因为：
+\[
+\forall k \neq \ell,\; \forall x \in \mathcal{X}: \quad
+g(\delta_k(x)) = g(\delta_\ell(x)) \;\Longleftrightarrow\; \delta_k(x) = \delta_\ell(x).
+\]
+\textbf{关键}：只要求 $\delta_k$ 的某个单调变换是线性的，$\delta_k$ 本身不必是线性的。
+
+\subsubsection{损失函数}
+
+损失函数是一个映射 $L : \mathcal{G} \times \mathcal{G} \to \R_{\geq 0}$，其中 $L(g, \hat{g})$ 表示真类别为 $g$、预测为 $\hat{g}$ 时的代价。
+最常用的 0--1 损失：
+\[
+L(g, \hat{g}) = \mathbf{1}\{g \neq \hat{g}\} =
+\begin{cases}
+    0, & g = \hat{g}, \\
+    1, & g \neq \hat{g}.
+\end{cases}
+\]
+更一般地可用损失矩阵 $\mathbf{L} = (L_{k\ell})_{K \times K}$，其中 $L_{k\ell} = L(k, \ell)$。
+
+\subsubsection{期望预测误差 (EPE)}
+
+分类器 $\hat{G}$ 的期望预测误差为损失在联合分布下的期望：
+\begin{equation}\label{eq:epe_classification}
+    \mathrm{EPE}(\hat{G}) = \E_{(X,Y) \sim P_{XY}}\Big[ L(Y, \hat{G}(X)) \Big].
+\end{equation}
+
+展开为积分形式（记 $f_X$ 为 $X$ 的边缘密度，$P(Y = k \mid X = x)$ 为后验概率）：
+\begin{equation}\label{eq:epe_expanded}
+    \mathrm{EPE}(\hat{G}) = \int_{\mathcal{X}}
+    \Bigg[ \sum_{k=1}^{K} L\big(k, \hat{G}(x)\big) \cdot P(Y = k \mid X = x) \Bigg]
+    f_X(x) \; dx.
+\end{equation}
+
+\textbf{逐点最小化}：要最小化 $\mathrm{EPE}$，等价于对每个 $x \in \mathcal{X}$ 独立地最小化括号内的条件期望——
+\[
+\forall x \in \mathcal{X}, \quad
+\hat{G}_{\mathrm{opt}}(x) = \argmin_{g \in \mathcal{G}} \;
+\sum_{k=1}^{K} L(k, g) \cdot P(Y = k \mid X = x).
+\]
+
+\subsubsection{Bayes 分类器：EPE 的最优解}
+
+在 0--1 损失下，逐点最小化简化为：
+\[
+\hat{G}_{\mathrm{Bayes}}(x)
+= \argmin_{g \in \mathcal{G}} \big(1 - P(Y = g \mid X = x)\big)
+= \argmax_{g \in \mathcal{G}} \; P(Y = g \mid X = x).
+\]
+即：\textbf{选择后验概率最大的类别}。
+
+\subsubsection{框架统一}
+
+将上述诸概念串成一条链：
+\[
+\boxed{
+\begin{aligned}
+&\text{判别函数族} \quad \{\delta_k\}_{k \in \mathcal{G}} \\
+&\quad\downarrow\quad \hat{G}(x) = \argmax_k \delta_k(x) \\
+&\mathrm{EPE} = \E_{(X,Y)}[L(Y, \hat{G}(X))] \\
+&\quad\downarrow\quad \text{逐点最小化} \\
+&\hat{G}_{\mathrm{Bayes}}(x) = \argmax_k P(Y = k \mid X = x)
+\end{aligned}}
+\]
+
+若取 $\delta_k(x) = P(Y = k \mid X = x)$（或其单调变换如 $\log P(Y = k \mid X = x)$），
+则判别函数分类器 $\hat{G}$ 等价于 Bayes 分类器。
+实际算法（LDA、Logistic 回归等）通过不同方式\textbf{估计}这些后验概率或其单调变换，从而逼近 Bayes 最优解。
+
 \subsection{判别函数方法}
 
 一类通用方法是：对每个类别 $k$ 建模一个\textbf{判别函数} $\delta_k(x)$，然后分类到最大值：
@@ -33,6 +149,121 @@
 \end{equation}
 
 决策边界是 $\{x \mid \beta_0 + \beta^\top x = 0\}$，即一个超平面。
+
+下面将 Logistic 回归套入前面建立的判别函数 / EPE 框架，逐一说明各符号的具体含义。
+
+\subsubsection{Logistic 回归中的 $\delta_k$ 是什么？}
+
+在 Logistic 回归中，自然地取后验概率作为判别函数：
+\[
+\delta_1(x) = \Pr(G = 1 \mid X = x), \qquad
+\delta_2(x) = \Pr(G = 2 \mid X = x) = 1 - \delta_1(x).
+\]
+分类规则 $\hat{G}(x) = \argmax_k \delta_k(x)$ 即选择后验概率较大的类别，等价于 Bayes 分类器（在 0--1 损失下最优）。
+
+\subsubsection{$\delta_k$ 本身并非线性，但单调变换后是线性的}
+
+这里的 $\delta_1(x)$ 是 sigmoid 函数，显然不是 $x$ 的线性函数。但取 logit 变换
+\[
+g(p) = \log\frac{p}{1-p}
+\]
+（$g$ 在 $(0,1)$ 上严格单调递增），则有：
+\[
+g(\delta_1(x)) = \log\frac{\Pr(G=1\mid X=x)}{\Pr(G=2\mid X=x)} = \beta_0 + \beta^\top x,
+\]
+即 $g \circ \delta_1$ 是 $x$ 的线性函数。
+
+由于 $g$ 严格单调递增，对任意 $x$：
+\[
+\delta_1(x) > \delta_2(x)
+\;\Longleftrightarrow\;
+g(\delta_1(x)) > g(\delta_2(x))
+\;\Longleftrightarrow\;
+\beta_0 + \beta^\top x > 0.
+\]
+因此决策边界 $\{x \mid \delta_1(x) = \delta_2(x)\}$ 等价于 $\{x \mid \beta_0 + \beta^\top x = 0\}$，是一个线性超平面。
+这正好印证了引言中的结论：\textbf{只要存在某个单调变换使 $\delta_k$ 变为线性，决策边界就是线性的，$\delta_k$ 本身不必是线性的。}
+
+\subsubsection{$\delta_k$ 的一般取法}
+
+除后验概率外，不同方法中 $\delta_k$ 还有多种自然取法，本质都是对「$x$ 属于第 $k$ 类的证据强度」的某种度量：
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+$\delta_k(x)$ 的取法 & 来源方法 & 单调变换后线性？ \\
+\midrule
+$P(G=k \mid X=x)$ & Bayes 最优 & 不一定 \\
+$\log P(G=k \mid X=x)$ & 等价 Bayes（$\log$ 单调） & 不一定 \\
+$x^\top\Sigma^{-1}\mu_k - \frac12\mu_k^\top\Sigma^{-1}\mu_k + \log\pi_k$ & LDA & $\delta_k$ 本身就是线性的 \\
+$\beta_{k0} + \beta_k^\top x$（直接建模） & 指示矩阵回归 & $\delta_k$ 本身就是线性的 \\
+$\beta_{k0} + \beta_k^\top x$（log-odds 形式） & 多类 Logistic 回归 & 其 logit 变换是线性的 \\
+$f_k(x)\,\pi_k$（似然 $\times$ 先验） & Bayes 定理展开 & 取决于 $f_k$ 假设 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+关键：只要各类使用同一个度量尺度（同一单调变换），$\argmax_k \delta_k(x)$ 的结果不变。
+
+\subsubsection{「后验概率」的理解}
+
+「后验」即\textbf{后于数据、后于经验}——看到证据 $x$ 之后更新了的信念。
+由 Bayes 定理展开：
+
+\[
+\underbrace{P(G=k \mid X=x)}_{\text{后验}}
+= \frac{\overbrace{f_k(x)}^{\text{似然}} \;\cdot\; \overbrace{\pi_k}^{\text{先验}}}
+{\underbrace{\sum_{j=1}^{K} f_j(x)\,\pi_j}_{\text{归一化常数}}},
+\]
+
+其中：
+\begin{itemize}
+    \item \textbf{先验} $\pi_k = P(G=k)$：在看到任何特征之前，样本属于第 $k$ 类的初始信念；
+    \item \textbf{似然} $f_k(x) = P(X=x \mid G=k)$：已知属于第 $k$ 类的前提下，观察到 $x$ 的可能性（类条件密度）；
+    \item \textbf{后验} $P(G=k \mid X=x)$：给定已观察到的 $x$，属于第 $k$ 类的更新后概率。
+\end{itemize}
+
+整条逻辑链为：先验 $\xrightarrow{\text{数据 }x}$ 后验。
+这正是统计推断的核心思想，也是 LDA（§4.3）通过假设 $f_k$ 为 Gaussian 来估计后验概率的理论基础。
+
+\subsubsection{训练的本质：用数据估计 $\delta_k$}
+
+前面把后验概率当作 $\delta_k$，自然会引出一个困惑：训练时只有 $\{(x_i, y_i)\}_{i=1}^{N}$，既不知道真实的 $\delta_k$，也不知道真实的 $P(G=k\mid X=x)$——为什么还能用它？
+
+关键在于区分\textbf{理论目标}和\textbf{实践操作}：
+
+\begin{center}
+\boxed{\text{理论：Bayes 分类器 } \argmax_k P(G=k\mid X=x) \text{ 是 EPE 最小的最优解（不可达上界）}}
+\end{center}
+
+\begin{center}
+\boxed{\text{实践：用数据拟合参数化模型来} \textbf{估计} \text{后验，而非直接使用真实后验}}
+\end{center}
+
+训练流程可以拆成三步：
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{选定模型族}：假设 $\delta_k$ 具有某种参数化形式 $\delta_k(x; \theta)$，
+    例如 Logistic 回归假设 $\log\frac{P(G=k)}{P(G=K)} = \beta_{k0} + \beta_k^\top x$；
+    \item \textbf{用数据估计参数}：通过训练数据 $\{(x_i, y_i)\}$ 估计参数 $\hat{\theta}$
+    （MLE、最小二乘等），得到 $\hat{\delta}_k(x) = \delta_k(x; \hat{\theta})$；
+    \item \textbf{预测}：对新输入 $x$，计算 $\hat{G}(x) = \argmax_k \hat{\delta}_k(x)$。
+\end{enumerate}
+
+不同方法估计后验的方式不同：
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+方法 & 如何估计后验 \\
+\midrule
+Logistic 回归 & 假设 log-odds 线性，用 MLE 估计 $\beta$，代入公式算 $\hat{P}(G=k\mid X=x)$ \\
+LDA & 假设 $f_k$ 为 Gaussian 且等协方差，用样本均值/协方差估计 $\hat{\mu}_k, \hat{\Sigma}$，代入 Bayes 公式 \\
+KNN & 用邻居类别比例直接估计 $\hat{P}(G=k\mid X=x) = \frac{\#\{i\in\mathcal{N}(x): y_i=k\}}{|\mathcal{N}(x)|}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+一句话：真实后验是靶子，$\hat{\delta}_k$ 是射出的箭，训练就是用 $(X,Y)$ 校准瞄准的过程。
 
 \subsection{实操流程：从线性函数到分类决策}
 
@@ -720,6 +951,59 @@ $\hat{f}_2$ 只拟合类 2 的指示变量列：$\mathbf{y}_2 = (0,0,1,0,0)^\top
     \item 指示矩阵回归：用 $\hat{f}_k(x)$ 近似 $\Pr(G=k\mid X=x)$（但可能越界）。
 \end{itemize}
 
+\subsubsection{LDA/QDA 如何逼近 Bayes 上界}
+
+Bayes 分类器 $\argmax_k P(G=k\mid X=x)$ 给出了 EPE 的理论下界——但真实后验未知。
+LDA/QDA 的策略不是直接估计后验，而是通过 Bayes 定理把它拆成可估计的零件：
+\[
+P(G=k\mid X=x) = \frac{f_k(x)\,\pi_k}{\sum_j f_j(x)\,\pi_j},
+\]
+然后对类条件密度 $f_k(x)$ 做分布假设，用训练数据估计其参数。
+
+二者的差异仅在于协方差假设：
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+& LDA & QDA \\
+\midrule
+假设 & $f_k \sim N(\mu_k, \Sigma)$，$\Sigma$ 所有类共用 & $f_k \sim N(\mu_k, \Sigma_k)$，$\Sigma_k$ 各类不同 \\
+决策边界 & 线性超平面 & 二次曲面 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{逼近上界的逻辑}：如果 Gaussian 假设恰好成立，代入估计参数后 $\hat{\delta}_k$ 在大样本下收敛到真实 Bayes 上界（$\hat{\mu}_k \to \mu_k$ 等）。若假设不成立，则是有偏近似——偏差来自分布假设的错误，方差来自参数估计的不确定性。
+
+\subsubsection{LDA/QDA 的训练：估计什么参数？}
+
+LDA/QDA 的训练不涉及迭代优化或梯度下降——直接从 $(X,Y)$ 计算样本统计量，然后组装成 $\delta_k$：
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+参数 & 含义 & 估计公式 \\
+\midrule
+$\hat{\mu}_k \in \R^p$ & 第 $k$ 类均值 & $\displaystyle\frac{1}{N_k}\sum_{i: y_i=k} x_i$（类内样本均值） \\
+$\hat{\Sigma} \in \R^{p\times p}$ & LDA 公共协方差 & $\displaystyle\frac{1}{N-K}\sum_{k=1}^{K}\sum_{i:y_i=k}(x_i-\hat{\mu}_k)(x_i-\hat{\mu}_k)^\top$（池化） \\
+$\hat{\Sigma}_k \in \R^{p\times p}$ & QDA 各类协方差 & $\displaystyle\frac{1}{N_k-1}\sum_{i:y_i=k}(x_i-\hat{\mu}_k)(x_i-\hat{\mu}_k)^\top$（各自估计） \\
+$\hat{\pi}_k \in [0,1]$ & 先验概率 & $N_k/N$（类频率），或由领域知识给定 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+最后将估计参数代入 LDA 的线性判别函数：
+\[
+\delta_k(x) = x^\top\hat{\Sigma}^{-1}\hat{\mu}_k - \frac12\hat{\mu}_k^\top\hat{\Sigma}^{-1}\hat{\mu}_k + \log\hat{\pi}_k,
+\]
+或 QDA 的二次判别函数：
+\[
+\delta_k(x) = -\frac12\log|\hat{\Sigma}_k| - \frac12(x-\hat{\mu}_k)^\top\hat{\Sigma}_k^{-1}(x-\hat{\mu}_k) + \log\hat{\pi}_k.
+\]
+
+训练完成后，对新输入 $x$ 只需计算这些 $\delta_k(x)$ 并取 $\argmax$ 即可分类。
+
+这与 Logistic 回归的本质区别在于：LDA 是\textbf{生成式}（建模 $P(X\mid G)$，再通过 Bayes 定理得后验），Logistic 回归是\textbf{判别式}（直接建模 $P(G\mid X)$，跳过了对 $X$ 分布的假设）。
+
 \subsubsection{完整数值示例：从密度到后验到决策}
 
 下面用一个二分类一维 Gaussian 例子走完整个 Bayes 分类流水线。
@@ -956,4 +1240,312 @@ LDA 和 QDA 在很多分类任务中表现优异。例如 STATLOG 项目（Michi
 
 \begin{remark}
 LDA/QDA 表现好的原因不太可能是数据近似 Gaussian 且协方差近似相等。更可能的原因是：\textbf{数据只能支持简单的线性或二次决策边界}，而 Gaussian 模型提供的估计是稳定的。这是偏差-方差权衡——线性边界的偏差可以接受，因为其方差远低于更复杂的替代方法。
+\end{remark}
+
+
+% ============ §4.3.1 正则化判别分析 (RDA) ============
+\section{正则化判别分析 (RDA)}
+
+Friedman (1989) 提出了 LDA 与 QDA 之间的折中方案：将 QDA 的各类协方差向公共协方差收缩，类似于岭回归的思想。
+
+\subsection{模型形式}
+
+正则化协方差矩阵：
+\begin{equation}\label{eq:rda_cov}
+    \hat{\Sigma}_k(\alpha) = \alpha \hat{\Sigma}_k + (1 - \alpha) \hat{\Sigma},
+\end{equation}
+其中 $\hat{\Sigma}$ 是 LDA 的池化协方差矩阵。$\alpha \in [0,1]$ 控制从 LDA（$\alpha=0$）到 QDA（$\alpha=1$）的连续过渡，通常通过交叉验证选择。
+
+进一步可将 $\hat{\Sigma}$ 自身向标量协方差收缩：
+\begin{equation}\label{eq:rda_scalar}
+    \hat{\Sigma}(\gamma) = \gamma \hat{\Sigma} + (1 - \gamma) \hat{\sigma}^2 \mathbf{I},
+\end{equation}
+$\gamma \in [0,1]$。将 $\hat{\Sigma}(\gamma)$ 替代 \eqref{eq:rda_cov} 中的 $\hat{\Sigma}$，得到由 $(\alpha, \gamma)$ 参数化的更一般的协方差族 $\hat{\Sigma}_k(\alpha, \gamma)$。
+
+
+
+
+% ============ §4.3.2 LDA 的计算 ============
+\section{LDA 的计算}
+
+LDA 和 QDA 的计算可通过对角化协方差矩阵来简化。
+
+\subsection{对角化方法}
+
+对每个 $\hat{\Sigma}_k$ 做特征分解 $\hat{\Sigma}_k = U_k D_k U_k^\top$，其中 $U_k$ 为 $p \times p$ 正交矩阵，$D_k$ 为对角正特征值矩阵。则判别函数 $\delta_k(x)$ 的两个成分简化为：
+
+\begin{itemize}
+    \item \textbf{马氏距离}：$(x - \hat{\mu}_k)^\top \hat{\Sigma}_k^{-1}(x - \hat{\mu}_k) = [U_k^\top(x - \hat{\mu}_k)]^\top D_k^{-1} [U_k^\top(x - \hat{\mu}_k)]$；
+    \item \textbf{对数行列式}：$\log|\hat{\Sigma}_k| = \sum_{\ell} \log d_{k\ell}$。
+\end{itemize}
+
+\subsection{LDA 的球形化实现}
+
+\subsubsection{为什么要球形化？}
+
+LDA 的判别函数 \eqref{eq:lda_discriminant} 中，核心项是马氏距离：
+\[
+(x - \mu_k)^\top \Sigma^{-1} (x - \mu_k).
+\]
+若直接使用欧氏距离 $\|x - \mu_k\|^2$，则隐含假设协方差 $\Sigma = \sigma^2\mathbf{I}$（各向同性球状分布）。
+但实际数据常呈椭球状——不同方向上的方差不同，且特征之间可能相关（$\Sigma$ 非对角）。
+
+马氏距离通过 $\Sigma^{-1}$ 对空间做了「扭曲」，正确度量了在数据分布下的距离。但每分类一个新点都要算一次 $(\cdot)^\top \Sigma^{-1}(\cdot)$，不够经济。
+球形化的思路是：\textbf{一次性把整个空间变换好，此后距离计算退化为欧氏距离。}
+
+\subsubsection{球形化变换}
+
+对公共协方差估计做特征分解：
+\begin{equation}\label{eq:sigma_eigen}
+    \hat{\Sigma} = U D U^\top,
+\end{equation}
+其中 $U$ 为 $p \times p$ 正交矩阵（列是 $\hat{\Sigma}$ 的特征向量），$D = \operatorname{diag}(d_1, \ldots, d_p)$ 为特征值对角矩阵（$d_j > 0$）。
+
+定义球形化变换：
+\begin{equation}\label{eq:sphering_transform}
+    X^* = D^{-\frac12} U^\top X,
+\end{equation}
+其中 $D^{-\frac12} = \operatorname{diag}(d_1^{-1/2}, \ldots, d_p^{-1/2})$。
+
+\subsubsection{变换后的协方差}
+
+验证：变换后 $X^*$ 的公共协方差成为单位矩阵：
+\[
+\begin{aligned}
+\operatorname{Cov}(X^*)
+&= D^{-\frac12} U^\top \,\hat{\Sigma}\, U D^{-\frac12} \\
+&= D^{-\frac12} U^\top (U D U^\top) U D^{-\frac12} \\
+&= D^{-\frac12} D D^{-\frac12} \\
+&= \mathbf{I}.
+\end{aligned}
+\]
+
+\subsubsection{Sphering 的几何含义}
+
+$D^{-\frac12} U^\top$ 这个操作分两步理解：
+
+\begin{enumerate}[label=(\arabic*)]
+    \item $U^\top X$（旋转）：将坐标轴旋转到 $\hat{\Sigma}$ 的特征向量方向，消除特征间的相关性（使协方差矩阵对角化）；
+    \item $D^{-\frac12}(\cdot)$（缩放）：沿每个新坐标轴除以对应的标准差 $\sqrt{d_j}$，使各方向方差均变为 1。
+\end{enumerate}
+
+几何上，原始空间中「1 单位马氏距离」的椭球 $\{x \mid x^\top\hat{\Sigma}^{-1}x = 1\}$，经变换后成为单位球面 $\{x^* \mid \|x^*\|^2 = 1\}$。
+
+\subsubsection{球形化后的分类规则}
+
+设 $\mu_k^* = D^{-\frac12} U^\top \hat{\mu}_k$ 为球形化空间中的类质心。则在球形化空间中，马氏距离退化为欧氏距离：
+\[
+(x - \hat{\mu}_k)^\top \hat{\Sigma}^{-1} (x - \hat{\mu}_k)
+= \|x^* - \mu_k^*\|^2.
+\]
+
+因此 LDA 分类规则等价于：
+\[
+\hat{G}(x) = \argmax_k \delta_k(x)
+= \argmax_k \Big( x^{*\top}\mu_k^* - \frac12 \|\mu_k^*\|^2 + \log\hat{\pi}_k \Big).
+\]
+
+在球形化空间中，$- \frac12 \|\mu_k^*\|^2 + \log\hat{\pi}_k$ 是仅依赖类别的常数修正项。
+
+\textbf{简化情形}：若各类先验相等（$\pi_k \equiv 1/K$），修正项退化为仅依赖 $\|\mu_k^*\|^2$，分类简化为——在球形化空间中，\textbf{到哪个质心最近就分到哪类}。
+
+\subsubsection{两步实现总结}
+
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{球形化}：对原始数据施加 \eqref{eq:sphering_transform}，一次性变换为「各向同性」空间；
+    \item \textbf{分类到最近质心}：在球形化空间中计算到各类质心的欧氏距离，取最近者（必要时加 $\log\pi_k$ 修正）。
+\end{enumerate}
+
+\begin{remark}
+实际使用 \texttt{sklearn} 等库时无需手动实现这些步骤——库内部自动完成特征分解和球形化。但理解球形化有助于：诊断 $\hat{\Sigma}$ 奇异（特征值为零时 $D^{-\frac12}$ 无定义→无法球形化→高维小样本下 LDA 失效），以及理解后续降秩 LDA 的原理。
+\end{remark}
+
+
+% ============ §4.3.3 降秩线性判别分析 ============
+\section{降秩线性判别分析}
+
+\subsection{动机：质心在低维仿射子空间中}
+
+$K$ 个类质心（$p$ 维空间中的点）必然落在至多 $K-1$ 维的仿射子空间中。若 $p \gg K$，维度大幅降低。在定位最近质心时，可忽略与该子空间正交方向上的距离——因为这些距离对各质心贡献相同，不影响比较结果。
+
+当 $K=3$ 时，可将数据投影到二维平面上查看（如图 4.4），且不丢失 LDA 分类所需的任何信息。
+
+\subsection{Fisher 的判别准则}
+
+Fisher 不从 Gaussian 假设出发，而是直接提出优化问题。
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{Chapters/pic/ch_分类的线性方法/Fisher方法.png}
+\caption{左图：质心连线方向投影——虽然该方向质心分离最大，但由于协方差结构，投影后两类严重重叠。右图：Fisher 判别方向——同时考虑类内协方差，投影后方差最小化、类间分离最大化（Gaussian 数据下）。来源：ESL Figure 4.9。}
+\label{fig:fisher_direction}
+\end{figure}
+
+如图 \ref{fig:fisher_direction} 所示，仅沿质心连线方向投影是不够的——该方向虽然最大化质心间距，却忽略了数据本身的散布（协方差）。Fisher 的关键洞察是：\textbf{好的投影方向应同时最大化类间分离和最小化类内散布}。形式化地：
+
+\[
+\boxed{\text{寻找线性组合 } Z = a^\top X \text{，使类间方差相对于类内方差最大化}}
+\]
+
+这等价于最大化 Rayleigh 商：
+\begin{equation}\label{eq:rayleigh}
+    \max_{a} \frac{a^\top B a}{a^\top W a},
+\end{equation}
+或等价地：
+\[
+\max_{a} a^\top B a \quad \text{s.t.} \quad a^\top W a = 1,
+\]
+其中 $B$ 为类间协方差矩阵，$W$ 为类内协方差矩阵。
+
+这是一个广义特征值问题，解 $a_1$ 是 $W^{-1}B$ 的最大特征值对应的特征向量。后续方向 $a_2, a_3, \ldots$ 在 $W$-正交约束下依次最大化 Rayleigh 商，对应 $W^{-1}B$ 的次大特征值对应的特征向量。
+
+这些 $a_\ell$ 称为\textbf{判别坐标 (discriminant coordinates)} 或\textbf{典型变量 (canonical variates)}。
+
+\subsection{LDA 子空间的计算步骤}
+
+\begin{enumerate}[label=(\arabic*)]
+    \item 计算 $K \times p$ 的类质心矩阵 $M$ 和公共类内协方差矩阵 $W$；
+    \item 计算 $M^* = M W^{-\frac12}$（利用 $W$ 的特征分解）；
+    \item 计算 $M^*$ 的协方差矩阵 $B^*$（类间协方差），做特征分解 $B^* = V^* D_B V^{*\top}$；
+    \item $V^*$ 的列按特征值从大到小排列，定义了最优子空间的坐标。
+\end{enumerate}
+
+结合以上步骤，第 $\ell$ 个判别变量为：
+\[
+Z_\ell = v_\ell^\top X, \quad v_\ell = W^{-\frac12} v_\ell^*.
+\]
+
+\subsection{用于分类与降维}
+
+降秩子空间不仅可用于数据可视化，还可直接用于分类——只需将距离计算限制在所选子空间内即可。可以证明这等价于附加约束（Gaussian 质心位于 $\R^p$ 的 $L$ 维子空间中）的高斯分类规则。
+
+\subsection{Fisher 方法与 Gaussian LDA 的等价性}
+
+Fisher 的判别坐标 $a_\ell$ 与 Gaussian LDA 导出的 $v_\ell$ 完全相同（习题 4.1）。这意味着：
+
+\begin{center}
+\boxed{\text{Fisher 判别} \;\Longleftrightarrow\; \text{Gaussian LDA 的最优子空间}}
+\end{center}
+
+但 Fisher 的推导不依赖 Gaussian 假设，因此其适用范围更广。这里「更广」需精确理解：Fisher 和 Gaussian LDA 给出同一套判别方向，但二者提供的保证层次不同。
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+& Gaussian LDA & Fisher 判别 \\
+\midrule
+给出什么 & 方向 $a_\ell$ \textbf{+} 截距/切点（完整分类器） & 仅给出方向 $a_\ell$ \\
+依赖假设 & $f_k \sim N(\mu_k, \Sigma)$ & 无分布假设（仅需均值、协方差存在） \\
+方向最优性 & Gaussian 下全体线性分类器中 EPE 最优 & \textbf{对任意分布}，在方差比意义下是最优线性投影 \\
+切点最优性 & Gaussian 下切点最优 & 不提供切点，需另行确定 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+关键区别：Fisher 只回答「往哪个方向投影使类间分离相对类内散布最大」——这仅涉及一阶矩和二阶矩，不依赖分布形状（偏态、厚尾、多峰均无妨）。而 Gaussian LDA 额外用 Gaussian 假设确定决策边界的具体位置（切点）。
+
+因此：
+\begin{itemize}
+    \item 若数据确实为 Gaussian 且等协方差：LDA 的完整分类器（方向 + 切点）是最优的；
+    \item 若数据非 Gaussian：Fisher 方向仍然有效，但 Gaussian 导出的切点可能次优。此时可保留 Fisher 方向，通过训练集上扫切点最小化分类误差来另行确定决策边界。
+\end{itemize}
+
+\textbf{一句话}：Fisher 保证\textbf{方向对}（任意分布成立）；Gaussian LDA 额外承诺\textbf{截距也对}（仅 Gaussian 下成立）。
+
+\subsection{总结}
+
+\begin{itemize}
+    \item Gaussian 分类（等协方差）→ 线性决策边界。通过球形化后分类到最近质心（加 $\log\pi_k$ 修正）。
+    \item 只需相对距离 → 数据可限制在球形化空间中质心张成的子空间内。
+    \item 该子空间可进一步分解为 centroid separation 意义上的递进最优子空间，等价于 Fisher 分解。
+\end{itemize}
+
+
+% ============ §4.4 Logistic 回归 ============
+\section{Logistic 回归}
+
+\subsection{模型设定}
+
+Logistic 回归直接对后验概率的 log-odds 建模为 $x$ 的线性函数，同时确保概率之和为 1 且落在 $[0,1]$ 内。对 $K$ 类问题：
+\begin{equation}\label{eq:multilogit}
+    \log\frac{\Pr(G = k \mid X = x)}{\Pr(G = K \mid X = x)} = \beta_{k0} + \beta_k^\top x, \quad k = 1, \ldots, K-1.
+\end{equation}
+
+以最后一类 $K$ 为参考类（选择任意，估计是等变的）。由 \eqref{eq:multilogit} 解出后验概率：
+\begin{equation}\label{eq:softmax}
+    \Pr(G = k \mid X = x) = \frac{\exp(\beta_{k0} + \beta_k^\top x)}{1 + \sum_{\ell=1}^{K-1} \exp(\beta_{\ell0} + \beta_\ell^\top x)}, \quad k = 1,\ldots,K-1,
+\end{equation}
+且 $\Pr(G = K \mid X = x) = 1 / \big(1 + \sum_{\ell=1}^{K-1} \exp(\beta_{\ell0} + \beta_\ell^\top x)\big)$。记全部参数集为 $\theta = \{\beta_{10}, \beta_1, \ldots, \beta_{(K-1)0}, \beta_{K-1}\}$，概率记为 $p_k(x; \theta)$。
+
+当 $K=2$ 时退化为 §4.1 中的二分类形式，广泛用于生物统计中的二值响应问题（存活/死亡、患病/未患病等）。
+
+\subsection{拟合：最大似然与 IRLS}
+
+Logistic 回归通常通过最大化条件似然 $\Pr(G \mid X)$ 来拟合。由于 $\Pr(G \mid X)$ 完全指定了条件分布，适用多项分布。$N$ 个观测的对数似然为：
+\begin{equation}\label{eq:multiloglik}
+    \ell(\theta) = \sum_{i=1}^{N} \log p_{g_i}(x_i; \theta).
+\end{equation}
+
+\subsubsection{二分类情形}
+
+用 0/1 编码：$y_i = 1$ 当 $g_i = 1$，$y_i = 0$ 当 $g_i = 2$。记 $p(x; \beta) = p_1(x; \beta)$，对数似然写为：
+\begin{equation}\label{eq:binomial_loglik}
+    \ell(\beta) = \sum_{i=1}^{N} \Big\{ y_i \log p(x_i; \beta) + (1 - y_i) \log(1 - p(x_i; \beta)) \Big\}
+    = \sum_{i=1}^{N} \Big\{ y_i \beta^\top x_i - \log(1 + e^{\beta^\top x_i}) \Big\}.
+\end{equation}
+这里 $\beta = (\beta_{10}, \beta_1)$，$x_i$ 包含常数项 1。
+
+令导数为零得\textbf{得分方程}：
+\begin{equation}\label{eq:score_eq}
+    \frac{\partial \ell(\beta)}{\partial \beta} = \sum_{i=1}^{N} x_i (y_i - p(x_i; \beta)) = 0,
+\end{equation}
+这是 $p+1$ 个关于 $\beta$ 的非线性方程。注意第一分量（$x_{i1}=1$）给出 $\sum_i y_i = \sum_i p(x_i; \beta)$——观测类别 1 的数量等于期望类别 1 的数量。
+
+\subsubsection{Newton-Raphson 算法}
+
+需要 Hessian 矩阵：
+\begin{equation}\label{eq:hessian}
+    \frac{\partial^2 \ell(\beta)}{\partial\beta\,\partial\beta^\top}
+    = -\sum_{i=1}^{N} x_i x_i^\top p(x_i; \beta)(1 - p(x_i; \beta)).
+\end{equation}
+
+Newton 更新为 $\beta^{\mathrm{new}} = \beta^{\mathrm{old}} - (\partial^2\ell/\partial\beta\partial\beta^\top)^{-1} (\partial\ell/\partial\beta)$。
+
+\subsubsection{矩阵形式与 IRLS}
+
+记 $\mathbf{y}$ 为 $y_i$ 向量，$\mathbf{X}$ 为 $N \times (p+1)$ 矩阵，$\mathbf{p}$ 为拟合概率向量，$\mathbf{W}$ 为 $N \times N$ 对角权重矩阵（第 $i$ 个对角元为 $p(x_i; \beta^{\mathrm{old}})(1 - p(x_i; \beta^{\mathrm{old}}))$）。则：
+\[
+\frac{\partial\ell}{\partial\beta} = \mathbf{X}^\top (\mathbf{y} - \mathbf{p}), \qquad
+\frac{\partial^2\ell}{\partial\beta\,\partial\beta^\top} = -\mathbf{X}^\top \mathbf{W} \mathbf{X}.
+\]
+
+Newton 步可改写为加权最小二乘形式：
+\begin{equation}\label{eq:irls}
+    \beta^{\mathrm{new}}
+    = (\mathbf{X}^\top\mathbf{W}\mathbf{X})^{-1} \mathbf{X}^\top\mathbf{W}\mathbf{z},
+    \quad \mathbf{z} = \mathbf{X}\beta^{\mathrm{old}} + \mathbf{W}^{-1}(\mathbf{y} - \mathbf{p}),
+\end{equation}
+其中 $\mathbf{z}$ 称为\textbf{调整响应 (adjusted response)}。
+
+每次迭代求解加权最小二乘问题 $\beta^{\mathrm{new}} \leftarrow \arg\min_\beta (\mathbf{z} - \mathbf{X}\beta)^\top \mathbf{W} (\mathbf{z} - \mathbf{X}\beta)$。该算法称为\textbf{迭代重加权最小二乘 (IRLS)}。
+
+\begin{remark}
+对数似然是凹函数，算法通常收敛。若罕见情况下似然下降，步长减半可保证收敛。对于多分类（$K \ge 3$），Newton 算法也可写为 IRLS 形式，但每观测有一个 $K-1$ 维响应向量和对角块权重矩阵。实际中可用坐标下降方法（如 R 包 \texttt{glmnet}）高效拟合。
+\end{remark}
+
+\subsection{示例：南非心脏病数据}
+
+表 4.2 展示了对南非心脏病数据的 Logistic 回归拟合结果。该数据来自 CORIS 基线调查，响应变量为心肌梗死 (MI) 的有无（总体患病率 5.1\%），包含 160 个病例和 302 个对照。
+
+输出包括每个系数的 Z 得分（系数除以其标准误）。Z 得分不显著（绝对值 $<2$）的变量可考虑从模型中剔除，对应于 Wald 检验（零假设为该系数为零而其他系数不变）。显著性水平 5\% 对应 $|Z| \approx 2$。
+
+该例揭示了几个意外：\textbf{sbp}（收缩压）不显著，而 \textbf{obesity}（肥胖）的系数甚至为负——这并不意味着肥胖对心脏病有保护作用，而是可能被其他变量（如年龄、ldl）所解释（多重共线性效应）。典型分析中需要拟合多个模型来寻找简约且包含交互项的子集。
+
+\begin{remark}
+Logistic 回归与 LDA 的关键区别：
+\begin{itemize}
+    \item LDA 是\textbf{生成式}：假设 $X\mid G$ 的分布 → Bayes 定理 → 后验，log-odds 自然为线性（若等协方差）；
+    \item Logistic 回归是\textbf{判别式}：直接假设 log-odds 为线性，不对 $X$ 的分布做任何假设。
+\end{itemize}
+这使得 Logistic 回归比 LDA 更一般、更鲁棒（不依赖 Gaussian 假设），但在数据确实近似 Gaussian 且等协方差时效率略低于 LDA。
 \end{remark}

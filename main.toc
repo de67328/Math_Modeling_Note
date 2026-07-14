@@ -434,45 +434,85 @@
 \contentsline {section}{\numberline {11.19}小结}{243}{section.11.19}%
 \contentsline {chapter}{\numberline {第十二章\hspace {.3em}}分类的线性方法}{249}{chapter.12}%
 \contentsline {section}{\numberline {12.1}引言}{249}{section.12.1}%
-\contentsline {subsection}{\numberline {12.1.1}判别函数方法}{249}{subsection.12.1.1}%
-\contentsline {subsection}{\numberline {12.1.2}Logit 变换与 Logistic 模型}{249}{subsection.12.1.2}%
-\contentsline {subsection}{\numberline {12.1.3}实操流程：从线性函数到分类决策}{249}{subsection.12.1.3}%
-\contentsline {subsubsection}{预测阶段（前向传播）：三段式流水线}{250}{Item.292}%
-\contentsline {subsubsection}{训练阶段：用什么损失函数？}{250}{Item.292}%
-\contentsline {subsubsection}{$\Pr (G=1\mid X=x)$ 的作用}{251}{remark.12.1}%
-\contentsline {subsubsection}{一句话总结}{251}{Item.295}%
-\contentsline {subsection}{\numberline {12.1.4}基展开：从线性到非线性}{251}{subsection.12.1.4}%
-\contentsline {subsection}{\numberline {12.1.5}本章对 $f$ 的核心限制}{251}{subsection.12.1.5}%
-\contentsline {section}{\numberline {12.2}指示矩阵的线性回归}{252}{section.12.2}%
-\contentsline {subsection}{\numberline {12.2.1}模型设定}{252}{subsection.12.2.1}%
-\contentsline {subsection}{\numberline {12.2.2}理论依据}{253}{subsection.12.2.2}%
-\contentsline {subsection}{\numberline {12.2.3}最近目标分类视角}{253}{subsection.12.2.3}%
-\contentsline {subsection}{\numberline {12.2.4}完整数值示例（$N=5,\tmspace +\thickmuskip {.2777em}K=3,\tmspace +\thickmuskip {.2777em}p=1$）}{253}{subsection.12.2.4}%
-\contentsline {subsubsection}{Step 1：构造数据}{253}{subsection.12.2.4}%
-\contentsline {subsubsection}{Step 2：构建设计矩阵 $\mathbf {X}$ 和指示矩阵 $\mathbf {Y}$}{254}{subsection.12.2.4}%
-\contentsline {subsubsection}{Step 3：计算 $\mathbf {X}^\top \mathbf {X}$ 和 $\mathbf {X}^\top \mathbf {Y}$}{254}{subsection.12.2.4}%
-\contentsline {subsubsection}{Step 4：求逆并计算系数矩阵 $\hat {\mathbf {B}}$}{254}{subsection.12.2.4}%
-\contentsline {subsubsection}{Step 5：用 $\hat {\mathbf {B}}$ 对新点分类}{254}{subsection.12.2.4}%
-\contentsline {subsubsection}{Step 6：确定决策边界}{255}{subsection.12.2.4}%
-\contentsline {subsection}{\numberline {12.2.5}Masking 问题}{255}{subsection.12.2.5}%
-\contentsline {subsection}{\numberline {12.2.6}Masking 数值演示（$N=5,\tmspace +\thickmuskip {.2777em}K=3,\tmspace +\thickmuskip {.2777em}p=1$）}{255}{subsection.12.2.6}%
-\contentsline {subsubsection}{数据构造：让中间类「被夹击」}{255}{subsection.12.2.6}%
-\contentsline {subsubsection}{Step 1--2：构造 $\mathbf {X}$ 和 $\mathbf {Y}$}{256}{subsection.12.2.6}%
-\contentsline {subsubsection}{Step 3：计算 $\mathbf {X}^\top \mathbf {X}$ 和 $\mathbf {X}^\top \mathbf {Y}$}{256}{subsection.12.2.6}%
-\contentsline {subsubsection}{Step 4：系数矩阵 $\hat {\mathbf {B}}$}{256}{subsection.12.2.6}%
-\contentsline {subsubsection}{Step 5：检验各类拟合值——谁在主导？}{257}{subsection.12.2.6}%
-\contentsline {subsubsection}{Step 6：从数学上看为什么会这样}{257}{subsection.12.2.6}%
-\contentsline {subsubsection}{与正常示例的对比}{257}{subsection.12.2.6}%
-\contentsline {subsubsection}{本质原因}{258}{subsection.12.2.6}%
-\contentsline {subsubsection}{为什么只有 1 个点时 $\hat {f}_2$ 恰好是常数？——最小二乘的视角}{258}{subsection.12.2.6}%
-\contentsline {section}{\numberline {12.3}线性判别分析 (LDA)}{259}{section.12.3}%
-\contentsline {subsection}{\numberline {12.3.1}Bayes 分类框架}{259}{subsection.12.3.1}%
-\contentsline {subsubsection}{为什么最优分类需要 $\Pr (G \mid X)$？——从损失函数到后验概率}{259}{equation.12.3.9}%
-\contentsline {subsubsection}{完整数值示例：从密度到后验到决策}{261}{equation.12.3.15}%
-\contentsline {subsection}{\numberline {12.3.2}Gaussian 假设下的 LDA}{263}{subsection.12.3.2}%
-\contentsline {subsection}{\numberline {12.3.3}线性判别函数}{263}{subsection.12.3.3}%
-\contentsline {subsection}{\numberline {12.3.4}参数估计}{263}{subsection.12.3.4}%
-\contentsline {subsection}{\numberline {12.3.5}二分类 LDA 与最小二乘的对应}{263}{subsection.12.3.5}%
-\contentsline {section}{\numberline {12.4}二次判别分析 (QDA)}{264}{section.12.4}%
-\contentsline {subsection}{\numberline {12.4.1}参数数量}{264}{subsection.12.4.1}%
-\contentsline {subsection}{\numberline {12.4.2}LDA 与 QDA 的性能讨论}{264}{subsection.12.4.2}%
+\contentsline {subsubsection}{基本设定}{249}{section.12.1}%
+\contentsline {subsubsection}{判别函数与分类规则}{249}{section.12.1}%
+\contentsline {subsubsection}{决策边界}{249}{equation.12.1.1}%
+\contentsline {subsubsection}{线性判别函数的充要条件}{249}{equation.12.1.2}%
+\contentsline {subsubsection}{损失函数}{250}{equation.12.1.2}%
+\contentsline {subsubsection}{期望预测误差 (EPE)}{250}{equation.12.1.2}%
+\contentsline {subsubsection}{Bayes 分类器：EPE 的最优解}{250}{equation.12.1.4}%
+\contentsline {subsubsection}{框架统一}{251}{equation.12.1.4}%
+\contentsline {subsection}{\numberline {12.1.1}判别函数方法}{251}{subsection.12.1.1}%
+\contentsline {subsection}{\numberline {12.1.2}Logit 变换与 Logistic 模型}{251}{subsection.12.1.2}%
+\contentsline {subsubsection}{Logistic 回归中的 $\delta _k$ 是什么？}{251}{equation.12.1.7}%
+\contentsline {subsubsection}{$\delta _k$ 本身并非线性，但单调变换后是线性的}{252}{equation.12.1.7}%
+\contentsline {subsubsection}{$\delta _k$ 的一般取法}{252}{equation.12.1.7}%
+\contentsline {subsubsection}{「后验概率」的理解}{252}{equation.12.1.7}%
+\contentsline {subsubsection}{训练的本质：用数据估计 $\delta _k$}{253}{equation.12.1.7}%
+\contentsline {subsection}{\numberline {12.1.3}实操流程：从线性函数到分类决策}{254}{subsection.12.1.3}%
+\contentsline {subsubsection}{预测阶段（前向传播）：三段式流水线}{254}{Item.295}%
+\contentsline {subsubsection}{训练阶段：用什么损失函数？}{254}{Item.295}%
+\contentsline {subsubsection}{$\Pr (G=1\mid X=x)$ 的作用}{255}{remark.12.1}%
+\contentsline {subsubsection}{一句话总结}{255}{Item.298}%
+\contentsline {subsection}{\numberline {12.1.4}基展开：从线性到非线性}{255}{subsection.12.1.4}%
+\contentsline {subsection}{\numberline {12.1.5}本章对 $f$ 的核心限制}{255}{subsection.12.1.5}%
+\contentsline {section}{\numberline {12.2}指示矩阵的线性回归}{256}{section.12.2}%
+\contentsline {subsection}{\numberline {12.2.1}模型设定}{256}{subsection.12.2.1}%
+\contentsline {subsection}{\numberline {12.2.2}理论依据}{257}{subsection.12.2.2}%
+\contentsline {subsection}{\numberline {12.2.3}最近目标分类视角}{257}{subsection.12.2.3}%
+\contentsline {subsection}{\numberline {12.2.4}完整数值示例（$N=5,\tmspace +\thickmuskip {.2777em}K=3,\tmspace +\thickmuskip {.2777em}p=1$）}{257}{subsection.12.2.4}%
+\contentsline {subsubsection}{Step 1：构造数据}{257}{subsection.12.2.4}%
+\contentsline {subsubsection}{Step 2：构建设计矩阵 $\mathbf {X}$ 和指示矩阵 $\mathbf {Y}$}{258}{subsection.12.2.4}%
+\contentsline {subsubsection}{Step 3：计算 $\mathbf {X}^\top \mathbf {X}$ 和 $\mathbf {X}^\top \mathbf {Y}$}{258}{subsection.12.2.4}%
+\contentsline {subsubsection}{Step 4：求逆并计算系数矩阵 $\hat {\mathbf {B}}$}{258}{subsection.12.2.4}%
+\contentsline {subsubsection}{Step 5：用 $\hat {\mathbf {B}}$ 对新点分类}{258}{subsection.12.2.4}%
+\contentsline {subsubsection}{Step 6：确定决策边界}{259}{subsection.12.2.4}%
+\contentsline {subsection}{\numberline {12.2.5}Masking 问题}{259}{subsection.12.2.5}%
+\contentsline {subsection}{\numberline {12.2.6}Masking 数值演示（$N=5,\tmspace +\thickmuskip {.2777em}K=3,\tmspace +\thickmuskip {.2777em}p=1$）}{259}{subsection.12.2.6}%
+\contentsline {subsubsection}{数据构造：让中间类「被夹击」}{259}{subsection.12.2.6}%
+\contentsline {subsubsection}{Step 1--2：构造 $\mathbf {X}$ 和 $\mathbf {Y}$}{260}{subsection.12.2.6}%
+\contentsline {subsubsection}{Step 3：计算 $\mathbf {X}^\top \mathbf {X}$ 和 $\mathbf {X}^\top \mathbf {Y}$}{260}{subsection.12.2.6}%
+\contentsline {subsubsection}{Step 4：系数矩阵 $\hat {\mathbf {B}}$}{260}{subsection.12.2.6}%
+\contentsline {subsubsection}{Step 5：检验各类拟合值——谁在主导？}{261}{subsection.12.2.6}%
+\contentsline {subsubsection}{Step 6：从数学上看为什么会这样}{261}{subsection.12.2.6}%
+\contentsline {subsubsection}{与正常示例的对比}{261}{subsection.12.2.6}%
+\contentsline {subsubsection}{本质原因}{262}{subsection.12.2.6}%
+\contentsline {subsubsection}{为什么只有 1 个点时 $\hat {f}_2$ 恰好是常数？——最小二乘的视角}{262}{subsection.12.2.6}%
+\contentsline {section}{\numberline {12.3}线性判别分析 (LDA)}{263}{section.12.3}%
+\contentsline {subsection}{\numberline {12.3.1}Bayes 分类框架}{263}{subsection.12.3.1}%
+\contentsline {subsubsection}{为什么最优分类需要 $\Pr (G \mid X)$？——从损失函数到后验概率}{263}{equation.12.3.13}%
+\contentsline {subsubsection}{LDA/QDA 如何逼近 Bayes 上界}{265}{equation.12.3.19}%
+\contentsline {subsubsection}{LDA/QDA 的训练：估计什么参数？}{265}{equation.12.3.19}%
+\contentsline {subsubsection}{完整数值示例：从密度到后验到决策}{266}{equation.12.3.19}%
+\contentsline {subsection}{\numberline {12.3.2}Gaussian 假设下的 LDA}{268}{subsection.12.3.2}%
+\contentsline {subsection}{\numberline {12.3.3}线性判别函数}{268}{subsection.12.3.3}%
+\contentsline {subsection}{\numberline {12.3.4}参数估计}{268}{subsection.12.3.4}%
+\contentsline {subsection}{\numberline {12.3.5}二分类 LDA 与最小二乘的对应}{268}{subsection.12.3.5}%
+\contentsline {section}{\numberline {12.4}二次判别分析 (QDA)}{269}{section.12.4}%
+\contentsline {subsection}{\numberline {12.4.1}参数数量}{269}{subsection.12.4.1}%
+\contentsline {subsection}{\numberline {12.4.2}LDA 与 QDA 的性能讨论}{269}{subsection.12.4.2}%
+\contentsline {section}{\numberline {12.5}正则化判别分析 (RDA)}{269}{section.12.5}%
+\contentsline {subsection}{\numberline {12.5.1}模型形式}{270}{subsection.12.5.1}%
+\contentsline {section}{\numberline {12.6}LDA 的计算}{270}{section.12.6}%
+\contentsline {subsection}{\numberline {12.6.1}对角化方法}{270}{subsection.12.6.1}%
+\contentsline {subsection}{\numberline {12.6.2}LDA 的球形化实现}{270}{subsection.12.6.2}%
+\contentsline {subsubsection}{为什么要球形化？}{270}{subsection.12.6.2}%
+\contentsline {subsubsection}{球形化变换}{271}{subsection.12.6.2}%
+\contentsline {subsubsection}{变换后的协方差}{271}{equation.12.6.28}%
+\contentsline {subsubsection}{Sphering 的几何含义}{271}{equation.12.6.28}%
+\contentsline {subsubsection}{球形化后的分类规则}{271}{Item.304}%
+\contentsline {subsubsection}{两步实现总结}{272}{Item.304}%
+\contentsline {section}{\numberline {12.7}降秩线性判别分析}{272}{section.12.7}%
+\contentsline {subsection}{\numberline {12.7.1}动机：质心在低维仿射子空间中}{272}{subsection.12.7.1}%
+\contentsline {subsection}{\numberline {12.7.2}Fisher 的判别准则}{272}{subsection.12.7.2}%
+\contentsline {subsection}{\numberline {12.7.3}LDA 子空间的计算步骤}{273}{subsection.12.7.3}%
+\contentsline {subsection}{\numberline {12.7.4}用于分类与降维}{273}{subsection.12.7.4}%
+\contentsline {subsection}{\numberline {12.7.5}Fisher 方法与 Gaussian LDA 的等价性}{274}{subsection.12.7.5}%
+\contentsline {subsection}{\numberline {12.7.6}总结}{274}{subsection.12.7.6}%
+\contentsline {section}{\numberline {12.8}Logistic 回归}{275}{section.12.8}%
+\contentsline {subsection}{\numberline {12.8.1}模型设定}{275}{subsection.12.8.1}%
+\contentsline {subsection}{\numberline {12.8.2}拟合：最大似然与 IRLS}{275}{subsection.12.8.2}%
+\contentsline {subsubsection}{二分类情形}{275}{equation.12.8.32}%
+\contentsline {subsubsection}{Newton-Raphson 算法}{276}{equation.12.8.34}%
+\contentsline {subsubsection}{矩阵形式与 IRLS}{276}{equation.12.8.35}%
+\contentsline {subsection}{\numberline {12.8.3}示例：南非心脏病数据}{276}{subsection.12.8.3}%
