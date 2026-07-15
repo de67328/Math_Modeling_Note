@@ -505,14 +505,28 @@
 \contentsline {section}{\numberline {12.7}降秩线性判别分析}{272}{section.12.7}%
 \contentsline {subsection}{\numberline {12.7.1}动机：质心在低维仿射子空间中}{272}{subsection.12.7.1}%
 \contentsline {subsection}{\numberline {12.7.2}Fisher 的判别准则}{272}{subsection.12.7.2}%
-\contentsline {subsection}{\numberline {12.7.3}LDA 子空间的计算步骤}{273}{subsection.12.7.3}%
-\contentsline {subsection}{\numberline {12.7.4}用于分类与降维}{273}{subsection.12.7.4}%
+\contentsline {subsubsection}{各符号的精确含义}{273}{equation.12.7.29}%
+\contentsline {subsubsection}{为什么是比值形式？}{273}{equation.12.7.29}%
+\contentsline {subsection}{\numberline {12.7.3}LDA 子空间的计算步骤}{274}{subsection.12.7.3}%
+\contentsline {subsection}{\numberline {12.7.4}用于分类与降维}{274}{subsection.12.7.4}%
 \contentsline {subsection}{\numberline {12.7.5}Fisher 方法与 Gaussian LDA 的等价性}{274}{subsection.12.7.5}%
-\contentsline {subsection}{\numberline {12.7.6}总结}{274}{subsection.12.7.6}%
-\contentsline {section}{\numberline {12.8}Logistic 回归}{275}{section.12.8}%
-\contentsline {subsection}{\numberline {12.8.1}模型设定}{275}{subsection.12.8.1}%
-\contentsline {subsection}{\numberline {12.8.2}拟合：最大似然与 IRLS}{275}{subsection.12.8.2}%
-\contentsline {subsubsection}{二分类情形}{275}{equation.12.8.32}%
-\contentsline {subsubsection}{Newton-Raphson 算法}{276}{equation.12.8.34}%
-\contentsline {subsubsection}{矩阵形式与 IRLS}{276}{equation.12.8.35}%
-\contentsline {subsection}{\numberline {12.8.3}示例：南非心脏病数据}{276}{subsection.12.8.3}%
+\contentsline {subsection}{\numberline {12.7.6}总结}{275}{subsection.12.7.6}%
+\contentsline {section}{\numberline {12.8}几何视角：$W^{-1}$-内积空间中的 LDA 与 Fisher}{275}{section.12.8}%
+\contentsline {subsection}{\numberline {12.8.1}$W^{-1}$-内积空间}{275}{subsection.12.8.1}%
+\contentsline {subsection}{\numberline {12.8.2}标准内积 vs $W^{-1}$-内积}{276}{subsection.12.8.2}%
+\contentsline {subsection}{\numberline {12.8.3}在此框架下重新理解 LDA}{276}{subsection.12.8.3}%
+\contentsline {subsection}{\numberline {12.8.4}在此框架下重新理解 Fisher}{276}{subsection.12.8.4}%
+\contentsline {subsection}{\numberline {12.8.5}球形化的几何意义}{277}{subsection.12.8.5}%
+\contentsline {subsection}{\numberline {12.8.6}统一视角总结}{277}{subsection.12.8.6}%
+\contentsline {section}{\numberline {12.9}Logistic 回归}{277}{section.12.9}%
+\contentsline {subsection}{\numberline {12.9.1}回到判别函数与 EPE 框架}{277}{subsection.12.9.1}%
+\contentsline {subsection}{\numberline {12.9.2}模型设定}{278}{subsection.12.9.2}%
+\contentsline {subsubsection}{出发点：我们有什么，不知道什么}{278}{subsection.12.9.2}%
+\contentsline {subsubsection}{核心假设：log-odds 是线性的}{278}{subsection.12.9.2}%
+\contentsline {subsubsection}{从 log-odds 到后验概率}{278}{equation.12.9.31}%
+\contentsline {subsubsection}{训练的本质：找参数 $\beta $}{278}{equation.12.9.32}%
+\contentsline {subsection}{\numberline {12.9.3}拟合：最大似然与 IRLS}{279}{subsection.12.9.3}%
+\contentsline {subsubsection}{二分类情形}{279}{equation.12.9.33}%
+\contentsline {subsubsection}{Newton-Raphson 算法}{279}{equation.12.9.35}%
+\contentsline {subsubsection}{矩阵形式与 IRLS}{279}{equation.12.9.36}%
+\contentsline {subsection}{\numberline {12.9.4}示例：南非心脏病数据}{280}{subsection.12.9.4}%

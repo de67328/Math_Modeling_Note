@@ -1395,7 +1395,38 @@ Fisher 不从 Gaussian 假设出发，而是直接提出优化问题。
 \[
 \max_{a} a^\top B a \quad \text{s.t.} \quad a^\top W a = 1,
 \]
-其中 $B$ 为类间协方差矩阵，$W$ 为类内协方差矩阵。
+其中 $B$ 为类间散布矩阵，$W$ 为类内散布矩阵。
+
+\subsubsection{各符号的精确含义}
+
+\begin{itemize}
+    \item \textbf{$a \in \R^p \setminus \{0\}$}：投影方向向量。投影操作 $z = a^\top x$ 将 $p$ 维向量 $x$ 压缩为标量 $z$（沿 $a$ 方向的坐标）。任何非零 $p$ 维向量都是候选方向，优化目标是从 $\R^p$ 中选出最好的那个。
+
+    \item \textbf{$B$（类间散布，Between-class scatter）}：度量各类质心相对于总质心的散布程度，
+    \[
+    B = \sum_{k=1}^{K} N_k (\mu_k - \mu)(\mu_k - \mu)^\top,
+    \]
+    其中 $\mu_k$ 为第 $k$ 类均值（质心），$\mu$ 为全体总均值。对二分类退化为 $B \propto (\mu_1 - \mu_2)(\mu_1 - \mu_2)^\top$（秩-1 矩阵，方向沿质心连线）。
+
+    \item \textbf{$W$（类内散布，Within-class scatter）}：池化（pooled）的公共类内离差和，
+    \[
+    W = \sum_{k=1}^{K} \sum_{i: y_i = k} (x_i - \mu_k)(x_i - \mu_k)^\top
+      = \sum_{k=1}^{K} (N_k - 1)\, \hat{\Sigma}_k,
+    \]
+    其中 $\hat{\Sigma}_k$ 为各类各自的协方差估计。注意 $W$ 不分类别——它假设各类协方差相同（$\Sigma_1 = \cdots = \Sigma_K = \Sigma$），用一个公共 $W$ 估计。这就是 LDA 的核心假设：等协方差。若各类协方差不同，则需用 QDA。
+\end{itemize}
+
+\subsubsection{为什么是比值形式？}
+
+若只最大化 $a^\top B a$（组间方差），问题病态——将 $a$ 放大 10 倍，$a^\top B a$ 放大 100 倍，无上界。因此必须归一化。分母 $a^\top W a$ 是投影后的类内方差，比值 $a^\top B a / a^\top W a$ 就是\textbf{信噪比}（组间分离是「信号」，类内散布是「噪声」）。方向缩放时分子分母同比例变化，比值不变——优化良定。
+
+比值形式和约束形式等价：
+\[
+\max_{a} \frac{a^\top B a}{a^\top W a}
+\;\Longleftrightarrow\;
+\max_{a} a^\top B a \quad \text{s.t.} \quad a^\top W a = 1.
+\]
+后者将类内方差固定为 1，在此约束下最大化组间方差。
 
 这是一个广义特征值问题，解 $a_1$ 是 $W^{-1}B$ 的最大特征值对应的特征向量。后续方向 $a_2, a_3, \ldots$ 在 $W$-正交约束下依次最大化 Rayleigh 商，对应 $W^{-1}B$ 的次大特征值对应的特征向量。
 
@@ -1461,23 +1492,164 @@ Fisher 的判别坐标 $a_\ell$ 与 Gaussian LDA 导出的 $v_\ell$ 完全相同
 \end{itemize}
 
 
+% ============ 几何视角：内积空间框架下的 LDA 与 Fisher ============
+\section{几何视角：$W^{-1}$-内积空间中的 LDA 与 Fisher}
+
+前面各节的推导可以统一到一个更深刻的几何框架下：一切操作本质上都是在\textbf{由 $W^{-1}$（或 $\Sigma^{-1}$）定义的内积空间}中进行的。
+
+\subsection{$W^{-1}$-内积空间}
+
+以类内散布矩阵 $W$（对称正定）的逆作为度量矩阵，定义新内积：
+\begin{equation}\label{eq:W_inner}
+    \langle x, y \rangle_W = x^\top W^{-1} y.
+\end{equation}
+$W^{-1}$ 对称正定，满足内积的三条公理（对称、双线性、正定性），因此 $(\R^p, \langle\cdot,\cdot\rangle_W)$ 是合法的内积空间。
+
+导出：
+\[
+\|x\|_W = \sqrt{\langle x, x \rangle_W} = \sqrt{x^\top W^{-1} x}, \qquad
+d_W(x, y) = \|x - y\|_W = \sqrt{(x-y)^\top W^{-1} (x-y)}.
+\]
+\textbf{$d_W$ 正是马氏距离 (Mahalanobis distance)。}
+
+\subsection{标准内积 vs $W^{-1}$-内积}
+
+同一向量空间 $\R^p$ 上可定义不同内积，度量不同的「形状」：
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+& 标准欧氏内积 $x^\top y$ & $W^{-1}$-内积 $x^\top W^{-1} y$ \\
+\midrule
+单位球形状 & 球面 & 椭球面（贴合数据散布） \\
+正交的含义 & 直角 & 马氏意义下的「不相关」 \\
+距离 & 欧氏距离 & 马氏距离 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{关键思想}：Fisher/LDA 使用 $W^{-1}$-内积而非标准欧氏内积，是因为它\textbf{尊重数据本身的协方差结构}——在数据散布大的方向上「距离单位」被压缩，散布小的方向上被拉伸。这比强加外部标准欧氏几何更合理。
+
+\subsection{在此框架下重新理解 LDA}
+
+LDA 判别函数 \eqref{eq:lda_discriminant} 用 $W$-内积改写：
+\[
+\delta_k(x) = \langle x, \mu_k \rangle_W - \frac12 \|\mu_k\|_W^2 + \log \pi_k.
+\]
+
+展开 $\|x - \mu_k\|_W^2 = \|x\|_W^2 - 2\langle x, \mu_k\rangle_W + \|\mu_k\|_W^2$，消去与 $k$ 无关的 $\frac12\|x\|_W^2$，得：
+\[
+\boxed{\hat{G}(x) = \argmax_k \delta_k(x) = \argmin_k \Big( \frac12 \|x - \mu_k\|_W^2 - \log \pi_k \Big)}.
+\]
+
+\textbf{LDA = 在 $W^{-1}$-内积空间中，用马氏距离分类到最近质心，以 $\log\pi_k$ 修正。}
+
+\subsection{在此框架下重新理解 Fisher}
+
+Fisher 的 Rayleigh 商可写为：
+\[
+R(a) = \frac{a^\top B a}{a^\top W a}
+     = \frac{\text{标准内积下的组间方差}}{\|a\|_W^2}.
+\]
+分子用标准内积度量组间分离，分母用 $W$-范数归一化方向长度。做变量替换 $b = W^{1/2} a$，问题退化为标准特征值问题。
+
+\textbf{Fisher = 在 $W^{-1}$-内积几何中寻找使信噪比最大的投影方向，即 $W^{-1}B$ 的最大特征向量。}
+
+\subsection{球形化的几何意义}
+
+球形化变换 $X^* = D^{-1/2}U^\top X$（其中 $W = UDU^\top$）等价于将 $W^{-1}$-内积空间\textbf{等距映射到标准欧氏空间}：
+\[
+\langle x, y \rangle_W = x^\top W^{-1} y = (D^{-1/2}U^\top x)^\top (D^{-1/2}U^\top y) = \langle x^*, y^* \rangle_{\text{std}}.
+\]
+即：球形化是一次性地将弯曲的 $W^{-1}$-几何「拉直」为欧氏几何。此后所有操作退化为标准欧氏空间中的最近质心分类。
+
+\subsection{统一视角总结}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+概念 & 标准欧氏空间 & $W^{-1}$-内积空间 \\
+\midrule
+内积 & $x^\top y$ & $x^\top W^{-1} y$ \\
+范数 & $\|x\|$ & $\|x\|_W$（马氏范数） \\
+距离 & 欧氏距离 & 马氏距离 \\
+单位球 & 球面 & 数据分布形状的椭球面 \\
+LDA 分类 & — & 马氏最近质心 + $\log\pi_k$ \\
+Fisher 方向 & — & $W^{-1}B$ 的最大特征向量 \\
+球形化 & — & 将 $W^{-1}$-几何等距拉直为欧氏几何 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{一句话}：LDA 和 Fisher 本质上都是在马氏距离定义的弯曲几何中做线性代数——Fisher 找该几何的「主轴」，LDA 用马氏距离做最近质心分类，球形化是一次性将该几何拉直。
+
+
 % ============ §4.4 Logistic 回归 ============
 \section{Logistic 回归}
 
+\subsection{回到判别函数与 EPE 框架}
+
+在 §4.1 引言中建立了分类问题的严格框架：判别函数 $\delta_k(x)$ → $\argmax$ → $\hat{G}(x)$ → EPE 最小化 → Bayes 分类器 $\argmax_k P(G=k\mid X=x)$。
+Logistic 回归是该框架的直接实例化：
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+框架概念 & Logistic 回归中的对应 \\
+\midrule
+$\delta_k(x)$ & $p_k(x; \theta) = \Pr(G = k \mid X = x; \theta)$，即参数化后验概率 \\
+分类规则 & $\hat{G}(x) = \argmax_k p_k(x; \theta)$（等价于 Bayes 分类器） \\
+线性条件 & 不要求 $\delta_k$ 线性，只要求 $\log\frac{p_k}{p_K}$ 是 $x$ 的线性函数（单调变换后线性） \\
+损失函数 & 训练用交叉熵（负对数似然）；最终评估用 0--1 损失 \\
+训练方式 & 最大似然估计 (MLE)，等价于最小化 EPE 的经验近似 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+与 LDA（§4.3）的生成式路线不同，Logistic 回归走判别式路线：直接参数化 $P(G\mid X)$ 的 log-odds，跳过对 $X$ 分布的建模。核心假设只有一条——\textbf{log-odds 是 $x$ 的线性函数}。
+
 \subsection{模型设定}
 
-Logistic 回归直接对后验概率的 log-odds 建模为 $x$ 的线性函数，同时确保概率之和为 1 且落在 $[0,1]$ 内。对 $K$ 类问题：
+\subsubsection{出发点：我们有什么，不知道什么}
+
+训练时手头只有数据 $\{(x_i, y_i)\}_{i=1}^{N}$（$x_i \in \R^p$，$y_i \in \{1,\ldots,K\}$），并不知道真实的 $P(G=k \mid X=x)$。
+但引言中已证明 Bayes 分类器 $\argmax_k P(G=k\mid X=x)$ 是 EPE 的最优解——因此\textbf{目标不是使用真实后验，而是用一个参数化模型去逼近它}。
+这与回归中不知道真实 $f(x)$ 却用 $\hat{f}(x)=\hat{\beta}^\top x$ 去逼近的逻辑完全一致。
+
+\subsubsection{核心假设：log-odds 是线性的}
+
+Logistic 回归\textbf{不假设} $P(G\mid X)$ 本身是线性的，而是假设其 log-odds（logit 变换）是 $x$ 的线性函数。对 $K$ 类问题：
 \begin{equation}\label{eq:multilogit}
     \log\frac{\Pr(G = k \mid X = x)}{\Pr(G = K \mid X = x)} = \beta_{k0} + \beta_k^\top x, \quad k = 1, \ldots, K-1.
 \end{equation}
+
+注意：
+\begin{itemize}
+    \item 这是\textbf{假设}，不是从数据推导出的事实——是我们选择相信这个结构，然后用数据去验证和拟合；
+    \item 因为只对 $P(G\mid X)$ 做假设、不对 $X$ 的分布做任何假设，Logistic 回归是\textbf{判别式}方法；而 LDA 假设了 $X\mid G$ 的 Gaussian 分布，是\textbf{生成式}方法。
+\end{itemize}
+
+\subsubsection{从 log-odds 到后验概率}
 
 以最后一类 $K$ 为参考类（选择任意，估计是等变的）。由 \eqref{eq:multilogit} 解出后验概率：
 \begin{equation}\label{eq:softmax}
     \Pr(G = k \mid X = x) = \frac{\exp(\beta_{k0} + \beta_k^\top x)}{1 + \sum_{\ell=1}^{K-1} \exp(\beta_{\ell0} + \beta_\ell^\top x)}, \quad k = 1,\ldots,K-1,
 \end{equation}
-且 $\Pr(G = K \mid X = x) = 1 / \big(1 + \sum_{\ell=1}^{K-1} \exp(\beta_{\ell0} + \beta_\ell^\top x)\big)$。记全部参数集为 $\theta = \{\beta_{10}, \beta_1, \ldots, \beta_{(K-1)0}, \beta_{K-1}\}$，概率记为 $p_k(x; \theta)$。
+且 $\Pr(G = K \mid X = x) = 1 / \big(1 + \sum_{\ell=1}^{K-1} \exp(\beta_{\ell0} + \beta_\ell^\top x)\big)$。记全部参数为 $\theta = \{\beta_{10}, \beta_1, \ldots, \beta_{(K-1)0}, \beta_{K-1}\}$，概率简记为 $p_k(x; \theta) = \Pr(G=k\mid X=x; \theta)$。
 
-当 $K=2$ 时退化为 §4.1 中的二分类形式，广泛用于生物统计中的二值响应问题（存活/死亡、患病/未患病等）。
+当 $K=2$ 时退化为一对 log-odds，即 §4.1 中讨论的二分类形式。
+
+\subsubsection{训练的本质：找参数 $\beta$}
+
+模型结构（log-odds 线性）已经定了，剩下的工作是用数据 $\{(x_i, y_i)\}$ 来估计参数 $\beta$：
+
+\[
+\text{训练} = \argmin_{\beta}\; \Big( \text{负对数似然 } \ell(\beta) \Big) = \argmax_{\beta}\; \Big( \text{观测数据的似然} \Big).
+\]
+
+训练结束后得到 $\hat{\beta}$，代入 \eqref{eq:softmax} 即可算出任何新 $x$ 的后验概率估计 $\hat{P}(G=k\mid X=x)$，从而分类。具体求解算法（IRLS）在下一节详述。
+
+\textbf{一句话}：Logistic 回归 = 假设 log-odds 线性 + 用 MLE 拟合 $\beta$，与线性回归「假设 $f$ 线性 + 用最小二乘拟合 $\beta$」逻辑完全相同。
 
 \subsection{拟合：最大似然与 IRLS}
 

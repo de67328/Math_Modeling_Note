@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024) (preloaded format=xelatex 2024.6.27)  14 JUL 2026 23:46
+This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024) (preloaded format=xelatex 2024.6.27)  15 JUL 2026 16:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -4407,7 +4407,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [273]
-Overfull \hbox (95.02794pt too wide) in paragraph at lines 1433--1443
+Overfull \hbox (95.02794pt too wide) in paragraph at lines 1464--1474
  [] 
  []
 
@@ -4421,6 +4421,30 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 [274]
 
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 1496.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `superscript' on input line 1496.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 1496.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 1500.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `superscript' on input line 1500.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 1500.
+
+
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
 (fancyhdr)                \setlength{\headheight}{14.49998pt}.
@@ -4430,6 +4454,18 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 [275]
 
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 1515.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `superscript' on input line 1515.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 1515.
+
+
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
 (fancyhdr)                \setlength{\headheight}{14.49998pt}.
@@ -4437,7 +4473,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[276])
+[276]
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -4446,7 +4482,44 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[277] (./main.aux)
+[277]
+Overfull \hbox (63.30873pt too wide) in paragraph at lines 1637--1639
+\TU/SimSun(0)/m/n/12 且 $[]\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 G \OT1/cmr/m/n/12 =
+ \OML/cmm/m/it/12 K \OMS/cmsy/m/n/12 j \OML/cmm/m/it/12 X \OT1/cmr/m/n/12 = \OM
+L/cmm/m/it/12 x\OT1/cmr/m/n/12 ) = 1/[]1 + [][] [](\OML/cmm/m/it/12 ^^L[] \OT1/
+cmr/m/n/12 + \OML/cmm/m/it/12 ^^L[]x\OT1/cmr/m/n/12 )[]$\TU/SimSun(0)/m/n/12 。|
+  记 全 部 参 数 为 $\OML/cmm/m/it/12 ^^R \OT1/cmr/m/n/12 = \OMS/cmsy/m/n/12 f\OML/cm
+m/m/it/12 ^^L[]; ^^L[]; [] ; ^^L[]; ^^L[]\OMS/cmsy/m/n/12 g$\TU/SimSun(0)/m/n/1
+2 ，|
+ []
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[278]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[279])
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[280] (./main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2022/07/14>
@@ -4462,15 +4535,15 @@ LaTeX Warning: There were undefined references.
 LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 118E6FD650D6EE3C2D68C85D5F99D6A3;46216.
+(rerunfilecheck)             Checksum: AD36215570D28E985369B3B9CC54F5DF;47480.
  ) 
 Here is how much of TeX's memory you used:
- 32781 strings out of 474773
- 757537 string characters out of 5761289
+ 32806 strings out of 474773
+ 758792 string characters out of 5761289
  1950842 words of memory out of 5000000
- 54323 multiletter control sequences out of 15000+600000
+ 54348 multiletter control sequences out of 15000+600000
  580588 words of font info for 193 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  93i,22n,97p,1194b,933s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.pdf (277 pages).
+Output written on main.pdf (280 pages).

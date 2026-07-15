@@ -715,22 +715,37 @@
 \@writefile{lof}{\contentsline {figure}{\numberline {12.1}{\ignorespaces 左图：质心连线方向投影——虽然该方向质心分离最大，但由于协方差结构，投影后两类严重重叠。右图：Fisher 判别方向——同时考虑类内协方差，投影后方差最小化、类间分离最大化（Gaussian 数据下）。来源：ESL Figure 4.9。}}{272}{figure.caption.7}\protected@file@percent }
 \newlabel{fig:fisher_direction}{{12.1}{272}{左图：质心连线方向投影——虽然该方向质心分离最大，但由于协方差结构，投影后两类严重重叠。右图：Fisher 判别方向——同时考虑类内协方差，投影后方差最小化、类间分离最大化（Gaussian 数据下）。来源：ESL Figure 4.9。}{figure.caption.7}{}}
 \newlabel{eq:rayleigh}{{12.29}{273}{Fisher 的判别准则}{equation.12.7.29}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.7.3}LDA 子空间的计算步骤}{273}{subsection.12.7.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.7.4}用于分类与降维}{273}{subsection.12.7.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{各符号的精确含义}{273}{equation.12.7.29}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{为什么是比值形式？}{273}{equation.12.7.29}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.7.3}LDA 子空间的计算步骤}{274}{subsection.12.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.7.4}用于分类与降维}{274}{subsection.12.7.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {12.7.5}Fisher 方法与 Gaussian LDA 的等价性}{274}{subsection.12.7.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.7.6}总结}{274}{subsection.12.7.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {12.8}Logistic 回归}{275}{section.12.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.8.1}模型设定}{275}{subsection.12.8.1}\protected@file@percent }
-\newlabel{eq:multilogit}{{12.30}{275}{模型设定}{equation.12.8.30}{}}
-\newlabel{eq:softmax}{{12.31}{275}{模型设定}{equation.12.8.31}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.8.2}拟合：最大似然与 IRLS}{275}{subsection.12.8.2}\protected@file@percent }
-\newlabel{eq:multiloglik}{{12.32}{275}{拟合：最大似然与 IRLS}{equation.12.8.32}{}}
-\@writefile{toc}{\contentsline {subsubsection}{二分类情形}{275}{equation.12.8.32}\protected@file@percent }
-\newlabel{eq:binomial_loglik}{{12.33}{275}{二分类情形}{equation.12.8.33}{}}
-\newlabel{eq:score_eq}{{12.34}{275}{二分类情形}{equation.12.8.34}{}}
-\@writefile{toc}{\contentsline {subsubsection}{Newton-Raphson 算法}{276}{equation.12.8.34}\protected@file@percent }
-\newlabel{eq:hessian}{{12.35}{276}{Newton-Raphson 算法}{equation.12.8.35}{}}
-\@writefile{toc}{\contentsline {subsubsection}{矩阵形式与 IRLS}{276}{equation.12.8.35}\protected@file@percent }
-\newlabel{eq:irls}{{12.36}{276}{矩阵形式与 IRLS}{equation.12.8.36}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {12.8.3}示例：南非心脏病数据}{276}{subsection.12.8.3}\protected@file@percent }
-\gdef \@abspage@last{277}
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.7.6}总结}{275}{subsection.12.7.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {12.8}几何视角：$W^{-1}$-内积空间中的 LDA 与 Fisher}{275}{section.12.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.8.1}$W^{-1}$-内积空间}{275}{subsection.12.8.1}\protected@file@percent }
+\newlabel{eq:W_inner}{{12.30}{275}{$W^{-1}$-内积空间}{equation.12.8.30}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.8.2}标准内积 vs $W^{-1}$-内积}{276}{subsection.12.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.8.3}在此框架下重新理解 LDA}{276}{subsection.12.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.8.4}在此框架下重新理解 Fisher}{276}{subsection.12.8.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.8.5}球形化的几何意义}{277}{subsection.12.8.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.8.6}统一视角总结}{277}{subsection.12.8.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {12.9}Logistic 回归}{277}{section.12.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.9.1}回到判别函数与 EPE 框架}{277}{subsection.12.9.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.9.2}模型设定}{278}{subsection.12.9.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{出发点：我们有什么，不知道什么}{278}{subsection.12.9.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{核心假设：log-odds 是线性的}{278}{subsection.12.9.2}\protected@file@percent }
+\newlabel{eq:multilogit}{{12.31}{278}{核心假设：log-odds 是线性的}{equation.12.9.31}{}}
+\@writefile{toc}{\contentsline {subsubsection}{从 log-odds 到后验概率}{278}{equation.12.9.31}\protected@file@percent }
+\newlabel{eq:softmax}{{12.32}{278}{从 log-odds 到后验概率}{equation.12.9.32}{}}
+\@writefile{toc}{\contentsline {subsubsection}{训练的本质：找参数 $\beta $}{278}{equation.12.9.32}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.9.3}拟合：最大似然与 IRLS}{279}{subsection.12.9.3}\protected@file@percent }
+\newlabel{eq:multiloglik}{{12.33}{279}{拟合：最大似然与 IRLS}{equation.12.9.33}{}}
+\@writefile{toc}{\contentsline {subsubsection}{二分类情形}{279}{equation.12.9.33}\protected@file@percent }
+\newlabel{eq:binomial_loglik}{{12.34}{279}{二分类情形}{equation.12.9.34}{}}
+\newlabel{eq:score_eq}{{12.35}{279}{二分类情形}{equation.12.9.35}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Newton-Raphson 算法}{279}{equation.12.9.35}\protected@file@percent }
+\newlabel{eq:hessian}{{12.36}{279}{Newton-Raphson 算法}{equation.12.9.36}{}}
+\@writefile{toc}{\contentsline {subsubsection}{矩阵形式与 IRLS}{279}{equation.12.9.36}\protected@file@percent }
+\newlabel{eq:irls}{{12.37}{280}{矩阵形式与 IRLS}{equation.12.9.37}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.9.4}示例：南非心脏病数据}{280}{subsection.12.9.4}\protected@file@percent }
+\gdef \@abspage@last{280}
