@@ -573,23 +573,51 @@
 \contentsline {subsubsection}{R 中的实现}{298}{subsection.13.2.5}%
 \contentsline {subsubsection}{实践中节点位置怎么选？}{299}{subsection.13.2.5}%
 \contentsline {subsubsection}{分位数放置是最优的吗？}{299}{subsection.13.2.5}%
-\contentsline {subsection}{\numberline {13.2.6}示例：南非心脏病数据（续）}{300}{subsection.13.2.6}%
-\contentsline {subsubsection}{问题设定}{300}{subsection.13.2.6}%
-\contentsline {subsubsection}{第一步：线性 Logistic 回归 → 确定谁不显著}{300}{subsection.13.2.6}%
-\contentsline {subsubsection}{第二步：改用自然样条 → 允许非线性效应}{301}{subsection.13.2.6}%
+\contentsline {subsection}{\numberline {13.2.6}样条方法概览}{300}{subsection.13.2.6}%
+\contentsline {subsection}{\numberline {13.2.7}示例：南非心脏病数据（续）}{300}{subsection.13.2.7}%
+\contentsline {subsubsection}{问题设定}{300}{subsection.13.2.7}%
+\contentsline {subsubsection}{第一步：线性 Logistic 回归 → 确定谁不显著}{301}{subsection.13.2.7}%
+\contentsline {subsubsection}{第二步：改用自然样条 → 允许非线性效应}{301}{subsection.13.2.7}%
 \contentsline {subsubsection}{第三步：模型选择与最终结果}{301}{equation.13.2.5}%
-\contentsline {subsubsection}{关键发现与解释}{303}{figure.caption.11}%
-\contentsline {subsubsection}{数学推导：$\hat {f}_{\mathrm {sbp}}(x)$ 如何计算}{303}{figure.caption.11}%
-\contentsline {subsubsection}{标准误 (Standard Error) 的定义}{304}{figure.caption.11}%
-\contentsline {subsubsection}{训练与画图的时序}{304}{figure.caption.11}%
-\contentsline {subsection}{\numberline {13.2.7}示例：音素识别}{305}{subsection.13.2.7}%
+\contentsline {subsubsection}{关键发现与解释}{304}{figure.caption.11}%
+\contentsline {subsubsection}{数学推导：$\hat {f}_{\mathrm {sbp}}(x)$ 如何计算}{304}{figure.caption.11}%
+\contentsline {subsubsection}{标准误 (Standard Error) 的定义}{305}{figure.caption.11}%
+\contentsline {subsubsection}{训练与画图的时序}{305}{figure.caption.11}%
+\contentsline {subsection}{\numberline {13.2.8}示例：音素识别}{305}{subsection.13.2.8}%
 \contentsline {section}{\numberline {13.3}滤波与特征提取}{306}{section.13.3}%
-\contentsline {section}{\numberline {13.4}光滑样条}{306}{section.13.4}%
-\contentsline {subsection}{\numberline {13.4.1}惩罚残差平方和}{306}{subsection.13.4.1}%
+\contentsline {section}{\numberline {13.4}光滑样条}{307}{section.13.4}%
+\contentsline {subsection}{\numberline {13.4.1}惩罚残差平方和}{307}{subsection.13.4.1}%
 \contentsline {subsection}{\numberline {13.4.2}有限维解}{307}{subsection.13.4.2}%
-\contentsline {subsection}{\numberline {13.4.3}自由度与光滑矩阵}{307}{subsection.13.4.3}%
-\contentsline {subsubsection}{光滑矩阵 $\mathbf {S}_\lambda $}{307}{subsection.13.4.3}%
-\contentsline {subsubsection}{投影光滑器 vs 收缩光滑器}{308}{equation.13.4.9}%
-\contentsline {subsubsection}{光滑样条的自由度}{308}{equation.13.4.9}%
-\contentsline {subsubsection}{特征分解}{308}{equation.13.4.10}%
-\contentsline {subsubsection}{等价核——光滑样条的局部性}{309}{equation.13.4.10}%
+\contentsline {subsection}{\numberline {13.4.3}完整示例：光滑样条的符号化流程}{308}{subsection.13.4.3}%
+\contentsline {subsubsection}{给定}{308}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 1——选择光滑参数 $\lambda $（或等价地 $\mathrm {df}_\lambda $）}{308}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 2——构造自然三次样条基矩阵}{309}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 3——构造惩罚矩阵}{309}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 4——求解广义岭回归}{309}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 5——在新点 $x_0$ 处预测}{309}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 6——复杂度与 $\lambda $ 的选择}{309}{subsection.13.4.3}%
+\contentsline {subsubsection}{与回归样条的操作对比}{310}{subsection.13.4.3}%
+\contentsline {subsection}{\numberline {13.4.4}自由度与光滑矩阵}{310}{subsection.13.4.4}%
+\contentsline {subsubsection}{光滑矩阵 $\mathbf {S}_\lambda $}{310}{subsection.13.4.4}%
+\contentsline {subsubsection}{投影光滑器 vs 收缩光滑器}{310}{equation.13.4.9}%
+\contentsline {subsubsection}{光滑样条的自由度}{310}{equation.13.4.9}%
+\contentsline {subsubsection}{特征分解}{311}{equation.13.4.10}%
+\contentsline {subsubsection}{等价核——光滑样条的局部性}{311}{equation.13.4.10}%
+\contentsline {section}{\numberline {13.5}光滑参数的自动选择}{313}{section.13.5}%
+\contentsline {subsection}{\numberline {13.5.1}用有效自由度参数化}{313}{subsection.13.5.1}%
+\contentsline {subsection}{\numberline {13.5.2}偏差-方差权衡}{313}{subsection.13.5.2}%
+\contentsline {subsection}{\numberline {13.5.3}交叉验证 (CV)}{313}{subsection.13.5.3}%
+\contentsline {section}{\numberline {13.6}非参数 Logistic 回归}{315}{section.13.6}%
+\contentsline {section}{\numberline {13.7}多维样条}{315}{section.13.7}%
+\contentsline {subsection}{\numberline {13.7.1}张量积基}{316}{subsection.13.7.1}%
+\contentsline {subsection}{\numberline {13.7.2}薄板样条 (Thin-Plate Splines)}{316}{subsection.13.7.2}%
+\contentsline {subsection}{\numberline {13.7.3}加性样条与 ANOVA 分解}{316}{subsection.13.7.3}%
+\contentsline {section}{\numberline {13.8}正则化与再生核 Hilbert 空间 (RKHS)}{317}{section.13.8}%
+\contentsline {subsection}{\numberline {13.8.1}一般形式}{317}{subsection.13.8.1}%
+\contentsline {subsection}{\numberline {13.8.2}RKHS 与核方法}{317}{subsection.13.8.2}%
+\contentsline {subsection}{\numberline {13.8.3}实例}{318}{subsection.13.8.3}%
+\contentsline {section}{\numberline {13.9}小波光滑}{318}{section.13.9}%
+\contentsline {subsection}{\numberline {13.9.1}核心思想：时间-频率定位}{318}{subsection.13.9.1}%
+\contentsline {subsection}{\numberline {13.9.2}多分辨率分析}{318}{subsection.13.9.2}%
+\contentsline {subsection}{\numberline {13.9.3}自适应小波阈值 (Wavelet Shrinkage)}{319}{subsection.13.9.3}%
+\contentsline {subsection}{\numberline {13.9.4}小波 vs 光滑样条（图 5.17, 5.19）}{319}{subsection.13.9.4}%

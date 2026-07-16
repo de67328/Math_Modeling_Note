@@ -230,6 +230,31 @@ d_k(X) = \frac{(X - \xi_k)_+^3 - (X - \xi_K)_+^3}{\xi_K - \xi_k}.
 
 \textbf{权衡}：边界附近偏差略有增加（假设函数在边界处近似线性通常是合理的），但方差大幅降低。
 
+\subsection{样条方法概览}
+
+在进入具体实例之前，对目前以及后续出现的样条方法做一个系统总结：
+
+\begin{center}
+\small
+\begin{tabular}{llll}
+\toprule
+类型 & 节点 & 复杂度控制 & 特点 \\
+\midrule
+回归样条（§5.2） & 手动选 $K$ 个内节点 & $\mathrm{df}=M+K$ & 最基础 \\
+自然样条（§5.2.1） & 同上 + 边界线性约束 & $\mathrm{df}=K$ & 降边界方差，最常用 \\
+B-样条（附录） & 同回归样条 & 同回归样条 & 局部支撑，数值稳定 \\
+周期样条 & 同上 + 循环边界 & 同上 & 周期性数据 \\
+光滑样条（§5.4） & 每个 $x_i$ 都是节点 & $\lambda$ 惩罚 $\int(f'')^2$ & 免选节点，$\lambda$ 由 CV 定 \\
+惩罚样条 (P-splines) & 均匀密节点 + 差分惩罚 & $\lambda$ 惩罚系数差 & 更高效，现代 GAM 主流 \\
+薄板样条（§5.7） & 多维推广 & $\lambda$ 惩罚曲率 & 多维光滑样条 \\
+张量积样条 & 多维交互 & 基数 $=$ 各维基数的乘积 & 建模联合非线性 \\
+MARS（§9.4） & 自适应选择 & 贪心 + 剪枝 & 自动找交互和节点 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+本章重点介绍回归样条（§5.2）、自然样条（§5.2.1）和光滑样条（§5.4），后续各章将逐步展开其余方法。读者可随时回查此表以保持方向感。
+
 \subsection{示例：南非心脏病数据（续）}
 
 \subsubsection{问题设定}
@@ -472,6 +497,18 @@ $\mathbf{H}$ 维度变化 & $N\times 7 \to N\times 28$（变大） & $N\times 25
 
 准则 \eqref{eq:smoothing_spline} 定义在无穷维函数空间（Sobolev 空间）上。但可以证明（习题 5.7）：\textbf{其唯一最小化解是节点位于所有唯一 $x_i$ 值处的自然三次样条。} 表面上参数数量惊人（多达 $N$ 个节点），但正则化项 $\lambda\int(f'')^2$ 自动控制了有效复杂度。
 
+\textbf{为什么恰好是自然三次样条？} 两个互补的直觉：
+
+\emph{物理直觉——弹性梁}：将 $f$ 想象成一根弹性木条，$\int(f'')^2$ 即弯曲能（弯得越厉害弹性势能越大）。$N$ 个数据点好比套在木条上的环，木条倾向于笔直（减小弯曲能），但环拉着它靠近数据（减小残差）。在环之间的自由段，弯曲能的 Euler-Lagrange 方程 $f''''=0$ 表明最优形状是\textbf{分段三次多项式}。环处 $f, f', f''$ 连续（外力平衡），端点外无力作用 $\Rightarrow$ $f''=0$（直线）——即自然边界。
+
+\emph{变分直觉——任何非样条函数都可改善}：若 $f$ 不是节点在 $x_i$ 的自然三次样条，可构造 $g$ 为插值 $f(x_i)$ 的自然三次样条。由分部积分可得 $\int f''g'' = \int(g'')^2$，于是
+\[
+\int(f'')^2 = \int(g'')^2 + \int(f''-g'')^2 \ge \int(g'')^2,
+\]
+即 $g$ 与 $f$ 拟合完全一致但曲率惩罚更小。因此最优解必须在自然三次样条族中。
+
+\textbf{推论}：无穷维优化 $\Rightarrow$ 有限维广义岭回归。这个定理是光滑样条能够实际计算的数学基础——没有它，光滑样条只是一个不可计算的抽象概念。
+
 设 $\{N_j(x)\}_{j=1}^{N}$ 为此族自然样条的 $N$ 维基函数，则 $f(x) = \sum_{j=1}^{N} N_j(x)\,\theta_j$。准则化为：
 \begin{equation}\label{eq:smoothing_spline_ridge}
     \operatorname{RSS}(\theta, \lambda) = (\mathbf{y} - \mathbf{N}\boldsymbol{\theta})^\top (\mathbf{y} - \mathbf{N}\boldsymbol{\theta})
@@ -487,6 +524,79 @@ $\mathbf{H}$ 维度变化 & $N\times 7 \to N\times 28$（变大） & $N\times 25
 \]
 
 图 5.6 展示了青少年骨密度（BMD）数据上男性和女性各一条光滑样条（$\lambda \approx 0.00022$，对应约 12 个自由度），清晰揭示女性的生长陡增比男性早约两年。
+
+\subsection{完整示例：光滑样条的符号化流程}
+
+下面不涉及具体数值，用标准符号语言展示光滑样条从数据到预测的完整六步流水线。
+
+\subsubsection{给定}
+
+训练数据 $\{(x_i, y_i)\}_{i=1}^{N}$，$x_i \in \R$（一维输入），$y_i \in \R$（连续响应）。真实 $f(x) = \E[Y\mid X=x]$ 未知，不假设任何参数形式。目标：估计一个光滑的 $\hat{f}(x)$。
+
+\subsubsection{Step 1——选择光滑参数 $\lambda$（或等价地 $\mathrm{df}_\lambda$）}
+
+$\lambda$ 控制拟合度与光滑度的权衡，通常通过交叉验证确定。等价地可指定有效自由度 $\mathrm{df}_\lambda \in [2, N]$——实践中最常用的参数化方式（如 `smooth.spline(x, y, df=12)`）。
+
+\subsubsection{Step 2——构造自然三次样条基矩阵}
+
+将全体 $\{x_i\}$ 的 $M$ 个唯一值排序：$x_{(1)} < x_{(2)} < \cdots < x_{(M)}$。以这些点为节点构造 $M$ 个自然三次样条基函数 $\{N_j(x)\}_{j=1}^{M}$（$N_1(x)=1, N_2(x)=x$，其余由 \eqref{eq:natural_spline_basis} 定义）。在 $N$ 个训练点上求值，构造 $N \times M$ 基矩阵：
+\[
+\mathbf{N}_{ij} = N_j(x_i),\quad i=1,\ldots,N,\; j=1,\ldots,M.
+\]
+
+\subsubsection{Step 3——构造惩罚矩阵}
+
+计算基函数二阶导数的内积：
+\[
+\boldsymbol{\Omega}_{jk} = \int N_j''(t)\,N_k''(t)\,dt,\quad j,k=1,\ldots,M,
+\]
+得 $M \times M$ 惩罚矩阵 $\boldsymbol{\Omega}$（对称半正定）。注意：$\boldsymbol{\Omega}$ 仅依赖于 $\{x_i\}$ 的位置，与 $y$ 无关。
+
+\subsubsection{Step 4——求解广义岭回归}
+
+模型为 $f(x) = \sum_{j=1}^{M} N_j(x)\,\theta_j$。将 $\{N_j\}$ 代入 \eqref{eq:smoothing_spline}，目标函数化为：
+\[
+\min_{\boldsymbol{\theta} \in \R^{M}} \big\{ (\mathbf{y} - \mathbf{N}\boldsymbol{\theta})^\top(\mathbf{y} - \mathbf{N}\boldsymbol{\theta}) + \lambda\,\boldsymbol{\theta}^\top\boldsymbol{\Omega}\,\boldsymbol{\theta} \big\}.
+\]
+解析解：
+\[
+\hat{\boldsymbol{\theta}} = (\mathbf{N}^\top\mathbf{N} + \lambda\boldsymbol{\Omega})^{-1} \mathbf{N}^\top \mathbf{y}.
+\]
+此时 $\hat{\boldsymbol{\theta}}$ 已确定，模型训练完毕。拟合值向量 $\hat{\mathbf{f}} = \mathbf{N}\hat{\boldsymbol{\theta}} = \mathbf{S}_\lambda\mathbf{y}$，其中 $\mathbf{S}_\lambda = \mathbf{N}(\mathbf{N}^\top\mathbf{N} + \lambda\boldsymbol{\Omega})^{-1}\mathbf{N}^\top$ 为光滑矩阵。
+
+\subsubsection{Step 5——在新点 $x_0$ 处预测}
+
+计算 $x_0$ 处的基函数值 $\mathbf{n}_0 = [N_1(x_0),\ldots,N_M(x_0)]^\top \in \R^{M}$。预测为：
+\[
+\hat{f}(x_0) = \sum_{j=1}^{M} \hat{\theta}_j N_j(x_0) = \mathbf{n}_0^\top \hat{\boldsymbol{\theta}}.
+\]
+
+\subsubsection{Step 6——复杂度与 $\lambda$ 的选择}
+
+光滑矩阵的迹给出有效自由度：
+\[
+\mathrm{df}_\lambda = \operatorname{trace}(\mathbf{S}_\lambda) = \sum_{k=1}^{M} \frac{1}{1 + \lambda d_k} \in [2, M],
+\]
+其中 $d_k$ 为惩罚矩阵 $\boldsymbol{\Omega}$ 相对于 $\mathbf{N}^\top\mathbf{N}$ 的广义特征值（$d_1=d_2=0$，线性函数永不惩罚）。实践中：
+\begin{itemize}
+    \item 用 $K$ 折 CV 对 $\mathrm{df}_\lambda$（或 $\lambda$）的候选网格做搜索，选 CV 误差最小的；
+    \item 或直接用 R 的 \texttt{smooth.spline(x, y, df=12)} / Python 的 \texttt{UnivariateSpline(x, y, s=...)}，库内部完成所有矩阵操作。
+\end{itemize}
+
+\subsubsection{与回归样条的操作对比}
+
+\[
+\begin{array}{c|c|c}
+& \text{回归样条（§5.2）} & \text{光滑样条（§5.4）} \\ \hline
+\text{节点数} & \text{手动选 } K \text{（少）} & \text{每个 } x_i \text{ 一个（多）} \\
+\text{防止过拟合} & \text{基函数本身就少} & \lambda\int(f'')^2 \text{ 惩罚} \\
+\text{目标函数} & \min\|\mathbf{y} - \mathbf{B}\boldsymbol{\beta}\|^2 & \min\|\mathbf{y} - \mathbf{N}\boldsymbol{\theta}\|^2 + \lambda\boldsymbol{\theta}^\top\boldsymbol{\Omega}\boldsymbol{\theta} \\
+\text{复杂度旋钮} & K \text{（节点数）} & \lambda \text{ 或 } \mathrm{df}_\lambda \text{（连续值）} \\
+\text{解的形式} & \hat{\boldsymbol{\beta}} = (\mathbf{B}^\top\mathbf{B})^{-1}\mathbf{B}^\top\mathbf{y} & \hat{\boldsymbol{\theta}} = (\mathbf{N}^\top\mathbf{N} + \lambda\boldsymbol{\Omega})^{-1}\mathbf{N}^\top\mathbf{y}
+\end{array}
+\]
+
+\textbf{一句话}：光滑样条将节点的离散选择替换为 $\lambda$（光滑度）的连续调节——你拧旋钮，它自动决定曲线弯多少。
 
 
 % ============ §5.4.1 自由度与光滑矩阵 ============
@@ -557,9 +667,295 @@ $\mathbf{S}_\lambda$ 的特征分解：
 
 \subsubsection{等价核——光滑样条的局部性}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{Chapters/pic/ch_基展开和正则化/figure_5_8.png}
+\caption{光滑样条的光滑矩阵 $\mathbf{S}_\lambda$。左：矩阵元素图（行按 $x$ 排序），带状结构表明局部支撑。右：选定行的等价核（加权函数），每行在对应 $x_i$ 处取峰值并向两侧衰减。来源：ESL Figure 5.8。}
+\label{fig:smoother_matrix}
+\end{figure}
+
 图 5.8 展示了光滑矩阵 $\mathbf{S}_\lambda$ 的带状结构（行按 $x$ 排序）——表明光滑样条本质上是一个\textbf{局部拟合方法}，类似于第 6 章的局部加权回归。$\mathbf{S}_\lambda$ 的每一行即为\textbf{等价核}——$\hat{f}(x_i)$ 实质上是 $y_i$ 附近点的加权平均，权重在 $x_i$ 处最大并向两侧衰减。
 
 \[
 \lambda \to 0 \Longrightarrow \mathrm{df} \to N,\; \mathbf{S}_\lambda \to \mathbf{I}, \qquad
 \lambda \to \infty \Longrightarrow \mathrm{df} \to 2,\; \mathbf{S}_\lambda \to \mathbf{H}_{\text{线性}}.
 \]
+
+
+% ============ §5.5 光滑参数的自动选择 ============
+\section{光滑参数的自动选择}
+
+\subsection{用有效自由度参数化}
+
+光滑样条的 $\mathrm{df}_\lambda = \operatorname{trace}(\mathbf{S}_\lambda)$ 关于 $\lambda$ 单调递减（$\lambda$ 越大 $\to$ df 越小 $\to$ 越光滑），可以反解——\textbf{固定 df 来确定 $\lambda$}。实践中通过简单数值方法实现（如 R 的 \texttt{smooth.spline(x, y, df=6)}）。
+
+这种方法鼓励更传统的模型选择模式：尝试几个不同的 df 值，基于近似 $F$ 检验、残差图等主观准则选择。\textbf{df 的统一度量使不同的光滑方法可以公平比较}——在广义加性模型（第 9 章）中尤其有用，多个光滑方法可同时用于一个模型。
+
+\subsection{偏差-方差权衡}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{Chapters/pic/ch_基展开和正则化/figure_5_9.png}
+\caption{左上：EPE($\lambda$) 和 CV($\lambda$) 曲线。其余三面板：真实函数（紫色）、拟合曲线（绿色）及 $\pm 2$ 标准误带（黄色），分别对应 $\mathrm{df}=5,9,15$。$\mathrm{df}=5$ 欠拟合，$\mathrm{df}=15$ 略显过拟合，$\mathrm{df}=9$ 接近最优。来源：ESL Figure 5.9。}
+\label{fig:bias_variance}
+\end{figure}
+
+图 5.9 用模拟数据 $Y = \frac{\sin(12(X+0.2))}{X+0.2} + \varepsilon$（$X \sim U[0,1], \varepsilon \sim N(0,1), N=100$）展示了 df 的三个取值：
+
+\begin{center}
+\small
+\begin{tabular}{c|p{5.5cm}|p{4.5cm}}
+\toprule
+$\mathrm{df}_\lambda$ & 表现 & 诊断 \\
+\midrule
+5 & 欠拟合：削峰填谷，高曲率区偏差大 & 标准误带极窄——有偏但确信 \\
+9 & 接近最优，轻微偏差 & 方差尚未明显增加 \\
+15 & 略显波动，接近真实函数 & 标准误带增宽——追随个别点 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{定量表达}：$\hat{\mathbf{f}} = \mathbf{S}_\lambda\mathbf{y}$ 的方差-偏差分解为
+\[
+\operatorname{Cov}(\hat{\mathbf{f}}) = \mathbf{S}_\lambda\mathbf{S}_\lambda^\top, \qquad
+\operatorname{Bias}(\hat{\mathbf{f}}) = \mathbf{f} - \mathbf{S}_\lambda\mathbf{f},
+\]
+其中 $\mathbf{f}$ 是未知真实值向量。\textbf{EPE（期望预测误差）}综合了偏差和方差：
+\[
+\operatorname{EPE}(\hat{f}_\lambda) = \E\big(Y - \hat{f}_\lambda(X)\big)^2
+= \sigma^2 + \underbrace{\E[\operatorname{Bias}^2(\hat{f}_\lambda(X))] + \E[\operatorname{Var}(\hat{f}_\lambda(X))]}_{\operatorname{MSE}(\hat{f}_\lambda)}.
+\]
+
+\subsection{交叉验证 (CV)}
+
+$\lambda$ 的实际选择通过最小化 CV 得分：
+\[
+\operatorname{CV}(\hat{f}_\lambda) = \frac{1}{N} \sum_{i=1}^{N} \big( y_i - \hat{f}_\lambda^{(-i)}(x_i) \big)^2,
+\]
+其中 $\hat{f}_\lambda^{(-i)}$ 是删除第 $i$ 个观测后拟合的模型。对光滑样条这一线性光滑器，有\textbf{免重拟合公式}（习题 5.13）：
+\[
+\boxed{\operatorname{CV}(\hat{f}_\lambda) = \frac{1}{N} \sum_{i=1}^{N}
+\left( \frac{y_i - \hat{f}_\lambda(x_i)}{1 - S_\lambda(i,i)} \right)^2,}
+\]
+即只需完整拟合一次，使用对角线元素 $S_\lambda(i,i)$ 校正。CV 曲线是 EPE 曲线的近似无偏估计量（图 5.9 左上）。\textbf{对回归样条}还需额外选择节点位置和数量——这是个组合爆炸问题，除非使用 MARS（§9.4）等贪心策略。
+
+
+% ============ §5.6 非参数 Logistic 回归 ============
+\section{非参数 Logistic 回归}
+
+将光滑样条从回归推广到分类是直接了当的。对单个连续输入 $X$ 的 Logistic 回归：
+\[
+\log\frac{\Pr(Y=1\mid X=x)}{\Pr(Y=0\mid X=x)} = f(x), \qquad
+\Pr(Y=1\mid X=x) = \frac{e^{f(x)}}{1 + e^{f(x)}}.
+\]
+在光滑样条框架下拟合 $f$ 得到条件概率 $\Pr(Y=1\mid x)$ 的光滑估计。
+
+\textbf{惩罚对数似然准则}：
+\begin{equation}\label{eq:penalized_loglik}
+    \ell(f; \lambda) = \sum_{i=1}^{N} \big[ y_i f(x_i) - \log(1 + e^{f(x_i)}) \big]
+    - \frac{\lambda}{2} \int \big\{ f''(t) \big\}^2 dt,
+\end{equation}
+第一项是二项分布的对数似然（第 4 章），第二项是曲率惩罚。与回归情况一样，最优 $f$ 是节点在唯一 $x_i$ 处的有限维自然样条：$f(x) = \sum_{j=1}^{N} N_j(x)\,\theta_j$。
+
+\textbf{Newton-Raphson 迭代}：梯度和 Hessian 为
+\[
+\frac{\partial\ell}{\partial\boldsymbol{\theta}} = \mathbf{N}^\top(\mathbf{y} - \mathbf{p}) - \lambda\boldsymbol{\Omega}\boldsymbol{\theta}, \qquad
+\frac{\partial^2\ell}{\partial\boldsymbol{\theta}\partial\boldsymbol{\theta}^\top} = -\mathbf{N}^\top\mathbf{W}\mathbf{N} - \lambda\boldsymbol{\Omega},
+\]
+其中 $\mathbf{W} = \operatorname{diag}(p_i(1-p_i))$。Newton 更新为：
+\begin{equation}\label{eq:nplr_update_theta}
+    \boldsymbol{\theta}^{\mathrm{new}} = (\mathbf{N}^\top\mathbf{W}\mathbf{N} + \lambda\boldsymbol{\Omega})^{-1}
+    \mathbf{N}^\top\mathbf{W}\,\mathbf{z},
+\end{equation}
+或以拟合值表示：
+\[
+\mathbf{f}^{\mathrm{new}} = \underbrace{\mathbf{N}(\mathbf{N}^\top\mathbf{W}\mathbf{N} + \lambda\boldsymbol{\Omega})^{-1}\mathbf{N}^\top\mathbf{W}}_{\mathbf{S}_{\lambda,w}} \mathbf{z}
+    = \mathbf{S}_{\lambda,w}\,\mathbf{z}.
+\]
+这恰好是\textbf{加权光滑样条}对工作响应 $\mathbf{z}$ 的拟合——与 §4.4.1 的 IRLS 完全一致，只是将线性回归换成了光滑样条。
+
+\textbf{推广}：$\mathbf{S}_{\lambda,w}$ 可替换为任何非参数（加权）回归算子，得到一般的非参数 Logistic 回归族。该思想自然推广到高维——这正是\textbf{广义加性模型（GAM，第 9 章）}的基石。
+
+
+% ============ §5.7 多维样条 ============
+\section{多维样条}
+
+至此所有样条均为一维。本节讨论多维推广。
+
+\subsection{张量积基}
+
+设有一维基函数族 $\{h_{1j}(X_1)\}_{j=1}^{M_1}$ 和 $\{h_{2k}(X_2)\}_{k=1}^{M_2}$，则 $M_1 \times M_2$ 维\textbf{张量积基}定义为：
+\begin{equation}\label{eq:tensor_product}
+    g_{jk}(X) = h_{1j}(X_1)\,h_{2k}(X_2), \quad j=1,\ldots,M_1,\; k=1,\ldots,M_2,
+\end{equation}
+二维函数表示为：
+\[
+g(X) = \sum_{j=1}^{M_1}\sum_{k=1}^{M_2} \theta_{jk}\,g_{jk}(X).
+\]
+图 5.10 展示了使用 B-样条的张量积基。系数由最小二乘拟合。
+
+\textbf{可推广到 $d$ 维}，但基的维度指数增长——\textbf{维数灾难的又一个表现}。MARS（§9.4）使用贪心前向算法仅包含最小二乘认为必要的张量积项。
+
+\textbf{加性 vs 张量积}：图 5.11 比较了二维分类问题上两者的决策边界。加性模型（各自样条相加）捕捉主效应，张量积可拟合更灵活的交互，但可能引入虚假结构。
+
+\subsection{薄板样条 (Thin-Plate Splines)}
+
+一维光滑样条的正则化思想可推广到 $\R^d$：
+\begin{equation}\label{eq:thin_plate}
+    \min_{f} \sum_{i=1}^{N} \big\{ y_i - f(x_i) \big\}^2 + \lambda J[f],
+\end{equation}
+其中 $J[f]$ 是 $d$ 维粗糙度惩罚。对 $d=2$：
+\[
+J[f] = \iint_{\R^2} \left[ \left(\frac{\partial^2 f}{\partial x_1^2}\right)^2
+    + 2\left(\frac{\partial^2 f}{\partial x_1\partial x_2}\right)^2
+    + \left(\frac{\partial^2 f}{\partial x_2^2}\right)^2 \right] dx_1 dx_2.
+\]
+
+\textbf{解的形式}（与一维自然三次样条共享性质）：
+\[
+f(x) = \beta_0 + \boldsymbol{\beta}^\top x + \sum_{j=1}^{N} \alpha_j\,h_j(x),
+\quad h_j(x) = \|x - x_j\|^2 \log\|x - x_j\|,
+\]
+其中 $h_j$ 为\textbf{径向基函数}（§5.9 详述）。系数由带线性约束的惩罚最小二乘确定（习题 5.14）。
+\[
+\lambda \to 0 \Rightarrow \text{插值表面}, \qquad
+\lambda \to \infty \Rightarrow \text{最小二乘平面}.
+\]
+
+\textbf{计算复杂度}：薄板样条为 $O(N^3)$（一般无稀疏结构可资利用），实践中用放置在一组格点上的\textbf{节点约简}：用 $K$ 个节点将计算量降至 $O(NK^2 + K^3)$。图 5.12 展示了心脏病数据上年龄 × 肥胖的薄板样条拟合（$\mathrm{df}=15$）。
+
+\subsection{加性样条与 ANOVA 分解}
+
+多维样条的一类重要限制是\textbf{加性模型}：
+\[
+f(X) = \alpha + f_1(X_1) + f_2(X_2) + \cdots + f_d(X_d),
+\]
+每 $f_j$ 是一维样条。惩罚自然施加于各分量：
+\[
+J[f] = \sum_{j=1}^{d} \int f_j''(t_j)^2\,dt_j.
+\]
+这自然推广到 ANOVA 分解：
+\[
+f(X) = \alpha + \sum_j f_j(X_j) + \sum_{j<k} f_{jk}(X_j, X_k) + \cdots,
+\]
+每项为相应维数的样条。需做的选择包括：最大交互阶数、包含哪些项、每项使用回归样条还是光滑样条。MARS（§9.4）和 MART（第 10 章）提供了自动化方案。
+
+
+% ============ §5.8 正则化与再生核 Hilbert 空间 ============
+\section{正则化与再生核 Hilbert 空间 (RKHS)}
+
+本节将样条纳入正则化方法的更广阔框架。
+
+\subsection{一般形式}
+
+一类正则化问题可统一写为：
+\begin{equation}\label{eq:general_regularization}
+    \min_{f \in \mathcal{H}} \left[ \sum_{i=1}^{N} L(y_i, f(x_i)) + \lambda J(f) \right],
+\end{equation}
+其中 $L$ 为损失函数，$J(f)$ 为惩罚泛函，$\mathcal{H}$ 为 $J(f)$ 有定义的函数空间。
+
+若惩罚在 Fourier 域中取形式 $J(f) = \int |\tilde{f}(s)|^2 / \tilde{G}(s)\,ds$（$\tilde{G}$ 在高频处衰减），则解具有有限维表示：
+\[
+f(X) = \sum_{k=1}^{K} \alpha_k \phi_k(X) + \sum_{i=1}^{N} \theta_i G(X - x_i),
+\]
+其中 $\phi_k$ 张成惩罚的零空间（不惩罚的方向），$G$ 是 $\tilde{G}$ 的 Fourier 逆变换。光滑样条和薄板样条均属此框架。
+
+\subsection{RKHS 与核方法}
+
+一个重要子类由\textbf{正定核} $K(x, y)$ 生成。相应函数空间 $\mathcal{H}_K$ 称为\textbf{再生核 Hilbert 空间}。设核的特征展开为 $K(x,y) = \sum \gamma_i \phi_i(x)\phi_i(y)$，则范数定义为 $\|f\|_{\mathcal{H}_K}^2 = \sum c_i^2/\gamma_i$，其中 $f = \sum c_i\phi_i$。惩罚取 $J(f) = \|f\|_{\mathcal{H}_K}^2$。
+
+\textbf{表示定理 (Representer Theorem)}：问题
+\[
+\min_{f \in \mathcal{H}_K} \sum_{i=1}^{N} L(y_i, f(x_i)) + \lambda \|f\|_{\mathcal{H}_K}^2
+\]
+的有限维解为：
+\[
+\boxed{f(x) = \sum_{i=1}^{N} \alpha_i K(x, x_i)}.
+\]
+且 $J(f) = \boldsymbol{\alpha}^\top \mathbf{K} \boldsymbol{\alpha}$（$\mathbf{K}_{ij} = K(x_i, x_j)$）。无穷维优化 $\Rightarrow$ $N$ 维问题 $\min_{\boldsymbol{\alpha}} L(\mathbf{y}, \mathbf{K}\boldsymbol{\alpha}) + \lambda \boldsymbol{\alpha}^\top\mathbf{K}\boldsymbol{\alpha}$。
+
+\textbf{更一般的分解} $\mathcal{H} = \mathcal{H}_0 \oplus \mathcal{H}_1$：$\mathcal{H}_0$（多项式零空间，不惩罚）$+$ $\mathcal{H}_1$（惩罚空间）。解为 $f(x) = \sum_{j} \beta_j h_j(x) + \sum_{i} \alpha_i K(x, x_i)$。
+
+\subsection{实例}
+
+\textbf{平方误差损失}：$\hat{\boldsymbol{\alpha}} = (\mathbf{K} + \lambda\mathbf{I})^{-1}\mathbf{y}$，$\hat{\mathbf{f}} = \mathbf{K}(\mathbf{K} + \lambda\mathbf{I})^{-1}\mathbf{y} = (\mathbf{I} + \lambda\mathbf{K}^{-1})^{-1}\mathbf{y}$（对比光滑样条的 $(\mathbf{I}+\lambda\mathbf{K})^{-1}\mathbf{y}$）。在空间统计中称为 Kriging 估计。
+
+\textbf{多项式核}：$K(x,y) = (\langle x,y\rangle + 1)^d$。$M = \binom{p+d}{d}$ 个基函数（可能 $\gg N$），但核表示只需 $O(N^3)$——这是\textbf{核技巧}的本质：隐式使用高维特征空间而不显式构造它。
+
+\textbf{高斯径向基核}：$K(x,y) = e^{-\nu\|x-y\|^2}$。每个基函数 $k_m(x) = K(x, x_m)$ 是以训练点 $x_m$ 为中心的 Gaussian。核尺度 $\nu$ 控制局部性：$\nu$ 越大 $\to$ 越局部 $\to$ 有效维数越高（图 5.14--5.15）。
+
+\textbf{薄板样条核}：$K(x,y) = \|x-y\|^2\log(\|x-y\|)$（径向基函数形式的薄板样条）。
+
+\textbf{支持向量机}（第 12 章）：二分类下使用 hinge loss：
+\[
+\min_{\alpha_0, \boldsymbol{\alpha}} \sum_{i=1}^{N} [1 - y_i f(x_i)]_+ + \frac{\lambda}{2}\boldsymbol{\alpha}^\top\mathbf{K}\boldsymbol{\alpha},
+\]
+非零 $\hat{\alpha}_i$ 对应的 $x_i$ 即为\textbf{支持向量}。
+
+
+% ============ §5.9 小波光滑 ============
+\section{小波光滑}
+
+小波提供了一种与样条互补的基函数字典：样条通过\textbf{光滑性}实现压缩，小波通过\textbf{稀疏性}实现压缩。
+
+\subsection{核心思想：时间-频率定位}
+
+样条擅长表示光滑函数（用少量基函数）；小波擅长表示「大部分平坦 + 少数突起」的信号（用少量 bumpy 基函数）。小波基能同时定位\textbf{时间}（突起在哪里）和\textbf{频率}（突起有多尖锐）——传统 Fourier 基只能定位频率。
+
+\subsection{多分辨率分析}
+
+小波基通过单个\textbf{尺度函数} $\phi(x)$（父小波）和\textbf{母小波} $\psi(x)$ 的平移和缩放生成。以 Haar 小波为例：
+\[
+\phi(x) = I(0 \le x < 1), \qquad
+\psi(x) = \phi(2x) - \phi(2x-1) \;\;(\text{在}[0,\tfrac12)\text{为}+1,\;[\tfrac12,1)\text{为}-1).
+\]
+
+空间分解：$V_{j+1} = V_j \oplus W_j$（$V_j$ = 分辨率 $2^{-j}$ 的逼近空间，$W_j$ = 细节空间）。迭代得\textbf{多分辨率分解}：
+\[
+V_J = V_0 \oplus W_0 \oplus W_1 \oplus \cdots \oplus W_{J-1}.
+\]
+$V_0$ 是最粗逼近（Haar 下为常数），$W_0, W_1, \ldots$ 是递增分辨率的细节层。
+
+Haar 基简单但不光滑，实践中更常用\textbf{symmlet-p} 族：
+\begin{itemize}
+    \item 支撑：$2p-1$ 个连续区间（Haar 为 1）；
+    \item 消失矩：$p$ 个（$\int \psi(x)x^j dx = 0,\; j=0,\ldots,p-1$），使 $V_0$ 可精确复现 $p$ 阶多项式——类比光滑样条惩罚的零空间。
+\end{itemize}
+
+\subsection{自适应小波阈值 (Wavelet Shrinkage)}
+
+对一维离散信号 $\mathbf{y}$（$N=2^J$ 均匀样本），设 $\mathbf{W}$ 为 $N \times N$ 正交小波基矩阵，\textbf{小波变换} $\mathbf{y}^* = \mathbf{W}^\top \mathbf{y}$ 给出每个基上的系数。
+
+SURE 收缩（Donoho \& Johnstone, 1994）求解 Lasso 型问题：
+\[
+\min_{\boldsymbol{\theta}} \|\mathbf{y} - \mathbf{W}\boldsymbol{\theta}\|^2 + 2\lambda \|\boldsymbol{\theta}\|_1.
+\]
+由于 $\mathbf{W}$ 正交，解有显式\textbf{软阈值}规则：
+\begin{equation}\label{eq:soft_threshold}
+    \hat{\theta}_j = \operatorname{sign}(y_j^*)\,(|y_j^*| - \lambda)_+.
+\end{equation}
+即将系数向零平移 $\lambda$，不足 $\lambda$ 的置为零。常用阈值 $\lambda = \hat{\sigma}\sqrt{2\log N}$——理由：$N$ 个白噪声变量的最大绝对值约为 $\sigma\sqrt{2\log N}$，低于此的系数大概率是噪声。
+
+逆小波变换 $\hat{\mathbf{f}} = \mathbf{W}\hat{\boldsymbol{\theta}}$ 得光滑后信号。
+
+\subsection{小波 vs 光滑样条（图 5.17, 5.19）}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+& 光滑样条 & 小波收缩 \\
+\midrule
+适应对象 & 整体光滑的信号 & 平坦+局部尖峰的信号 \\
+压缩方式 & 曲率惩罚→光滑 & $\ell_1$ 阈值→稀疏 \\
+计算 & $O(N)$ & $O(N)$（金字塔算法，比 FFT 更快） \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+图 5.17 的 NMR 信号演示了完整流程：原始信号 → 小波变换（系数按尺度排列）→ 软阈值去噪 → 逆变换重建。
+
+图 5.19 对比了两类信号的拟合：NMR 尖峰信号中小波优于样条（精确定位尖峰，样条为迁就尖峰在整个域引入多余波动）；光滑信号中样条优于小波（小波为获得自适应性付出了额外方差的代价）。\textbf{两者的选择取决于信号的光滑 vs 稀疏性质。}
+
+\begin{remark}
+二维小波是现代图像压缩（如 JPEG2000）的核心技术。本章参考文献见 de Boor (1978)、Wahba (1990)、Daubechies (1992)、Donoho \& Johnstone (1994) 等。
+\end{remark}
