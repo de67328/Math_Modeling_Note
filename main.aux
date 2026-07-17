@@ -914,4 +914,85 @@
 \@writefile{lof}{\contentsline {figure}{\numberline {13.11}{\ignorespaces 小波光滑与光滑样条的对比（两例）。每面板对比 SURE-shrunk 小波拟合（实线）与交叉验证光滑样条拟合（虚线）。左：NMR 尖峰信号——小波精确定位尖峰，样条为捕捉尖峰产生额外波动。右：光滑信号——样条以更少有效参数获得相近拟合，小波因自适应性付出方差代价。来源：ESL Figure 5.19。}}{332}{figure.caption.18}\protected@file@percent }
 \newlabel{fig:wavelet_vs_spline}{{13.11}{332}{小波光滑与光滑样条的对比（两例）。每面板对比 SURE-shrunk 小波拟合（实线）与交叉验证光滑样条拟合（虚线）。左：NMR 尖峰信号——小波精确定位尖峰，样条为捕捉尖峰产生额外波动。右：光滑信号——样条以更少有效参数获得相近拟合，小波因自适应性付出方差代价。来源：ESL Figure 5.19。}{figure.caption.18}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {13.10}本章小结}{333}{section.13.10}\protected@file@percent }
-\gdef \@abspage@last{334}
+\@writefile{toc}{\contentsline {chapter}{\numberline {第十四章\hspace  {.3em}}核光滑方法}{335}{chapter.14}\protected@file@percent }
+\@writefile{lof}{\addvspace {10.0pt}}
+\@writefile{lot}{\addvspace {10.0pt}}
+\@writefile{toc}{\contentsline {section}{\numberline {14.1}一维核光滑器}{335}{section.14.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.1.1}从 $k$-最近邻平均到核加权平均}{335}{subsection.14.1.1}\protected@file@percent }
+\newlabel{eq:knn_avg}{{14.1}{335}{从 $k$-最近邻平均到核加权平均}{equation.14.1.1}{}}
+\newlabel{eq:nw_kernel}{{14.2}{335}{从 $k$-最近邻平均到核加权平均}{equation.14.1.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14.1}{\ignorespaces 每面板中 100 对 $(x_i, y_i)$ 由蓝色曲线加高斯误差随机生成：$Y = \sin (4X) + \varepsilon $，$X \sim U[0,1]$，$\varepsilon \sim N(0, 1/3)$。\textbf  {左面板}：绿色曲线是 30-最近邻滑动平均光滑器的结果。红点是拟合的常数 $\hat  {f}(x_0)$，红色圆圈标示了参与 $x_0$ 处拟合的观测。黄色实心区域表示分配给各观测的权重。\textbf  {右面板}：绿色曲线是核加权平均，使用 Epanechnikov 核，半窗宽 $\lambda = 0.2$。}}{336}{figure.caption.19}\protected@file@percent }
+\newlabel{fig:6_1}{{14.1}{336}{每面板中 100 对 $(x_i, y_i)$ 由蓝色曲线加高斯误差随机生成：$Y = \sin (4X) + \varepsilon $，$X \sim U[0,1]$，$\varepsilon \sim N(0, 1/3)$。\textbf {左面板}：绿色曲线是 30-最近邻滑动平均光滑器的结果。红点是拟合的常数 $\hat {f}(x_0)$，红色圆圈标示了参与 $x_0$ 处拟合的观测。黄色实心区域表示分配给各观测的权重。\textbf {右面板}：绿色曲线是核加权平均，使用 Epanechnikov 核，半窗宽 $\lambda = 0.2$。}{figure.caption.19}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.1.2}核函数的形式}{337}{subsection.14.1.2}\protected@file@percent }
+\newlabel{eq:kernel_general}{{14.3}{337}{核函数的形式}{equation.14.1.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.1.3}三种常用核}{337}{subsection.14.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.1.4}实践中的注意事项}{337}{subsection.14.1.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {14.2}局部线性回归}{338}{section.14.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.2.1}边界偏差问题}{338}{subsection.14.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.2.2}局部加权最小二乘}{338}{subsection.14.2.2}\protected@file@percent }
+\newlabel{eq:local_linear}{{14.7}{338}{局部加权最小二乘}{equation.14.2.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.2.3}矩阵形式与等价核}{338}{subsection.14.2.3}\protected@file@percent }
+\newlabel{eq:local_linear_matrix}{{14.8}{338}{矩阵形式与等价核}{equation.14.2.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14.2}{\ignorespaces 局部加权平均在定义域边界处或附近存在偏差问题。此处的真实函数近似线性，但邻域内大多数观测的均值高于目标点，因此即使加权后，其均值仍向上偏。通过在局部拟合加权线性回归（右面板），这一偏差被精确到一阶地消除。}}{339}{figure.caption.20}\protected@file@percent }
+\newlabel{fig:6_3}{{14.2}{339}{局部加权平均在定义域边界处或附近存在偏差问题。此处的真实函数近似线性，但邻域内大多数观测的均值高于目标点，因此即使加权后，其均值仍向上偏。通过在局部拟合加权线性回归（右面板），这一偏差被精确到一阶地消除。}{figure.caption.20}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.2.4}自动核木工（Automatic Kernel Carpentry）}{339}{subsection.14.2.4}\protected@file@percent }
+\newlabel{eq:bias_expansion}{{14.9}{339}{自动核木工（Automatic Kernel Carpentry）}{equation.14.2.9}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {14.3}局部多项式回归}{340}{section.14.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.3.1}$d$ 阶局部多项式拟合}{340}{subsection.14.3.1}\protected@file@percent }
+\newlabel{eq:local_poly}{{14.10}{340}{$d$ 阶局部多项式拟合}{equation.14.3.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.3.2}削峰填谷效应}{341}{subsection.14.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {14.3}{\ignorespaces 局部线性拟合在真实函数曲率区域表现出偏差。局部二次拟合倾向于消除此偏差。左面板中红色曲线（局部线性）在曲率处偏离绿色真实曲线，右面板中局部二次拟合更好地追踪了曲率。}}{341}{figure.caption.21}\protected@file@percent }
+\newlabel{fig:6_5}{{14.3}{341}{局部线性拟合在真实函数曲率区域表现出偏差。局部二次拟合倾向于消除此偏差。左面板中红色曲线（局部线性）在曲率处偏离绿色真实曲线，右面板中局部二次拟合更好地追踪了曲率。}{figure.caption.21}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.3.3}偏差--方差权衡}{341}{subsection.14.3.3}\protected@file@percent }
+\newlabel{eq:local_var}{{14.11}{341}{偏差--方差权衡}{equation.14.3.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.3.4}奇数阶 vs 偶数阶：实践建议}{341}{subsection.14.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {14.4}核宽度的选择}{342}{section.14.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.4.1}$\lambda $ 在不同核中的含义}{342}{subsection.14.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.4.2}偏差--方差权衡与窗宽}{342}{subsection.14.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.4.3}线性估计量与光滑矩阵}{342}{subsection.14.4.3}\protected@file@percent }
+\newlabel{eq:loocv_shortcut}{{14.12}{343}{线性估计量与光滑矩阵}{equation.14.4.12}{}}
+\newlabel{eq:gcv}{{14.13}{343}{线性估计量与光滑矩阵}{equation.14.4.13}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.4.4}有效自由度}{343}{subsection.14.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {14.5}$\mathbb  {R}^p$ 中的局部回归}{343}{section.14.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {14.4}{\ignorespaces 局部线性回归光滑器（tri-cube 核，橙色）与光滑样条（蓝色）的等价核，两者具有匹配的自由度。竖直尖刺标示目标点。局部回归光滑器的 span 为 40\%，对应 $\text  {df} = \operatorname  {tr}(\mathbf  {S}_\lambda ) = 5.86$；光滑样条被校准到相同 df，两者的等价核定性上高度相似。}}{344}{figure.caption.22}\protected@file@percent }
+\newlabel{fig:6_7}{{14.4}{344}{局部线性回归光滑器（tri-cube 核，橙色）与光滑样条（蓝色）的等价核，两者具有匹配的自由度。竖直尖刺标示目标点。局部回归光滑器的 span 为 40\%，对应 $\text {df} = \tr (\mathbf {S}_\lambda ) = 5.86$；光滑样条被校准到相同 df，两者的等价核定性上高度相似。}{figure.caption.22}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.5.1}多项式向量与径向核}{344}{subsection.14.5.1}\protected@file@percent }
+\newlabel{eq:local_poly_p}{{14.14}{344}{多项式向量与径向核}{equation.14.5.14}{}}
+\newlabel{eq:radial_kernel}{{14.15}{344}{多项式向量与径向核}{equation.14.5.15}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.5.2}高维中的边界问题与维数灾难}{344}{subsection.14.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {14.6}$\mathbb  {R}^p$ 中的结构化局部回归模型}{345}{section.14.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.6.1}结构化核}{345}{subsection.14.6.1}\protected@file@percent }
+\newlabel{eq:structured_kernel}{{14.16}{345}{结构化核}{equation.14.6.16}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.6.2}结构化回归函数}{345}{subsection.14.6.2}\protected@file@percent }
+\newlabel{eq:anova_decomp}{{14.17}{345}{结构化回归函数}{equation.14.6.17}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.6.3}变系数模型}{346}{subsection.14.6.3}\protected@file@percent }
+\newlabel{eq:varying_coef}{{14.18}{346}{变系数模型}{equation.14.6.18}{}}
+\newlabel{eq:varying_coef_fit}{{14.19}{346}{变系数模型}{equation.14.6.19}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {14.7}局部似然与其他模型}{346}{section.14.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.7.1}局部似然}{346}{subsection.14.7.1}\protected@file@percent }
+\newlabel{eq:local_likelihood}{{14.20}{346}{局部似然}{equation.14.7.20}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.7.2}局部自回归时间序列}{346}{subsection.14.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.7.3}局部多类 Logistic 回归}{347}{subsection.14.7.3}\protected@file@percent }
+\newlabel{eq:multiclass_logistic}{{14.22}{347}{局部多类 Logistic 回归}{equation.14.7.22}{}}
+\newlabel{eq:local_multiclass}{{14.23}{347}{局部多类 Logistic 回归}{equation.14.7.23}{}}
+\newlabel{eq:local_posterior}{{14.24}{347}{局部多类 Logistic 回归}{equation.14.7.24}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {14.8}核密度估计与分类}{347}{section.14.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.8.1}核密度估计}{347}{subsection.14.8.1}\protected@file@percent }
+\newlabel{eq:local_density}{{14.25}{347}{核密度估计}{equation.14.8.25}{}}
+\newlabel{eq:parzen}{{14.26}{347}{核密度估计}{equation.14.8.26}{}}
+\newlabel{eq:parzen_conv}{{14.27}{348}{核密度估计}{equation.14.8.27}{}}
+\newlabel{eq:gaussian_product}{{14.28}{348}{核密度估计}{equation.14.8.28}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.8.2}核密度分类}{348}{subsection.14.8.2}\protected@file@percent }
+\newlabel{eq:bayes_density_classify}{{14.29}{348}{核密度分类}{equation.14.8.29}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.8.3}朴素 Bayes 分类器}{348}{subsection.14.8.3}\protected@file@percent }
+\newlabel{eq:naive_bayes}{{14.30}{348}{朴素 Bayes 分类器}{equation.14.8.30}{}}
+\newlabel{eq:naive_bayes_logit}{{14.31}{349}{朴素 Bayes 分类器}{equation.14.8.31}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {14.9}径向基函数与核}{349}{section.14.9}\protected@file@percent }
+\newlabel{eq:rbf}{{14.32}{349}{径向基函数与核}{equation.14.9.32}{}}
+\newlabel{eq:rbf_network}{{14.33}{349}{径向基函数与核}{equation.14.9.33}{}}
+\newlabel{eq:renormalized_rbf}{{14.34}{350}{径向基函数与核}{equation.14.9.34}{}}
+\newlabel{eq:nw_as_rbf}{{14.35}{350}{径向基函数与核}{equation.14.9.35}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {14.10}混合模型用于密度估计与分类}{350}{section.14.10}\protected@file@percent }
+\newlabel{eq:gmm}{{14.36}{350}{混合模型用于密度估计与分类}{equation.14.10.36}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {14.11}计算考量}{350}{section.14.11}\protected@file@percent }
+\gdef \@abspage@last{351}

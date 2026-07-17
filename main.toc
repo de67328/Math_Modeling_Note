@@ -636,3 +636,42 @@
 \contentsline {subsection}{\numberline {13.9.4}自适应小波阈值 (Wavelet Shrinkage)}{330}{subsection.13.9.4}%
 \contentsline {subsection}{\numberline {13.9.5}小波 vs 光滑样条（图 5.19）}{330}{subsection.13.9.5}%
 \contentsline {section}{\numberline {13.10}本章小结}{333}{section.13.10}%
+\contentsline {chapter}{\numberline {第十四章\hspace {.3em}}核光滑方法}{335}{chapter.14}%
+\contentsline {section}{\numberline {14.1}一维核光滑器}{335}{section.14.1}%
+\contentsline {subsection}{\numberline {14.1.1}从 $k$-最近邻平均到核加权平均}{335}{subsection.14.1.1}%
+\contentsline {subsection}{\numberline {14.1.2}核函数的形式}{337}{subsection.14.1.2}%
+\contentsline {subsection}{\numberline {14.1.3}三种常用核}{337}{subsection.14.1.3}%
+\contentsline {subsection}{\numberline {14.1.4}实践中的注意事项}{337}{subsection.14.1.4}%
+\contentsline {section}{\numberline {14.2}局部线性回归}{338}{section.14.2}%
+\contentsline {subsection}{\numberline {14.2.1}边界偏差问题}{338}{subsection.14.2.1}%
+\contentsline {subsection}{\numberline {14.2.2}局部加权最小二乘}{338}{subsection.14.2.2}%
+\contentsline {subsection}{\numberline {14.2.3}矩阵形式与等价核}{338}{subsection.14.2.3}%
+\contentsline {subsection}{\numberline {14.2.4}自动核木工（Automatic Kernel Carpentry）}{339}{subsection.14.2.4}%
+\contentsline {section}{\numberline {14.3}局部多项式回归}{340}{section.14.3}%
+\contentsline {subsection}{\numberline {14.3.1}$d$ 阶局部多项式拟合}{340}{subsection.14.3.1}%
+\contentsline {subsection}{\numberline {14.3.2}削峰填谷效应}{341}{subsection.14.3.2}%
+\contentsline {subsection}{\numberline {14.3.3}偏差--方差权衡}{341}{subsection.14.3.3}%
+\contentsline {subsection}{\numberline {14.3.4}奇数阶 vs 偶数阶：实践建议}{341}{subsection.14.3.4}%
+\contentsline {section}{\numberline {14.4}核宽度的选择}{342}{section.14.4}%
+\contentsline {subsection}{\numberline {14.4.1}$\lambda $ 在不同核中的含义}{342}{subsection.14.4.1}%
+\contentsline {subsection}{\numberline {14.4.2}偏差--方差权衡与窗宽}{342}{subsection.14.4.2}%
+\contentsline {subsection}{\numberline {14.4.3}线性估计量与光滑矩阵}{342}{subsection.14.4.3}%
+\contentsline {subsection}{\numberline {14.4.4}有效自由度}{343}{subsection.14.4.4}%
+\contentsline {section}{\numberline {14.5}$\mathbb {R}^p$ 中的局部回归}{343}{section.14.5}%
+\contentsline {subsection}{\numberline {14.5.1}多项式向量与径向核}{344}{subsection.14.5.1}%
+\contentsline {subsection}{\numberline {14.5.2}高维中的边界问题与维数灾难}{344}{subsection.14.5.2}%
+\contentsline {section}{\numberline {14.6}$\mathbb {R}^p$ 中的结构化局部回归模型}{345}{section.14.6}%
+\contentsline {subsection}{\numberline {14.6.1}结构化核}{345}{subsection.14.6.1}%
+\contentsline {subsection}{\numberline {14.6.2}结构化回归函数}{345}{subsection.14.6.2}%
+\contentsline {subsection}{\numberline {14.6.3}变系数模型}{346}{subsection.14.6.3}%
+\contentsline {section}{\numberline {14.7}局部似然与其他模型}{346}{section.14.7}%
+\contentsline {subsection}{\numberline {14.7.1}局部似然}{346}{subsection.14.7.1}%
+\contentsline {subsection}{\numberline {14.7.2}局部自回归时间序列}{346}{subsection.14.7.2}%
+\contentsline {subsection}{\numberline {14.7.3}局部多类 Logistic 回归}{347}{subsection.14.7.3}%
+\contentsline {section}{\numberline {14.8}核密度估计与分类}{347}{section.14.8}%
+\contentsline {subsection}{\numberline {14.8.1}核密度估计}{347}{subsection.14.8.1}%
+\contentsline {subsection}{\numberline {14.8.2}核密度分类}{348}{subsection.14.8.2}%
+\contentsline {subsection}{\numberline {14.8.3}朴素 Bayes 分类器}{348}{subsection.14.8.3}%
+\contentsline {section}{\numberline {14.9}径向基函数与核}{349}{section.14.9}%
+\contentsline {section}{\numberline {14.10}混合模型用于密度估计与分类}{350}{section.14.10}%
+\contentsline {section}{\numberline {14.11}计算考量}{350}{section.14.11}%
