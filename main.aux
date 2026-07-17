@@ -795,92 +795,123 @@
 \@writefile{lof}{\addvspace {10.0pt}}
 \@writefile{lot}{\addvspace {10.0pt}}
 \@writefile{toc}{\contentsline {section}{\numberline {13.1}引言}{293}{section.13.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.1.1}核心思想：变换输入空间}{293}{subsection.13.1.1}\protected@file@percent }
-\newlabel{eq:basis_expansion}{{13.1}{293}{核心思想：变换输入空间}{equation.13.1.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.1.2}常见基函数示例}{293}{subsection.13.1.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.1.3}复杂度的控制}{294}{subsection.13.1.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {13.2}分段多项式与样条}{294}{section.13.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.1}分段常数与分段线性}{294}{subsection.13.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.2}截断幂基}{294}{subsection.13.2.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {13.1}{\ignorespaces 分段多项式拟合人造数据。左上：分段常数（三个区间各自的均值）；右上：无约束分段线性；左下：节点处连续的分段线性；右下：截断幂基函数 $h_3(X)=(X-\xi _1)_+$（在 $\xi _1$ 之前为 0，之后线性增长）。来源：ESL Figure 5.1。}}{295}{figure.caption.8}\protected@file@percent }
-\newlabel{fig:piecewise}{{13.1}{295}{分段多项式拟合人造数据。左上：分段常数（三个区间各自的均值）；右上：无约束分段线性；左下：节点处连续的分段线性；右下：截断幂基函数 $h_3(X)=(X-\xi _1)_+$（在 $\xi _1$ 之前为 0，之后线性增长）。来源：ESL Figure 5.1。}{figure.caption.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.3}三次样条 (Cubic Spline)}{296}{subsection.13.2.3}\protected@file@percent }
-\newlabel{eq:cubic_spline_basis}{{13.2}{296}{三次样条 (Cubic Spline)}{equation.13.2.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.4}一般阶样条}{296}{subsection.13.2.4}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {13.2}{\ignorespaces 分段三次多项式，节点处连续性递增。左上：不连续；右上：连续但导数不连续；左下：一阶导数连续；右下：一阶和二阶导数均连续（三次样条）。再额外施加一阶连续性将退化为全局三次多项式。来源：ESL Figure 5.2。}}{297}{figure.caption.9}\protected@file@percent }
-\newlabel{fig:cubic_splines}{{13.2}{297}{分段三次多项式，节点处连续性递增。左上：不连续；右上：连续但导数不连续；左下：一阶导数连续；右下：一阶和二阶导数均连续（三次样条）。再额外施加一阶连续性将退化为全局三次多项式。来源：ESL Figure 5.2。}{figure.caption.9}{}}
-\newlabel{eq:truncated_power}{{13.3}{298}{一般阶样条}{equation.13.2.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.5}节点选择}{298}{subsection.13.2.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{R 中的实现}{298}{subsection.13.2.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{实践中节点位置怎么选？}{299}{subsection.13.2.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{分位数放置是最优的吗？}{299}{subsection.13.2.5}\protected@file@percent }
-\newlabel{eq:natural_spline_basis}{{13.4}{300}{分位数放置是最优的吗？}{equation.13.2.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.6}样条方法概览}{300}{subsection.13.2.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.7}示例：南非心脏病数据（续）}{300}{subsection.13.2.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{问题设定}{300}{subsection.13.2.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{第一步：线性 Logistic 回归 → 确定谁不显著}{301}{subsection.13.2.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{第二步：改用自然样条 → 允许非线性效应}{301}{subsection.13.2.7}\protected@file@percent }
-\newlabel{eq:spline_logistic}{{13.5}{301}{第二步：改用自然样条 → 允许非线性效应}{equation.13.2.5}{}}
-\@writefile{toc}{\contentsline {subsubsection}{第三步：模型选择与最终结果}{301}{equation.13.2.5}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {13.3}{\ignorespaces 最终模型中各变量的拟合自然样条函数。实线：$\hat  {f}_j(X_j)$；虚线带：$\pm 2$ 标准误的逐点置信带；底部 rug plot：每个刻度对应一个样本在该变量上的取值（抖动防重叠）。famhist 为二值变量，显示为两个点 + 误差棒。来源：ESL Figure 5.4。}}{302}{figure.caption.10}\protected@file@percent }
-\newlabel{fig:heart_splines}{{13.3}{302}{最终模型中各变量的拟合自然样条函数。实线：$\hat {f}_j(X_j)$；虚线带：$\pm 2$ 标准误的逐点置信带；底部 rug plot：每个刻度对应一个样本在该变量上的取值（抖动防重叠）。famhist 为二值变量，显示为两个点 + 误差棒。来源：ESL Figure 5.4。}{figure.caption.10}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {13.4}{\ignorespaces 逐步删除自然样条项后的最终 Logistic 回归模型。Terms：变量名（none=全模型）；Df：该变量占用自由度；Deviance：离差；AIC：赤池信息准则；LRT：似然比检验统计量（该变量删除后 deviance 的增加量）；P-value：LRT 的 p 值。来源：ESL Table 5.1。}}{303}{figure.caption.11}\protected@file@percent }
-\newlabel{tab:heart_final}{{13.4}{303}{逐步删除自然样条项后的最终 Logistic 回归模型。Terms：变量名（none=全模型）；Df：该变量占用自由度；Deviance：离差；AIC：赤池信息准则；LRT：似然比检验统计量（该变量删除后 deviance 的增加量）；P-value：LRT 的 p 值。来源：ESL Table 5.1。}{figure.caption.11}{}}
-\@writefile{toc}{\contentsline {subsubsection}{关键发现与解释}{304}{figure.caption.11}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{数学推导：$\hat  {f}_{\mathrm  {sbp}}(x)$ 如何计算}{304}{figure.caption.11}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{标准误 (Standard Error) 的定义}{305}{figure.caption.11}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{训练与画图的时序}{305}{figure.caption.11}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.8}示例：音素识别}{305}{subsection.13.2.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {13.3}滤波与特征提取}{306}{section.13.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {13.4}光滑样条}{307}{section.13.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.4.1}惩罚残差平方和}{307}{subsection.13.4.1}\protected@file@percent }
-\newlabel{eq:smoothing_spline}{{13.6}{307}{惩罚残差平方和}{equation.13.4.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.4.2}有限维解}{307}{subsection.13.4.2}\protected@file@percent }
-\newlabel{eq:smoothing_spline_ridge}{{13.7}{308}{有限维解}{equation.13.4.7}{}}
-\newlabel{eq:smoothing_spline_solution}{{13.8}{308}{有限维解}{equation.13.4.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.4.3}完整示例：光滑样条的符号化流程}{308}{subsection.13.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{给定}{308}{subsection.13.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Step 1——选择光滑参数 $\lambda $（或等价地 $\mathrm  {df}_\lambda $）}{308}{subsection.13.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Step 2——构造自然三次样条基矩阵}{309}{subsection.13.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Step 3——构造惩罚矩阵}{309}{subsection.13.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Step 4——求解广义岭回归}{309}{subsection.13.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Step 5——在新点 $x_0$ 处预测}{309}{subsection.13.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Step 6——复杂度与 $\lambda $ 的选择}{309}{subsection.13.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{与回归样条的操作对比}{310}{subsection.13.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.4.4}自由度与光滑矩阵}{310}{subsection.13.4.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{光滑矩阵 $\mathbf  {S}_\lambda $}{310}{subsection.13.4.4}\protected@file@percent }
-\newlabel{eq:smoother_matrix}{{13.9}{310}{光滑矩阵 $\mathbf {S}_\lambda $}{equation.13.4.9}{}}
-\@writefile{toc}{\contentsline {subsubsection}{投影光滑器 vs 收缩光滑器}{310}{equation.13.4.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{光滑样条的自由度}{310}{equation.13.4.9}\protected@file@percent }
-\newlabel{eq:df_smoothing}{{13.10}{310}{光滑样条的自由度}{equation.13.4.10}{}}
-\@writefile{toc}{\contentsline {subsubsection}{特征分解}{311}{equation.13.4.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{等价核——光滑样条的局部性}{311}{equation.13.4.10}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {13.5}{\ignorespaces 光滑样条的光滑矩阵 $\mathbf  {S}_\lambda $。左：矩阵元素图（行按 $x$ 排序），带状结构表明局部支撑。右：选定行的等价核（加权函数），每行在对应 $x_i$ 处取峰值并向两侧衰减。来源：ESL Figure 5.8。}}{312}{figure.caption.12}\protected@file@percent }
-\newlabel{fig:smoother_matrix}{{13.5}{312}{光滑样条的光滑矩阵 $\mathbf {S}_\lambda $。左：矩阵元素图（行按 $x$ 排序），带状结构表明局部支撑。右：选定行的等价核（加权函数），每行在对应 $x_i$ 处取峰值并向两侧衰减。来源：ESL Figure 5.8。}{figure.caption.12}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {13.5}光滑参数的自动选择}{313}{section.13.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.5.1}用有效自由度参数化}{313}{subsection.13.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.5.2}偏差-方差权衡}{313}{subsection.13.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.5.3}交叉验证 (CV)}{313}{subsection.13.5.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {13.6}{\ignorespaces 左上：EPE($\lambda $) 和 CV($\lambda $) 曲线。其余三面板：真实函数（紫色）、拟合曲线（绿色）及 $\pm 2$ 标准误带（黄色），分别对应 $\mathrm  {df}=5,9,15$。$\mathrm  {df}=5$ 欠拟合，$\mathrm  {df}=15$ 略显过拟合，$\mathrm  {df}=9$ 接近最优。来源：ESL Figure 5.9。}}{314}{figure.caption.13}\protected@file@percent }
-\newlabel{fig:bias_variance}{{13.6}{314}{左上：EPE($\lambda $) 和 CV($\lambda $) 曲线。其余三面板：真实函数（紫色）、拟合曲线（绿色）及 $\pm 2$ 标准误带（黄色），分别对应 $\mathrm {df}=5,9,15$。$\mathrm {df}=5$ 欠拟合，$\mathrm {df}=15$ 略显过拟合，$\mathrm {df}=9$ 接近最优。来源：ESL Figure 5.9。}{figure.caption.13}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {13.6}非参数 Logistic 回归}{315}{section.13.6}\protected@file@percent }
-\newlabel{eq:penalized_loglik}{{13.11}{315}{非参数 Logistic 回归}{equation.13.6.11}{}}
-\newlabel{eq:nplr_update_theta}{{13.12}{315}{非参数 Logistic 回归}{equation.13.6.12}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {13.7}多维样条}{315}{section.13.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.7.1}张量积基}{316}{subsection.13.7.1}\protected@file@percent }
-\newlabel{eq:tensor_product}{{13.13}{316}{张量积基}{equation.13.7.13}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.7.2}薄板样条 (Thin-Plate Splines)}{316}{subsection.13.7.2}\protected@file@percent }
-\newlabel{eq:thin_plate}{{13.14}{316}{薄板样条 (Thin-Plate Splines)}{equation.13.7.14}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.7.3}加性样条与 ANOVA 分解}{316}{subsection.13.7.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {13.8}正则化与再生核 Hilbert 空间 (RKHS)}{317}{section.13.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.8.1}一般形式}{317}{subsection.13.8.1}\protected@file@percent }
-\newlabel{eq:general_regularization}{{13.15}{317}{一般形式}{equation.13.8.15}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.8.2}RKHS 与核方法}{317}{subsection.13.8.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.8.3}实例}{318}{subsection.13.8.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {13.9}小波光滑}{318}{section.13.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.9.1}核心思想：时间-频率定位}{318}{subsection.13.9.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.9.2}多分辨率分析}{318}{subsection.13.9.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.9.3}自适应小波阈值 (Wavelet Shrinkage)}{319}{subsection.13.9.3}\protected@file@percent }
-\newlabel{eq:soft_threshold}{{13.16}{319}{自适应小波阈值 (Wavelet Shrinkage)}{equation.13.9.16}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {13.9.4}小波 vs 光滑样条（图 5.17, 5.19）}{319}{subsection.13.9.4}\protected@file@percent }
-\gdef \@abspage@last{319}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.1.1}两种突破线性的思路：参数化 vs 非参数化}{293}{subsection.13.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.1.2}核心思想：变换输入空间}{294}{subsection.13.1.2}\protected@file@percent }
+\newlabel{eq:basis_expansion}{{13.1}{294}{核心思想：变换输入空间}{equation.13.1.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.1.3}常见基函数示例}{294}{subsection.13.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.1.4}复杂度的控制}{294}{subsection.13.1.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {13.2}分段多项式与样条}{295}{section.13.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.1}分段常数与分段线性}{295}{subsection.13.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.2}截断幂基}{295}{subsection.13.2.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {13.1}{\ignorespaces 分段多项式拟合人造数据。左上：分段常数（三个区间各自的均值）；右上：无约束分段线性；左下：节点处连续的分段线性；右下：截断幂基函数 $h_3(X)=(X-\xi _1)_+$（在 $\xi _1$ 之前为 0，之后线性增长）。来源：ESL Figure 5.1。}}{296}{figure.caption.8}\protected@file@percent }
+\newlabel{fig:piecewise}{{13.1}{296}{分段多项式拟合人造数据。左上：分段常数（三个区间各自的均值）；右上：无约束分段线性；左下：节点处连续的分段线性；右下：截断幂基函数 $h_3(X)=(X-\xi _1)_+$（在 $\xi _1$ 之前为 0，之后线性增长）。来源：ESL Figure 5.1。}{figure.caption.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.3}三次样条 (Cubic Spline)}{297}{subsection.13.2.3}\protected@file@percent }
+\newlabel{eq:cubic_spline_basis}{{13.2}{297}{三次样条 (Cubic Spline)}{equation.13.2.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.4}一般阶样条}{297}{subsection.13.2.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {13.2}{\ignorespaces 分段三次多项式，节点处连续性递增。左上：不连续；右上：连续但导数不连续；左下：一阶导数连续；右下：一阶和二阶导数均连续（三次样条）。再额外施加一阶连续性将退化为全局三次多项式。来源：ESL Figure 5.2。}}{298}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:cubic_splines}{{13.2}{298}{分段三次多项式，节点处连续性递增。左上：不连续；右上：连续但导数不连续；左下：一阶导数连续；右下：一阶和二阶导数均连续（三次样条）。再额外施加一阶连续性将退化为全局三次多项式。来源：ESL Figure 5.2。}{figure.caption.9}{}}
+\newlabel{eq:truncated_power}{{13.3}{299}{一般阶样条}{equation.13.2.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.5}节点选择}{299}{subsection.13.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{R 中的实现}{299}{subsection.13.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{实践中节点位置怎么选？}{300}{subsection.13.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{分位数放置是最优的吗？}{300}{subsection.13.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.6}自然三次样条}{301}{subsection.13.2.6}\protected@file@percent }
+\newlabel{eq:natural_spline_basis}{{13.4}{301}{自然三次样条}{equation.13.2.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{为什么边界外是线性的？}{301}{equation.13.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{基函数构造示例（$K=5$）}{302}{equation.13.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.7}样条方法概览}{302}{subsection.13.2.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.8}示例：南非心脏病数据（续）}{303}{subsection.13.2.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{问题设定}{303}{subsection.13.2.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{第一步：线性 Logistic 回归 → 确定谁不显著}{303}{subsection.13.2.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{第二步：改用自然样条 → 允许非线性效应}{304}{subsection.13.2.8}\protected@file@percent }
+\newlabel{eq:spline_logistic}{{13.5}{304}{第二步：改用自然样条 → 允许非线性效应}{equation.13.2.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{第三步：模型选择与最终结果}{304}{equation.13.2.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {13.3}{\ignorespaces 最终模型中各变量的拟合自然样条函数。实线：$\hat  {f}_j(X_j)$；虚线带：$\pm 2$ 标准误的逐点置信带；底部 rug plot：每个刻度对应一个样本在该变量上的取值（抖动防重叠）。famhist 为二值变量，显示为两个点 + 误差棒。来源：ESL Figure 5.4。}}{305}{figure.caption.10}\protected@file@percent }
+\newlabel{fig:heart_splines}{{13.3}{305}{最终模型中各变量的拟合自然样条函数。实线：$\hat {f}_j(X_j)$；虚线带：$\pm 2$ 标准误的逐点置信带；底部 rug plot：每个刻度对应一个样本在该变量上的取值（抖动防重叠）。famhist 为二值变量，显示为两个点 + 误差棒。来源：ESL Figure 5.4。}{figure.caption.10}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13.4}{\ignorespaces 逐步删除自然样条项后的最终 Logistic 回归模型。Terms：变量名（none=全模型）；Df：该变量占用自由度；Deviance：离差；AIC：赤池信息准则；LRT：似然比检验统计量（该变量删除后 deviance 的增加量）；P-value：LRT 的 p 值。来源：ESL Table 5.1。}}{306}{figure.caption.11}\protected@file@percent }
+\newlabel{tab:heart_final}{{13.4}{306}{逐步删除自然样条项后的最终 Logistic 回归模型。Terms：变量名（none=全模型）；Df：该变量占用自由度；Deviance：离差；AIC：赤池信息准则；LRT：似然比检验统计量（该变量删除后 deviance 的增加量）；P-value：LRT 的 p 值。来源：ESL Table 5.1。}{figure.caption.11}{}}
+\@writefile{toc}{\contentsline {subsubsection}{关键发现与解释}{306}{figure.caption.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{数学推导：$\hat  {f}_{\mathrm  {sbp}}(x)$ 如何计算}{307}{figure.caption.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{标准误 (Standard Error) 的定义}{307}{figure.caption.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{训练与画图的时序}{308}{figure.caption.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.2.9}示例：音素识别}{308}{subsection.13.2.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {13.3}滤波与特征提取}{309}{section.13.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {13.4}光滑样条}{309}{section.13.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.4.1}惩罚残差平方和}{310}{subsection.13.4.1}\protected@file@percent }
+\newlabel{eq:smoothing_spline}{{13.6}{310}{惩罚残差平方和}{equation.13.4.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.4.2}有限维解}{310}{subsection.13.4.2}\protected@file@percent }
+\newlabel{eq:smoothing_spline_ridge}{{13.7}{311}{有限维解}{equation.13.4.7}{}}
+\newlabel{eq:smoothing_spline_solution}{{13.8}{311}{有限维解}{equation.13.4.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.4.3}完整示例：光滑样条的符号化流程}{311}{subsection.13.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{给定}{311}{subsection.13.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Step 1——选择光滑参数 $\lambda $（或等价地 $\mathrm  {df}_\lambda $）}{311}{subsection.13.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Step 2——构造自然三次样条基矩阵}{311}{subsection.13.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Step 3——构造惩罚矩阵}{311}{subsection.13.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Step 4——求解广义岭回归}{312}{subsection.13.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Step 5——在新点 $x_0$ 处预测}{312}{subsection.13.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Step 6——复杂度与 $\lambda $ 的选择}{312}{subsection.13.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{与回归样条的操作对比}{312}{subsection.13.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.4.4}自由度与光滑矩阵}{313}{subsection.13.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{光滑矩阵 $\mathbf  {S}_\lambda $}{313}{subsection.13.4.4}\protected@file@percent }
+\newlabel{eq:smoother_matrix}{{13.9}{313}{光滑矩阵 $\mathbf {S}_\lambda $}{equation.13.4.9}{}}
+\@writefile{toc}{\contentsline {subsubsection}{投影光滑器 vs 收缩光滑器}{313}{equation.13.4.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{光滑样条的自由度}{313}{equation.13.4.9}\protected@file@percent }
+\newlabel{eq:df_smoothing}{{13.10}{313}{光滑样条的自由度}{equation.13.4.10}{}}
+\@writefile{toc}{\contentsline {subsubsection}{特征分解}{313}{equation.13.4.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{等价核——光滑样条的局部性}{314}{equation.13.4.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {13.5}光滑参数的自动选择}{314}{section.13.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.5.1}用有效自由度参数化}{314}{subsection.13.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.5.2}偏差-方差权衡}{314}{subsection.13.5.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {13.5}{\ignorespaces 光滑样条的光滑矩阵 $\mathbf  {S}_\lambda $。左：矩阵元素图（行按 $x$ 排序），带状结构表明局部支撑。右：选定行的等价核（加权函数），每行在对应 $x_i$ 处取峰值并向两侧衰减。来源：ESL Figure 5.8。}}{315}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:smoother_matrix}{{13.5}{315}{光滑样条的光滑矩阵 $\mathbf {S}_\lambda $。左：矩阵元素图（行按 $x$ 排序），带状结构表明局部支撑。右：选定行的等价核（加权函数），每行在对应 $x_i$ 处取峰值并向两侧衰减。来源：ESL Figure 5.8。}{figure.caption.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13.6}{\ignorespaces 左上：EPE($\lambda $) 和 CV($\lambda $) 曲线。其余三面板：真实函数（紫色）、拟合曲线（绿色）及 $\pm 2$ 标准误带（黄色），分别对应 $\mathrm  {df}=5,9,15$。$\mathrm  {df}=5$ 欠拟合，$\mathrm  {df}=15$ 略显过拟合，$\mathrm  {df}=9$ 接近最优。来源：ESL Figure 5.9。}}{316}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:bias_variance}{{13.6}{316}{左上：EPE($\lambda $) 和 CV($\lambda $) 曲线。其余三面板：真实函数（紫色）、拟合曲线（绿色）及 $\pm 2$ 标准误带（黄色），分别对应 $\mathrm {df}=5,9,15$。$\mathrm {df}=5$ 欠拟合，$\mathrm {df}=15$ 略显过拟合，$\mathrm {df}=9$ 接近最优。来源：ESL Figure 5.9。}{figure.caption.13}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.5.3}交叉验证 (CV)}{317}{subsection.13.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {13.6}非参数 Logistic 回归}{317}{section.13.6}\protected@file@percent }
+\newlabel{eq:penalized_loglik}{{13.11}{317}{非参数 Logistic 回归}{equation.13.6.11}{}}
+\newlabel{eq:nplr_update_theta}{{13.12}{318}{非参数 Logistic 回归}{equation.13.6.12}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {13.7}多维样条}{318}{section.13.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.7.1}张量积基}{318}{subsection.13.7.1}\protected@file@percent }
+\newlabel{eq:tensor_product}{{13.13}{318}{张量积基}{equation.13.7.13}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13.7}{\ignorespaces B-样条的张量积基。选取了部分代表性函数对，每个二维函数是对应一维边缘基函数的张量积。来源：ESL Figure 5.10。}}{319}{figure.caption.14}\protected@file@percent }
+\newlabel{fig:tensor_product_basis}{{13.7}{319}{B-样条的张量积基。选取了部分代表性函数对，每个二维函数是对应一维边缘基函数的张量积。来源：ESL Figure 5.10。}{figure.caption.14}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13.8}{\ignorespaces 图 2.1 模拟例子的二维分类。上图：可加 Logistic 回归模型，每维用自然样条（总 df = $1+(4-1)+(4-1)=7$）。下图：每维自然样条基的张量积（总 df = $4\times 4=16$）。紫色虚线为 Bayes 决策边界。来源：ESL Figure 5.11。}}{320}{figure.caption.15}\protected@file@percent }
+\newlabel{fig:additive_vs_tensor}{{13.8}{320}{图 2.1 模拟例子的二维分类。上图：可加 Logistic 回归模型，每维用自然样条（总 df = $1+(4-1)+(4-1)=7$）。下图：每维自然样条基的张量积（总 df = $4\times 4=16$）。紫色虚线为 Bayes 决策边界。来源：ESL Figure 5.11。}{figure.caption.15}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.7.2}薄板样条 (Thin-Plate Splines)}{321}{subsection.13.7.2}\protected@file@percent }
+\newlabel{eq:thin_plate}{{13.14}{321}{薄板样条 (Thin-Plate Splines)}{equation.13.7.14}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.7.3}加性样条与 ANOVA 分解}{321}{subsection.13.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.7.4}小结：从一维到多维的选择路线}{322}{subsection.13.7.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {13.8}正则化与再生核 Hilbert 空间 (RKHS)}{322}{section.13.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.8.1}一般形式}{322}{subsection.13.8.1}\protected@file@percent }
+\newlabel{eq:general_regularization}{{13.15}{322}{一般形式}{equation.13.8.15}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.8.2}RKHS 与核方法}{323}{subsection.13.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{正定核}{323}{subsection.13.8.2}\protected@file@percent }
+\newlabel{eq:psd_kernel}{{13.16}{323}{正定核}{equation.13.8.16}{}}
+\@writefile{toc}{\contentsline {subsubsection}{再生核 Hilbert 空间 (RKHS)}{323}{equation.13.8.16}\protected@file@percent }
+\newlabel{eq:reproducing}{{13.17}{324}{再生核 Hilbert 空间 (RKHS)}{equation.13.8.17}{}}
+\@writefile{toc}{\contentsline {subsubsection}{表示定理如何导出 $\bm  {\alpha }$ 的解}{324}{equation.13.8.17}\protected@file@percent }
+\newlabel{eq:kernel_ridge_obj}{{13.18}{325}{表示定理如何导出 $\boldsymbol {\alpha }$ 的解}{equation.13.8.18}{}}
+\newlabel{eq:kernel_ridge_solution}{{13.19}{325}{表示定理如何导出 $\boldsymbol {\alpha }$ 的解}{equation.13.8.19}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.8.3}实例}{326}{subsection.13.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.8.4}实践指南：何时使用核方法}{326}{subsection.13.8.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{核方法的理想适用场景}{326}{subsection.13.8.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{何时不应使用核方法}{327}{subsection.13.8.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{EDA 中值得注意的信号}{327}{subsection.13.8.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{快速决策表}{328}{Item.327}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {13.9}小波光滑}{328}{section.13.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.9.1}核心思想：时间-频率定位}{328}{subsection.13.9.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.9.2}多分辨率分析}{328}{subsection.13.9.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {13.9}{\ignorespaces Haar 和 symmlet 族在不同平移和尺度下的小波函数。函数已缩放以适配显示。来源：ESL Figure 5.16。}}{329}{figure.caption.16}\protected@file@percent }
+\newlabel{fig:wavelets}{{13.9}{329}{Haar 和 symmlet 族在不同平移和尺度下的小波函数。函数已缩放以适配显示。来源：ESL Figure 5.16。}{figure.caption.16}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.9.3}小波变换的数学定义}{329}{subsection.13.9.3}\protected@file@percent }
+\newlabel{eq:wavelet_basis}{{13.20}{329}{小波变换的数学定义}{equation.13.9.20}{}}
+\newlabel{eq:dwt}{{13.21}{330}{小波变换的数学定义}{equation.13.9.21}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.9.4}自适应小波阈值 (Wavelet Shrinkage)}{330}{subsection.13.9.4}\protected@file@percent }
+\newlabel{eq:soft_threshold}{{13.22}{330}{自适应小波阈值 (Wavelet Shrinkage)}{equation.13.9.22}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {13.9.5}小波 vs 光滑样条（图 5.19）}{330}{subsection.13.9.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {13.10}{\ignorespaces 上图：NMR 信号（黑）与小波收缩后信号（绿）叠绘。左下：使用 symmlet-8 基的原始信号小波变换系数（$V_0$ 至 $V_4$），竖条高度 = 系数值（正/负）。右下：经 S-PLUS 的 SureShrink 方法收缩后的小波系数——大部分噪声尺度的系数被阈值化为零，仅保留显著突起。来源：ESL Figure 5.17。}}{331}{figure.caption.17}\protected@file@percent }
+\newlabel{fig:nmr_wavelet}{{13.10}{331}{上图：NMR 信号（黑）与小波收缩后信号（绿）叠绘。左下：使用 symmlet-8 基的原始信号小波变换系数（$V_0$ 至 $V_4$），竖条高度 = 系数值（正/负）。右下：经 S-PLUS 的 SureShrink 方法收缩后的小波系数——大部分噪声尺度的系数被阈值化为零，仅保留显著突起。来源：ESL Figure 5.17。}{figure.caption.17}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13.11}{\ignorespaces 小波光滑与光滑样条的对比（两例）。每面板对比 SURE-shrunk 小波拟合（实线）与交叉验证光滑样条拟合（虚线）。左：NMR 尖峰信号——小波精确定位尖峰，样条为捕捉尖峰产生额外波动。右：光滑信号——样条以更少有效参数获得相近拟合，小波因自适应性付出方差代价。来源：ESL Figure 5.19。}}{332}{figure.caption.18}\protected@file@percent }
+\newlabel{fig:wavelet_vs_spline}{{13.11}{332}{小波光滑与光滑样条的对比（两例）。每面板对比 SURE-shrunk 小波拟合（实线）与交叉验证光滑样条拟合（虚线）。左：NMR 尖峰信号——小波精确定位尖峰，样条为捕捉尖峰产生额外波动。右：光滑信号——样条以更少有效参数获得相近拟合，小波因自适应性付出方差代价。来源：ESL Figure 5.19。}{figure.caption.18}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {13.10}本章小结}{333}{section.13.10}\protected@file@percent }
+\gdef \@abspage@last{334}

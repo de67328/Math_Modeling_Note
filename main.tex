@@ -38,9 +38,21 @@
 \newtheorem{remark}{注记}[chapter]
 \newtheorem{example}{例}[chapter]
 
+% ---------- Q&A 环境 ----------
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable,skins}
+\newtcolorbox{qa}{
+    colback=gray!5,
+    colframe=gray!40,
+    left=4mm, right=4mm, top=2mm, bottom=2mm,
+    breakable,
+    before skip=8pt, after skip=8pt,
+}
+
 % ---------- 自定义命令 ----------
 \newcommand{\R}{\mathbb{R}}           % 实数集
 \newcommand{\N}{\mathbb{N}}           % 自然数集
+\newcommand{\Z}{\mathbb{Z}}           % 整数集
 \newcommand{\E}{\mathbb{E}}           % 期望
 \newcommand{\Var}{\mathrm{Var}}       % 方差
 \newcommand{\Cov}{\mathrm{Cov}}       % 协方差

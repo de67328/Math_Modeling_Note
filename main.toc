@@ -561,63 +561,78 @@
 \contentsline {section}{\numberline {12.11}本章小结}{291}{section.12.11}%
 \contentsline {chapter}{\numberline {第十三章\hspace {.3em}}基展开与正则化}{293}{chapter.13}%
 \contentsline {section}{\numberline {13.1}引言}{293}{section.13.1}%
-\contentsline {subsection}{\numberline {13.1.1}核心思想：变换输入空间}{293}{subsection.13.1.1}%
-\contentsline {subsection}{\numberline {13.1.2}常见基函数示例}{293}{subsection.13.1.2}%
-\contentsline {subsection}{\numberline {13.1.3}复杂度的控制}{294}{subsection.13.1.3}%
-\contentsline {section}{\numberline {13.2}分段多项式与样条}{294}{section.13.2}%
-\contentsline {subsection}{\numberline {13.2.1}分段常数与分段线性}{294}{subsection.13.2.1}%
-\contentsline {subsection}{\numberline {13.2.2}截断幂基}{294}{subsection.13.2.2}%
-\contentsline {subsection}{\numberline {13.2.3}三次样条 (Cubic Spline)}{296}{subsection.13.2.3}%
-\contentsline {subsection}{\numberline {13.2.4}一般阶样条}{296}{subsection.13.2.4}%
-\contentsline {subsection}{\numberline {13.2.5}节点选择}{298}{subsection.13.2.5}%
-\contentsline {subsubsection}{R 中的实现}{298}{subsection.13.2.5}%
-\contentsline {subsubsection}{实践中节点位置怎么选？}{299}{subsection.13.2.5}%
-\contentsline {subsubsection}{分位数放置是最优的吗？}{299}{subsection.13.2.5}%
-\contentsline {subsection}{\numberline {13.2.6}样条方法概览}{300}{subsection.13.2.6}%
-\contentsline {subsection}{\numberline {13.2.7}示例：南非心脏病数据（续）}{300}{subsection.13.2.7}%
-\contentsline {subsubsection}{问题设定}{300}{subsection.13.2.7}%
-\contentsline {subsubsection}{第一步：线性 Logistic 回归 → 确定谁不显著}{301}{subsection.13.2.7}%
-\contentsline {subsubsection}{第二步：改用自然样条 → 允许非线性效应}{301}{subsection.13.2.7}%
-\contentsline {subsubsection}{第三步：模型选择与最终结果}{301}{equation.13.2.5}%
-\contentsline {subsubsection}{关键发现与解释}{304}{figure.caption.11}%
-\contentsline {subsubsection}{数学推导：$\hat {f}_{\mathrm {sbp}}(x)$ 如何计算}{304}{figure.caption.11}%
-\contentsline {subsubsection}{标准误 (Standard Error) 的定义}{305}{figure.caption.11}%
-\contentsline {subsubsection}{训练与画图的时序}{305}{figure.caption.11}%
-\contentsline {subsection}{\numberline {13.2.8}示例：音素识别}{305}{subsection.13.2.8}%
-\contentsline {section}{\numberline {13.3}滤波与特征提取}{306}{section.13.3}%
-\contentsline {section}{\numberline {13.4}光滑样条}{307}{section.13.4}%
-\contentsline {subsection}{\numberline {13.4.1}惩罚残差平方和}{307}{subsection.13.4.1}%
-\contentsline {subsection}{\numberline {13.4.2}有限维解}{307}{subsection.13.4.2}%
-\contentsline {subsection}{\numberline {13.4.3}完整示例：光滑样条的符号化流程}{308}{subsection.13.4.3}%
-\contentsline {subsubsection}{给定}{308}{subsection.13.4.3}%
-\contentsline {subsubsection}{Step 1——选择光滑参数 $\lambda $（或等价地 $\mathrm {df}_\lambda $）}{308}{subsection.13.4.3}%
-\contentsline {subsubsection}{Step 2——构造自然三次样条基矩阵}{309}{subsection.13.4.3}%
-\contentsline {subsubsection}{Step 3——构造惩罚矩阵}{309}{subsection.13.4.3}%
-\contentsline {subsubsection}{Step 4——求解广义岭回归}{309}{subsection.13.4.3}%
-\contentsline {subsubsection}{Step 5——在新点 $x_0$ 处预测}{309}{subsection.13.4.3}%
-\contentsline {subsubsection}{Step 6——复杂度与 $\lambda $ 的选择}{309}{subsection.13.4.3}%
-\contentsline {subsubsection}{与回归样条的操作对比}{310}{subsection.13.4.3}%
-\contentsline {subsection}{\numberline {13.4.4}自由度与光滑矩阵}{310}{subsection.13.4.4}%
-\contentsline {subsubsection}{光滑矩阵 $\mathbf {S}_\lambda $}{310}{subsection.13.4.4}%
-\contentsline {subsubsection}{投影光滑器 vs 收缩光滑器}{310}{equation.13.4.9}%
-\contentsline {subsubsection}{光滑样条的自由度}{310}{equation.13.4.9}%
-\contentsline {subsubsection}{特征分解}{311}{equation.13.4.10}%
-\contentsline {subsubsection}{等价核——光滑样条的局部性}{311}{equation.13.4.10}%
-\contentsline {section}{\numberline {13.5}光滑参数的自动选择}{313}{section.13.5}%
-\contentsline {subsection}{\numberline {13.5.1}用有效自由度参数化}{313}{subsection.13.5.1}%
-\contentsline {subsection}{\numberline {13.5.2}偏差-方差权衡}{313}{subsection.13.5.2}%
-\contentsline {subsection}{\numberline {13.5.3}交叉验证 (CV)}{313}{subsection.13.5.3}%
-\contentsline {section}{\numberline {13.6}非参数 Logistic 回归}{315}{section.13.6}%
-\contentsline {section}{\numberline {13.7}多维样条}{315}{section.13.7}%
-\contentsline {subsection}{\numberline {13.7.1}张量积基}{316}{subsection.13.7.1}%
-\contentsline {subsection}{\numberline {13.7.2}薄板样条 (Thin-Plate Splines)}{316}{subsection.13.7.2}%
-\contentsline {subsection}{\numberline {13.7.3}加性样条与 ANOVA 分解}{316}{subsection.13.7.3}%
-\contentsline {section}{\numberline {13.8}正则化与再生核 Hilbert 空间 (RKHS)}{317}{section.13.8}%
-\contentsline {subsection}{\numberline {13.8.1}一般形式}{317}{subsection.13.8.1}%
-\contentsline {subsection}{\numberline {13.8.2}RKHS 与核方法}{317}{subsection.13.8.2}%
-\contentsline {subsection}{\numberline {13.8.3}实例}{318}{subsection.13.8.3}%
-\contentsline {section}{\numberline {13.9}小波光滑}{318}{section.13.9}%
-\contentsline {subsection}{\numberline {13.9.1}核心思想：时间-频率定位}{318}{subsection.13.9.1}%
-\contentsline {subsection}{\numberline {13.9.2}多分辨率分析}{318}{subsection.13.9.2}%
-\contentsline {subsection}{\numberline {13.9.3}自适应小波阈值 (Wavelet Shrinkage)}{319}{subsection.13.9.3}%
-\contentsline {subsection}{\numberline {13.9.4}小波 vs 光滑样条（图 5.17, 5.19）}{319}{subsection.13.9.4}%
+\contentsline {subsection}{\numberline {13.1.1}两种突破线性的思路：参数化 vs 非参数化}{293}{subsection.13.1.1}%
+\contentsline {subsection}{\numberline {13.1.2}核心思想：变换输入空间}{294}{subsection.13.1.2}%
+\contentsline {subsection}{\numberline {13.1.3}常见基函数示例}{294}{subsection.13.1.3}%
+\contentsline {subsection}{\numberline {13.1.4}复杂度的控制}{294}{subsection.13.1.4}%
+\contentsline {section}{\numberline {13.2}分段多项式与样条}{295}{section.13.2}%
+\contentsline {subsection}{\numberline {13.2.1}分段常数与分段线性}{295}{subsection.13.2.1}%
+\contentsline {subsection}{\numberline {13.2.2}截断幂基}{295}{subsection.13.2.2}%
+\contentsline {subsection}{\numberline {13.2.3}三次样条 (Cubic Spline)}{297}{subsection.13.2.3}%
+\contentsline {subsection}{\numberline {13.2.4}一般阶样条}{297}{subsection.13.2.4}%
+\contentsline {subsection}{\numberline {13.2.5}节点选择}{299}{subsection.13.2.5}%
+\contentsline {subsubsection}{R 中的实现}{299}{subsection.13.2.5}%
+\contentsline {subsubsection}{实践中节点位置怎么选？}{300}{subsection.13.2.5}%
+\contentsline {subsubsection}{分位数放置是最优的吗？}{300}{subsection.13.2.5}%
+\contentsline {subsection}{\numberline {13.2.6}自然三次样条}{301}{subsection.13.2.6}%
+\contentsline {subsubsection}{为什么边界外是线性的？}{301}{equation.13.2.4}%
+\contentsline {subsubsection}{基函数构造示例（$K=5$）}{302}{equation.13.2.4}%
+\contentsline {subsection}{\numberline {13.2.7}样条方法概览}{302}{subsection.13.2.7}%
+\contentsline {subsection}{\numberline {13.2.8}示例：南非心脏病数据（续）}{303}{subsection.13.2.8}%
+\contentsline {subsubsection}{问题设定}{303}{subsection.13.2.8}%
+\contentsline {subsubsection}{第一步：线性 Logistic 回归 → 确定谁不显著}{303}{subsection.13.2.8}%
+\contentsline {subsubsection}{第二步：改用自然样条 → 允许非线性效应}{304}{subsection.13.2.8}%
+\contentsline {subsubsection}{第三步：模型选择与最终结果}{304}{equation.13.2.5}%
+\contentsline {subsubsection}{关键发现与解释}{306}{figure.caption.11}%
+\contentsline {subsubsection}{数学推导：$\hat {f}_{\mathrm {sbp}}(x)$ 如何计算}{307}{figure.caption.11}%
+\contentsline {subsubsection}{标准误 (Standard Error) 的定义}{307}{figure.caption.11}%
+\contentsline {subsubsection}{训练与画图的时序}{308}{figure.caption.11}%
+\contentsline {subsection}{\numberline {13.2.9}示例：音素识别}{308}{subsection.13.2.9}%
+\contentsline {section}{\numberline {13.3}滤波与特征提取}{309}{section.13.3}%
+\contentsline {section}{\numberline {13.4}光滑样条}{309}{section.13.4}%
+\contentsline {subsection}{\numberline {13.4.1}惩罚残差平方和}{310}{subsection.13.4.1}%
+\contentsline {subsection}{\numberline {13.4.2}有限维解}{310}{subsection.13.4.2}%
+\contentsline {subsection}{\numberline {13.4.3}完整示例：光滑样条的符号化流程}{311}{subsection.13.4.3}%
+\contentsline {subsubsection}{给定}{311}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 1——选择光滑参数 $\lambda $（或等价地 $\mathrm {df}_\lambda $）}{311}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 2——构造自然三次样条基矩阵}{311}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 3——构造惩罚矩阵}{311}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 4——求解广义岭回归}{312}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 5——在新点 $x_0$ 处预测}{312}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 6——复杂度与 $\lambda $ 的选择}{312}{subsection.13.4.3}%
+\contentsline {subsubsection}{与回归样条的操作对比}{312}{subsection.13.4.3}%
+\contentsline {subsection}{\numberline {13.4.4}自由度与光滑矩阵}{313}{subsection.13.4.4}%
+\contentsline {subsubsection}{光滑矩阵 $\mathbf {S}_\lambda $}{313}{subsection.13.4.4}%
+\contentsline {subsubsection}{投影光滑器 vs 收缩光滑器}{313}{equation.13.4.9}%
+\contentsline {subsubsection}{光滑样条的自由度}{313}{equation.13.4.9}%
+\contentsline {subsubsection}{特征分解}{313}{equation.13.4.10}%
+\contentsline {subsubsection}{等价核——光滑样条的局部性}{314}{equation.13.4.10}%
+\contentsline {section}{\numberline {13.5}光滑参数的自动选择}{314}{section.13.5}%
+\contentsline {subsection}{\numberline {13.5.1}用有效自由度参数化}{314}{subsection.13.5.1}%
+\contentsline {subsection}{\numberline {13.5.2}偏差-方差权衡}{314}{subsection.13.5.2}%
+\contentsline {subsection}{\numberline {13.5.3}交叉验证 (CV)}{317}{subsection.13.5.3}%
+\contentsline {section}{\numberline {13.6}非参数 Logistic 回归}{317}{section.13.6}%
+\contentsline {section}{\numberline {13.7}多维样条}{318}{section.13.7}%
+\contentsline {subsection}{\numberline {13.7.1}张量积基}{318}{subsection.13.7.1}%
+\contentsline {subsection}{\numberline {13.7.2}薄板样条 (Thin-Plate Splines)}{321}{subsection.13.7.2}%
+\contentsline {subsection}{\numberline {13.7.3}加性样条与 ANOVA 分解}{321}{subsection.13.7.3}%
+\contentsline {subsection}{\numberline {13.7.4}小结：从一维到多维的选择路线}{322}{subsection.13.7.4}%
+\contentsline {section}{\numberline {13.8}正则化与再生核 Hilbert 空间 (RKHS)}{322}{section.13.8}%
+\contentsline {subsection}{\numberline {13.8.1}一般形式}{322}{subsection.13.8.1}%
+\contentsline {subsection}{\numberline {13.8.2}RKHS 与核方法}{323}{subsection.13.8.2}%
+\contentsline {subsubsection}{正定核}{323}{subsection.13.8.2}%
+\contentsline {subsubsection}{再生核 Hilbert 空间 (RKHS)}{323}{equation.13.8.16}%
+\contentsline {subsubsection}{表示定理如何导出 $\bm {\alpha }$ 的解}{324}{equation.13.8.17}%
+\contentsline {subsection}{\numberline {13.8.3}实例}{326}{subsection.13.8.3}%
+\contentsline {subsection}{\numberline {13.8.4}实践指南：何时使用核方法}{326}{subsection.13.8.4}%
+\contentsline {subsubsection}{核方法的理想适用场景}{326}{subsection.13.8.4}%
+\contentsline {subsubsection}{何时不应使用核方法}{327}{subsection.13.8.4}%
+\contentsline {subsubsection}{EDA 中值得注意的信号}{327}{subsection.13.8.4}%
+\contentsline {subsubsection}{快速决策表}{328}{Item.327}%
+\contentsline {section}{\numberline {13.9}小波光滑}{328}{section.13.9}%
+\contentsline {subsection}{\numberline {13.9.1}核心思想：时间-频率定位}{328}{subsection.13.9.1}%
+\contentsline {subsection}{\numberline {13.9.2}多分辨率分析}{328}{subsection.13.9.2}%
+\contentsline {subsection}{\numberline {13.9.3}小波变换的数学定义}{329}{subsection.13.9.3}%
+\contentsline {subsection}{\numberline {13.9.4}自适应小波阈值 (Wavelet Shrinkage)}{330}{subsection.13.9.4}%
+\contentsline {subsection}{\numberline {13.9.5}小波 vs 光滑样条（图 5.19）}{330}{subsection.13.9.5}%
+\contentsline {section}{\numberline {13.10}本章小结}{333}{section.13.10}%

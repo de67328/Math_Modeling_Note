@@ -7,6 +7,16 @@
 
 本章讨论突破线性局限的核心方法。
 
+\subsection{两种突破线性的思路：参数化 vs 非参数化}
+
+面对「$f(X)$ 不是线性的」这个问题，存在两条建模路线：
+
+\textbf{参数化路线（变换—验证）}：用领域知识或探索性分析猜测一个具体的变换形式——$h(X)=\log X,\;\sqrt{X},\;X^2,\ldots$——然后在新变量上做线性拟合。例如，若猜测血压与剂量的对数成正比，则拟合 $\text{BP} = \beta_0 + \beta_1 \log(\text{dose})$。这种做法的优势在于解释性强、参数量少（低方差），但风险是：一旦猜错了 $h$ 的形式，模型就是错的（高偏差）。
+
+\textbf{非参数化路线（基展开—让数据说话）}：不对 $f$ 的形状做具体假设，而是用一组足够丰富的基函数 $\{h_m(X)\}$ 的线性组合去自适应逼近。样条、核方法、小波、神经网络均属此类。优势在于灵活——几乎任何光滑函数都能被逼近；代价是使用了更多参数（高方差风险），需要复杂度控制（本章核心主题）。
+
+实践中二者并非互斥。在低维问题中，现代做法（如广义可加模型 GAM）倾向于对每个变量单独使用非参数光滑（如样条），同时保持可加结构 $\sum_j f_j(X_j)$——相当于「结构参数化、形状非参数化」的折中方案。本章重点介绍非参数化路线中的基展开与正则化方法。
+
 \subsection{核心思想：变换输入空间}
 
 用 $X$ 的变换 $h_m(X) : \R^p \to \R$（$m = 1,\ldots,M$）替代或增广原始输入，然后在这些\textbf{派生特征}的新空间中继续使用线性模型：
@@ -33,6 +43,18 @@
     \item \textbf{选择法}：自适应扫描字典，仅包含对拟合有显著贡献的基函数（CART、MARS、boosting 走这条路）；
     \item \textbf{正则化法}：使用整个字典但限制系数（Ridge、Lasso 属于此类）。
 \end{itemize}
+
+\begin{qa}
+\textbf{Q：基展开到底是一种什么方法？是给出很多基函数的通用方法吗？}
+
+基展开不是一种具体的"生成基"的方法，而是一种\textbf{建模框架/范式}：把原始输入 $X$ 通过基函数 $h_m(X)$ 变换到派生特征空间，然后在这个新空间里用线性模型 $\sum \beta_m h_m(X)$ 去拟合。之所以叫"展开"（expansion），是因为把原本只有 $p$ 维的输入空间"撑开"成一个更大的 $M$ 维空间——在这个高维空间里，原本非线性的关系变得（近似）线性了。
+
+类比线性代数：一组基向量通过线性组合可以张成向量空间；这里一组基函数通过线性组合可以逼近很宽泛的一类函数。基展开本身只是一个\textbf{容器}——它统一了后面几乎所有非参数方法的视角：样条是手工设计基函数 + 限制数量，平滑样条是每个点放一个基 + 正则化，CART/MARS 是自适应选择基，boosting 是自适应学习基。
+
+\textbf{Q：为什么说字典 $\mathcal{D}$ 通常包含大量基函数——远超负担得起的数量？}
+
+这是刻意为之的：字典必须足够大才能灵活逼近任意的 $f(X)$，否则能表示的函数类太窄。例如多项式基中 $p$ 个变量 $d$ 次就有 $O(p^d)$ 个项，样条网格上有 $K^p$ 个项，核基可以在每个训练点放一个。但数据量 $N$ 是有限的——$M \gg N$ 时全用上必然过拟合，这就是"远超负担得起"的含义（"负担"指在有限数据下稳定拟合的能力）。所以整章的逻辑链是：要灵活 → 字典必须大 → 但数据有限 → 需要复杂度控制（限制/选择/正则化）。字典大不是失误，而是这个框架要解决的核心张力。
+\end{qa}
 
 
 % ============ §5.2 分段多项式与样条 ============
@@ -216,6 +238,8 @@ df 越大 → 节点越多 → 模型越灵活 → 偏差↓、方差↑。通�
 
 实践结论：\textbf{没人手动调节点位置。}标准做法是用 \texttt{bs(x, df=k)}，$k$ 由 CV 决定，分位数自动放置节点。这套组合虽非数学最优，但在偏差-方差权衡下统计上稳健。真正花精力搜索最优节点的方法反而不如大量节点 + 惩罚（光滑样条，§5.4）实用。
 
+\subsection{自然三次样条}
+
 标准三次样条在边界区域方差爆增（图 5.3）。\textbf{自然三次样条}添加额外约束：函数在边界节点之外是\textbf{线性的}。这释放了 4 个自由度（两个边界区域各两个约束），可重新分配到内部区域增加节点。
 
 带 $K$ 个节点的自然三次样条由 $K$ 个基函数表示。从截断幂基出发施加边界约束，可得基函数（习题 5.4）：
@@ -229,6 +253,73 @@ d_k(X) = \frac{(X - \xi_k)_+^3 - (X - \xi_K)_+^3}{\xi_K - \xi_k}.
 每个基函数在 $X \ge \xi_K$ 处二阶和三阶导数均为零。
 
 \textbf{权衡}：边界附近偏差略有增加（假设函数在边界处近似线性通常是合理的），但方差大幅降低。
+
+\subsubsection{为什么边界外是线性的？}
+
+这里的「边界」指最外层节点 $\xi_1$ 和 $\xi_K$，而非数据的最值点。自然样条的线性约束作用于两个区域：$X < \xi_1$（最左节点以左）和 $X > \xi_K$（最右节点以右）。
+
+\textbf{左侧边界外}（$X < \xi_1$）。此时对所有 $j=1,\ldots,K$，$(X-\xi_j)_+ = 0$（截断幂函数尚未「打开」），故 $d_k(X) = 0$。于是 $N_{k+2}(X) = 0 - 0 = 0$，仅剩下 $N_1(X)=1$ 和 $N_2(X)=X$：
+\[
+f(X) = \beta_1 \cdot 1 + \beta_2 \cdot X = \beta_1 + \beta_2 X,
+\]
+是严格的线性函数。
+
+\textbf{右侧边界外}（$X > \xi_K$）。此时所有截断都开着，$(X-\xi_j)_+ = X - \xi_j$。代入 $d_k(X)$：
+\begin{align*}
+d_k(X) &= \frac{(X - \xi_k)^3 - (X - \xi_K)^3}{\xi_K - \xi_k}
+      = \frac{1}{\xi_K - \xi_k}\Big[(X^3 - 3X^2\xi_k + 3X\xi_k^2 - \xi_k^3) \\
+      &\qquad\qquad\qquad\; - (X^3 - 3X^2\xi_K + 3X\xi_K^2 - \xi_K^3)\Big] \\
+      &= \frac{1}{\xi_K - \xi_k}\Big[3X^2(\xi_K - \xi_k) - 3X(\xi_K^2 - \xi_k^2) + (\xi_K^3 - \xi_k^3)\Big] \\
+      &= 3X^2 - 3X(\xi_K + \xi_k) + (\xi_K^2 + \xi_K\xi_k + \xi_k^2).
+\end{align*}
+可见 $d_k(X)$ 在 $X > \xi_K$ 时是 $X$ 的\textbf{二次函数}，且 $X^2$ 的系数始终为 $3$，与 $k$ 无关。
+
+现在考虑 $N_{k+2}(X) = d_k(X) - d_{K-1}(X)$。因为 $d_k$ 和 $d_{K-1}$ 的 $X^2$ 系数都是 $3$，相减时恰好消掉：
+\begin{align*}
+N_{k+2}(X) &= [3X^2 - 3X(\xi_K + \xi_k) + \cdots] - [3X^2 - 3X(\xi_K + \xi_{K-1}) + \cdots] \\
+           &= 3X(\xi_{K-1} - \xi_k) + \text{常数},
+\end{align*}
+剩下的是 $X$ 的\textbf{一次函数}（线性）。加上 $N_1=1$（常数）和 $N_2=X$（线性），所有基函数在 $X > \xi_K$ 时都是线性的，因此 $f(X) = \sum \beta_m N_m(X)$ 也是线性的，且二阶、三阶导数均为零。
+
+\textbf{一句话总结}：线性外推不是拟合后施加的额外约束，而是\textbf{基函数本身内建的性质}——$d_k - d_{K-1}$ 的设计故意消掉了 $X^3$ 和 $X^2$ 项。
+
+\subsubsection{基函数构造示例（$K=5$）}
+
+以 $\xi = [0, 1, 2, 3, 4]$（$K=5$）为例，逐步构造 $N_1,\ldots,N_5$。
+
+\textbf{Step 1——前两个基函数始终不变}：
+\[
+N_1(X) = 1,\qquad N_2(X) = X.
+\]
+
+\textbf{Step 2——计算 $d_k(X)$，$k=1,2,3,4$}（分母用 $\xi_K = \xi_5 = 4$）：
+\begin{align*}
+d_1(X) &= \frac{(X-0)_+^3 - (X-4)_+^3}{4 - 0}
+        = \frac{(X)_+^3 - (X-4)_+^3}{4},\\[4pt]
+d_2(X) &= \frac{(X-1)_+^3 - (X-4)_+^3}{4 - 1}
+        = \frac{(X-1)_+^3 - (X-4)_+^3}{3},\\[4pt]
+d_3(X) &= \frac{(X-2)_+^3 - (X-4)_+^3}{4 - 2}
+        = \frac{(X-2)_+^3 - (X-4)_+^3}{2},\\[4pt]
+d_4(X) &= \frac{(X-3)_+^3 - (X-4)_+^3}{4 - 3}
+        = (X-3)_+^3 - (X-4)_+^3.
+\end{align*}
+
+\textbf{Step 3——以 $d_{K-1}=d_4$ 为基准，构造 $N_3,N_4,N_5$}：
+\[
+N_3(X) = d_1(X) - d_4(X),\quad
+N_4(X) = d_2(X) - d_4(X),\quad
+N_5(X) = d_3(X) - d_4(X).
+\]
+
+\textbf{直观理解}：$d_4$ 充当「基准函数」，每个 $N_{k+2}$ 是「第 $k$ 个节点的贡献减去基准贡献」。这个减法有两个目的：(i) 保证边界外的线性性（消去高阶项）；(ii) 使得基函数之间在节点密度和位置变化时保持数值稳定性。在实践中，$d_{K-1}$ 的选择并非唯一——任何 $d_j$ 都可以充当基准，但 ESL 选择 $d_{K-1}$ 是约定俗成。
+
+\textbf{验证}：取 $X=5,6,7$（均在 $\xi_5=4$ 右侧），计算 $N_3$ 的一阶差分——若为常数则 $N_3$ 是线性的：
+\begin{align*}
+N_3(5) &= d_1(5) - d_4(5),\quad
+N_3(6) = d_1(6) - d_4(6),\quad
+N_3(7) = d_1(7) - d_4(7),\\
+\implies N_3(6)-N_3(5) &= N_3(7)-N_3(6).\quad\text{（一阶差分为常数 → 线性无误）}
+\end{align*}
 
 \subsection{样条方法概览}
 
@@ -792,11 +883,26 @@ $\lambda$ 的实际选择通过最小化 CV 得分：
 \[
 g(X) = \sum_{j=1}^{M_1}\sum_{k=1}^{M_2} \theta_{jk}\,g_{jk}(X).
 \]
-图 5.10 展示了使用 B-样条的张量积基。系数由最小二乘拟合。
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{Chapters/pic/ch_基展开和正则化/figure_5_10.png}
+\caption{B-样条的张量积基。选取了部分代表性函数对，每个二维函数是对应一维边缘基函数的张量积。来源：ESL Figure 5.10。}
+\label{fig:tensor_product_basis}
+\end{figure}
+
+系数由最小二乘拟合。
 
 \textbf{可推广到 $d$ 维}，但基的维度指数增长——\textbf{维数灾难的又一个表现}。MARS（§9.4）使用贪心前向算法仅包含最小二乘认为必要的张量积项。
 
 \textbf{加性 vs 张量积}：图 5.11 比较了二维分类问题上两者的决策边界。加性模型（各自样条相加）捕捉主效应，张量积可拟合更灵活的交互，但可能引入虚假结构。
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{Chapters/pic/ch_基展开和正则化/figure_5_11.png}
+\caption{图 2.1 模拟例子的二维分类。上图：可加 Logistic 回归模型，每维用自然样条（总 df = $1+(4-1)+(4-1)=7$）。下图：每维自然样条基的张量积（总 df = $4\times4=16$）。紫色虚线为 Bayes 决策边界。来源：ESL Figure 5.11。}
+\label{fig:additive_vs_tensor}
+\end{figure}
 
 \subsection{薄板样条 (Thin-Plate Splines)}
 
@@ -840,6 +946,35 @@ f(X) = \alpha + \sum_j f_j(X_j) + \sum_{j<k} f_{jk}(X_j, X_k) + \cdots,
 \]
 每项为相应维数的样条。需做的选择包括：最大交互阶数、包含哪些项、每项使用回归样条还是光滑样条。MARS（§9.4）和 MART（第 10 章）提供了自动化方案。
 
+\subsection{小结：从一维到多维的选择路线}
+
+面对 $d$ 维输入，样条建模有三条路线，对应递增的复杂度与表达力：
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+策略 & 模型形式 & 基函数数 & 能建模的效应 \\
+\midrule
+加性模型      & $\alpha + \sum_{j=1}^{d} f_j(X_j)$                        & $O(dM)$           & 仅主效应 \\
+ANOVA 分解    & $\alpha + \sum_j f_j + \sum_{j<k} f_{jk} + \cdots$       & 递增              & 主效应 + 指定交互 \\
+全张量积      & $\sum_{j,k,\ldots} \theta_{jk\ldots}\,h_{1j}h_{2k}\cdots$ & $O(M^d)$         & 所有效应（维数灾难） \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{实践中何时考虑交互效应？} 一个务实的四步流程：
+
+\begin{enumerate}
+    \item \textbf{领域知识优先}：若物理/生物学机制暗示交互存在（如「药效取决于年龄」），直接加入；
+    \item \textbf{加性拟合后检查残差}：拟合纯加性模型，画残差 vs $(X_j, X_k)$ 的二维散点图或热力图——若出现系统模式（而非随机噪声），提示遗漏了交互；
+    \item \textbf{定量诊断}：使用 Friedman's $H$-statistic 测两个变量间的交互强度——该统计量衡量预测函数偏离纯加性的程度，值越大交互越强（$H^2_{jk} \in [0,1]$，0 表示纯加性）；
+    \item \textbf{交叉验证做最终裁决}：加入候选交互项后，用 CV 检验预测误差是否显著下降——下降则保留，否则剔除（除非解释性有强需求）。
+\end{enumerate}
+
+\textbf{EDA 的局限性}：对于两连续变量的交互，肉眼从散点图中几乎无法察觉——因为交互本质是「$X_1$ 对 $Y$ 的效应如何随 $X_2$ 变化」，这需要条件化思维，通常超出纯 EDA 的能力。MARS 和 boosting 等自适应方法（后续章节）能自动检测并纳入交互，是实践中更可靠的方案。
+
+\textbf{一般原则}：大多数问题中，主效应解释了绝大部分可预测变异——交互是锦上添花，常带来过拟合风险而非实质提升。从加性出发，有证据再加交互。
+
 
 % ============ §5.8 正则化与再生核 Hilbert 空间 ============
 \section{正则化与再生核 Hilbert 空间 (RKHS)}
@@ -862,7 +997,54 @@ f(X) = \sum_{k=1}^{K} \alpha_k \phi_k(X) + \sum_{i=1}^{N} \theta_i G(X - x_i),
 
 \subsection{RKHS 与核方法}
 
-一个重要子类由\textbf{正定核} $K(x, y)$ 生成。相应函数空间 $\mathcal{H}_K$ 称为\textbf{再生核 Hilbert 空间}。设核的特征展开为 $K(x,y) = \sum \gamma_i \phi_i(x)\phi_i(y)$，则范数定义为 $\|f\|_{\mathcal{H}_K}^2 = \sum c_i^2/\gamma_i$，其中 $f = \sum c_i\phi_i$。惩罚取 $J(f) = \|f\|_{\mathcal{H}_K}^2$。
+\subsubsection{正定核}
+
+一个二元函数 $K(\cdot,\cdot): \mathcal{X} \times \mathcal{X} \to \R$ 称为\textbf{正定核}，当且仅当：对任意 $n$ 个点 $\{x_1,\ldots,x_n\} \subset \mathcal{X}$ 和任意实数 $\{c_1,\ldots,c_n\}$，
+\begin{equation}\label{eq:psd_kernel}
+    \sum_{i=1}^{n}\sum_{j=1}^{n} c_i c_j K(x_i, x_j) \ge 0.
+\end{equation}
+等价地，$n \times n$ 的 Gram 矩阵 $\mathbf{K}_{ij} = K(x_i, x_j)$ 对任意 $n$ 和任意点集都是\textbf{半正定}的。
+
+这个条件的几何含义是：$K$ 可以作为某个函数空间的内积。直观上，$K(x,y)$ 度量了 $x$ 和 $y$ 的「相似度」；半正定性保证了这个相似度定义在几何上是自洽的——你无法通过加权组合相似度得到负值。
+
+常见正定核示例：
+\begin{itemize}
+    \item \textbf{线性核}：$K(x,y) = x^\top y$，对应有限维内积空间，生成的函数类为线性函数；
+    \item \textbf{多项式核}：$K(x,y) = (x^\top y + 1)^d$，对应 $\binom{p+d}{d}$ 维特征空间，生成的函数类为 $d$ 次多项式；
+    \item \textbf{高斯核 (RBF)}：$K(x,y) = e^{-\nu\|x-y\|^2}$，对应无限维特征空间，生成的函数类为任意光滑函数（$\nu$ 越大 $\to$ 越局部 $\to$ 有效维数越高）。
+\end{itemize}
+
+\subsubsection{再生核 Hilbert 空间 (RKHS)}
+
+给定正定核 $K$，其对应的函数空间 $\mathcal{H}_K$ 按如下方式构造：
+
+\textbf{Step 1——构造稠密子集}。把核固定在每个训练点 $x_i$ 上，得到单变量函数 $K(\cdot, x_i)$。这些函数的有限线性组合：
+\[
+f(x) = \sum_{i=1}^{n} \alpha_i K(x, x_i)
+\]
+构成了 $\mathcal{H}_K$ 的一个稠密子集——即任何属于 $\mathcal{H}_K$ 的函数都可以用这种形式的函数序列去逼近。
+
+\textbf{Step 2——定义内积}。在该稠密子集上定义内积：
+\[
+\big\langle \sum\nolimits_i \alpha_i K(\cdot, x_i),\;
+             \sum\nolimits_j \beta_j K(\cdot, y_j) \big\rangle_{\mathcal{H}_K}
+   = \sum_i \sum_j \alpha_i \beta_j\,K(x_i, y_j).
+\]
+注意两个核函数的内积恰好是核本身的值——这是 RKHS 构造的精妙之处。
+
+\textbf{Step 3——完备化}。取该内积空间在 Cauchy 列意义下的完备化，得到真正的 Hilbert 空间 $\mathcal{H}_K$——其范数由内积自然诱导：$\|f\|_{\mathcal{H}_K}^2 = \langle f, f\rangle_{\mathcal{H}_K}$。
+
+\textbf{再生性 (Reproducing Property)}——RKHS 得名的关键性质：
+\begin{equation}\label{eq:reproducing}
+    \boxed{f(x) = \big\langle f,\; K(\cdot, x) \big\rangle_{\mathcal{H}_K}, \qquad \forall x \in \mathcal{X},\; \forall f \in \mathcal{H}_K.}
+\end{equation}
+函数 $f$ 在任意点 $x$ 处的\textbf{求值操作}等价于 $f$ 与「以 $x$ 为中心的核」做\textbf{内积}。换言之，求值泛函在 RKHS 中是连续的——这是普通 Hilbert 空间（如 $L^2$）不具备的性质，也是 RKHS 能支撑「无穷维优化 $\Rightarrow$ 有限维问题」这一魔法的基础。
+
+\textbf{范数的含义}。回头再看特征展开视角——设核有特征分解 $K(x,y) = \sum_{m=1}^{\infty} \gamma_m \phi_m(x)\phi_m(y)$（Mercer 定理），则任意 $f \in \mathcal{H}_K$ 可展开为 $f = \sum_{m} c_m \phi_m$，且
+\[
+\|f\|_{\mathcal{H}_K}^2 = \sum_{m=1}^{\infty} \frac{c_m^2}{\gamma_m}.
+\]
+这意味着：若 $\gamma_m$ 随 $m$ 增大而快速衰减（如高斯核），则函数在高频方向的分量 $c_m$ 被赋予极大的范数惩罚——RKHS 范数天然偏好「低频」（光滑）函数。这正是 $\lambda \|f\|_{\mathcal{H}_K}^2$ 作为正则化项的内在机理。
 
 \textbf{表示定理 (Representer Theorem)}：问题
 \[
@@ -873,6 +1055,74 @@ f(X) = \sum_{k=1}^{K} \alpha_k \phi_k(X) + \sum_{i=1}^{N} \theta_i G(X - x_i),
 \boxed{f(x) = \sum_{i=1}^{N} \alpha_i K(x, x_i)}.
 \]
 且 $J(f) = \boldsymbol{\alpha}^\top \mathbf{K} \boldsymbol{\alpha}$（$\mathbf{K}_{ij} = K(x_i, x_j)$）。无穷维优化 $\Rightarrow$ $N$ 维问题 $\min_{\boldsymbol{\alpha}} L(\mathbf{y}, \mathbf{K}\boldsymbol{\alpha}) + \lambda \boldsymbol{\alpha}^\top\mathbf{K}\boldsymbol{\alpha}$。
+
+\subsubsection{表示定理如何导出 $\boldsymbol{\alpha}$ 的解}
+
+以最重要的特例——平方损失 $L(y_i, f(x_i)) = (y_i - f(x_i))^2$—— 演示从无穷维泛函到有限维解析解的完整推导。
+
+\textbf{Step 1——代入表示定理}。将 $f(x) = \sum_{j=1}^{N} \alpha_j K(x, x_j)$ 代入目标函数的两项。
+
+\textbf{Step 2——化简损失项}。在训练点 $x_i$ 处：
+\[
+f(x_i) = \sum_{j=1}^{N} \alpha_j K(x_i, x_j) = (\mathbf{K}\boldsymbol{\alpha})_i,
+\]
+其中 $\mathbf{K}$ 是 $N \times N$ 的 Gram 矩阵。因此：
+\[
+\sum_{i=1}^{N} \big(y_i - f(x_i)\big)^2 = \|\mathbf{y} - \mathbf{K}\boldsymbol{\alpha}\|_2^2 = (\mathbf{y} - \mathbf{K}\boldsymbol{\alpha})^\top (\mathbf{y} - \mathbf{K}\boldsymbol{\alpha}).
+\]
+
+\textbf{Step 3——化简惩罚项}。由 RKHS 内积的定义：
+\[
+\big\langle K(\cdot, x_i),\; K(\cdot, x_j) \big\rangle_{\mathcal{H}_K} = K(x_i, x_j),
+\]
+可得：
+\[
+\|f\|_{\mathcal{H}_K}^2 = \Big\langle \sum_i \alpha_i K(\cdot, x_i),\;\sum_j \alpha_j K(\cdot, x_j) \Big\rangle_{\mathcal{H}_K}
+= \sum_i \sum_j \alpha_i \alpha_j K(x_i, x_j) = \boldsymbol{\alpha}^\top \mathbf{K} \boldsymbol{\alpha}.
+\]
+
+\textbf{Step 4——化为有限维二次型}。无穷维泛函转化为对 $\boldsymbol{\alpha} \in \R^N$ 的普通无约束二次优化：
+\begin{equation}\label{eq:kernel_ridge_obj}
+    \min_{\boldsymbol{\alpha} \in \R^N} \big\{ (\mathbf{y} - \mathbf{K}\boldsymbol{\alpha})^\top (\mathbf{y} - \mathbf{K}\boldsymbol{\alpha}) + \lambda\,\boldsymbol{\alpha}^\top \mathbf{K} \boldsymbol{\alpha} \big\}.
+\end{equation}
+
+\textbf{Step 5——求导得解析解}。对 $\boldsymbol{\alpha}$ 求梯度（利用 $\mathbf{K}$ 对称）：
+\[
+\frac{\partial}{\partial\boldsymbol{\alpha}} = -2\mathbf{K}(\mathbf{y} - \mathbf{K}\boldsymbol{\alpha}) + 2\lambda \mathbf{K}\boldsymbol{\alpha} = 0
+\;\Longrightarrow\; \mathbf{K}\mathbf{K}\boldsymbol{\alpha} + \lambda\mathbf{K}\boldsymbol{\alpha} = \mathbf{K}\mathbf{y}.
+\]
+对严格正定核（如高斯核、多项式核），$\mathbf{K}$ 可逆，两边左乘 $\mathbf{K}^{-1}$ 即得：
+\begin{equation}\label{eq:kernel_ridge_solution}
+    \boxed{\hat{\boldsymbol{\alpha}} = (\mathbf{K} + \lambda\mathbf{I})^{-1}\,\mathbf{y}.}
+\end{equation}
+
+\textbf{Step 6——预测新点}。对于任意新输入 $x_{\text{new}}$，预测直接在核空间中完成：
+\[
+\hat{f}(x_{\text{new}}) = \sum_{i=1}^{N} \hat{\alpha}_i\,K(x_{\text{new}}, x_i) = \mathbf{k}_{\text{new}}^\top \hat{\boldsymbol{\alpha}},
+\]
+其中 $\mathbf{k}_{\text{new}} = [K(x_{\text{new}}, x_1), \ldots, K(x_{\text{new}}, x_N)]^\top$ 只需 $N$ 次核函数求值。
+
+\textbf{与线性岭回归的平行结构}。核岭回归与线性岭回归在代数上完全对应——唯一的区别是把 $p \times p$ 的 $\mathbf{X}^\top\mathbf{X}$ 换成了 $N \times N$ 的 $\mathbf{K}$：
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+& 线性岭回归 & 核岭回归 \\
+\midrule
+参数空间 & $\boldsymbol{\beta} \in \R^p$ & $\boldsymbol{\alpha} \in \R^N$ \\
+目标 & $\|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|^2 + \lambda\|\boldsymbol{\beta}\|^2$ & $\|\mathbf{y} - \mathbf{K}\boldsymbol{\alpha}\|^2 + \lambda\boldsymbol{\alpha}^\top\mathbf{K}\boldsymbol{\alpha}$ \\
+解析解 & $(\mathbf{X}^\top\mathbf{X} + \lambda\mathbf{I})^{-1}\mathbf{X}^\top\mathbf{y}$ & $(\mathbf{K} + \lambda\mathbf{I})^{-1}\mathbf{y}$ \\
+预测 & $x_{\text{new}}^\top \hat{\boldsymbol{\beta}}$ & $\mathbf{k}_{\text{new}}^\top \hat{\boldsymbol{\alpha}}$ \\
+计算量 & $O(p^3 + p^2 N)$ & $O(N^3)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+核形式的关键优势：计算复杂度与特征维度 $p$ \textbf{完全无关}——即使核隐式映射到无限维空间，实际求解始终是 $N \times N$ 的线性系统。代价是 $O(N^3)$ 对大规模数据不友好，后续章节（如 SVM 的 SMO 算法、高斯过程的稀疏近似）将讨论应对策略。
+
+\textbf{一般损失函数的推广}。若 $L$ 不是平方损失（如分类问题的 hinge loss 或交叉熵），则优化问题
+\[
+\min_{\boldsymbol{\alpha}} L(\mathbf{y}, \mathbf{K}\boldsymbol{\alpha}) + \lambda \boldsymbol{\alpha}^\top\mathbf{K}\boldsymbol{\alpha}
+\]
+通常无闭式解，但可用梯度下降或 Newton 法迭代求解。支持向量机（第 12 章）和核 Logistic 回归（第 4 章）恰是这一框架在不同损失函数下的特例。
 
 \textbf{更一般的分解} $\mathcal{H} = \mathcal{H}_0 \oplus \mathcal{H}_1$：$\mathcal{H}_0$（多项式零空间，不惩罚）$+$ $\mathcal{H}_1$（惩罚空间）。解为 $f(x) = \sum_{j} \beta_j h_j(x) + \sum_{i} \alpha_i K(x, x_i)$。
 
@@ -891,6 +1141,68 @@ f(X) = \sum_{k=1}^{K} \alpha_k \phi_k(X) + \sum_{i=1}^{N} \theta_i G(X - x_i),
 \min_{\alpha_0, \boldsymbol{\alpha}} \sum_{i=1}^{N} [1 - y_i f(x_i)]_+ + \frac{\lambda}{2}\boldsymbol{\alpha}^\top\mathbf{K}\boldsymbol{\alpha},
 \]
 非零 $\hat{\alpha}_i$ 对应的 $x_i$ 即为\textbf{支持向量}。
+
+\subsection{实践指南：何时使用核方法}
+
+核方法并非万能工具。以下从数据规模、特征维度、任务需求三个维度给出实用判断标准。
+
+\subsubsection{核方法的理想适用场景}
+
+以下三个条件\textbf{同时成立}时，核方法通常是最优选择：
+
+\begin{center}
+\begin{tabular}{p{3cm}|p{9cm}}
+\toprule
+条件 & 原因 \\
+\midrule
+$N$ 适中（$10^2 \sim 10^4$） & $O(N^3)$ 的计算量是主要瓶颈。$N > 10^4$ 时需用 Nyström 近似或随机 Fourier 特征，但实践中常被 XGBoost 取代 \\
+\hline
+$p$ 中等（$5 \sim 100$） & $p$ 太大时高斯核的距离在高维中坍塌（维数灾难）；$p$ 很小时（$<5$）样条或 GAM 更简单且可解释 \\
+\hline
+非线性复杂且未知  & 确定存在非线性，但无法用简单参数形式（二次、对数等）捕捉——如生物标记物预测、信用评分、图像像素级分类 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+典型成功案例：$N = 500$，$p = 30$，分类问题中决策边界高度非线性——SVM with RBF 核是标准基线。
+
+\subsubsection{何时不应使用核方法}
+
+\begin{itemize}
+    \item \textbf{大样本（$N > 10^5$）}：$O(N^3)$ 直接不可行。即使采用近似方法，XGBoost / LightGBM / 神经网络通常更快、精度相当或更好。
+    \item \textbf{高维稀疏数据（$p > 10^3$，多数特征为零）}：高维中欧氏距离失去区分力，高斯核退化为近似常数矩阵。此时带 $L_1$ 惩罚的线性模型或稀疏加性模型更实用。
+    \item \textbf{需要强解释性}：$\hat{f}(x) = \sum \alpha_i K(x, x_i)$ 本质是「与训练点的加权相似度」，医生、风控人员等非技术受众通常无法理解。若解释性必需，优先考虑 GAM 或决策树。
+    \item \textbf{特征有明确的物理含义和尺度}：如果已知 $y \approx \log(x_1) + x_2^2$ 这类显式关系，直接做参数化建模比核方法更高效（更少参数、更低方差）。
+\end{itemize}
+
+\subsubsection{EDA 中值得注意的信号}
+
+做探索性分析时，以下模式提示核方法可能优于线性或简单参数模型：
+
+\begin{enumerate}
+    \item \textbf{线性回归残差图有系统结构}：残差 vs 拟合值图呈现 U 形、波浪形或局部团簇，而非均匀随机散布——说明线性模型遗漏了非线性信号；
+    \item \textbf{变量间存在复杂互补性}：$X_1$ 大且 $X_2$ 中等时 $Y$ 才高——这类交互难以用有限阶多项式捕捉，但 RBF 核能自然建模；
+    \item \textbf{样本量和维度落入「甜区」}：$N$ 在数百至数千、$p$ 在数十量级——刚好是参数模型可能欠拟合、深度学习数据不足的交界地带。
+\end{enumerate}
+
+\subsubsection{快速决策表}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+数据画像 & 推荐方法 \\
+\midrule
+$N < 10^3$，$p < 20$，需不确定性量化 & 高斯过程 (GP) / 核岭回归 \\
+$N < 10^4$，$p < 100$，分类任务 & SVM (RBF 核) \\
+$N < 10^4$，$p < 100$，回归任务 & 核岭回归 / Nyström 近似 GP \\
+$N > 10^4$，任意 $p$ & XGBoost / LightGBM / 神经网络 \\
+$p > 500$，$N$ 任意 & 带 $L_1$ 的线性模型 + 特征工程 \\
+$p < 10$，需可解释性 & GAM (样条) / 加性核模型 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{一般原则}：核方法是中等规模非线性问题的首选工具之一，但在大规模数据和强解释性需求面前有明确边界。实践中常作为基线模型——先跑一个 SVM/GP，若性能不够再考虑更复杂的集成方法或深度学习。
 
 
 % ============ §5.9 小波光滑 ============
@@ -922,6 +1234,39 @@ Haar 基简单但不光滑，实践中更常用\textbf{symmlet-p} 族：
     \item 消失矩：$p$ 个（$\int \psi(x)x^j dx = 0,\; j=0,\ldots,p-1$），使 $V_0$ 可精确复现 $p$ 阶多项式——类比光滑样条惩罚的零空间。
 \end{itemize}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{Chapters/pic/ch_基展开和正则化/figure_5_16.png}
+\caption{Haar 和 symmlet 族在不同平移和尺度下的小波函数。函数已缩放以适配显示。来源：ESL Figure 5.16。}
+\label{fig:wavelets}
+\end{figure}
+
+\subsection{小波变换的数学定义}
+
+设母小波 $\psi(x)$ 满足容许条件 $\int \psi(x)dx = 0$。通过\textbf{平移}和\textbf{缩放}生成一族基函数：
+\begin{equation}\label{eq:wavelet_basis}
+    \psi_{j,k}(x) = 2^{j/2}\,\psi(2^{j}x - k), \quad j,k \in \Z,
+\end{equation}
+其中 $j$ 为\textbf{尺度参数}（控制频率：$j$ 越大 $\to$ 基函数越窄 $\to$ 频率越高），$k$ 为\textbf{平移参数}（控制时间位置）。因子 $2^{j/2}$ 保证所有基函数具有相同的 $L^2$ 范数。
+
+\textbf{连续小波变换}。函数 $f(x)$ 在尺度 $j$ 和位置 $k$ 处的小波系数为：
+\[
+    d_{jk} = \int_{-\infty}^{\infty} f(x)\,\psi_{j,k}(x)\,dx = \langle f, \psi_{j,k}\rangle.
+\]
+
+\textbf{离散小波变换 (DWT)}。给定 $N = 2^J$ 个等间距观测 $y_i = f(x_i)$（$i=1,\ldots,N$），存在正交小波基矩阵 $\mathbf{W}$（$N \times N$）使得系数向量 $\mathbf{y}^*$ 和原始信号彼此由线性变换关联：
+\begin{equation}\label{eq:dwt}
+    \mathbf{y}^* = \mathbf{W}^{\top}\mathbf{y} \quad \text{(正变换)}, \qquad
+    \mathbf{y} = \mathbf{W}\mathbf{y}^* \quad \text{(逆变换)}.
+\end{equation}
+$\mathbf{y}^*$ 的前半部分对应粗尺度（低频），后半部分对应细尺度（高频）。正交性 $\mathbf{W}^{\top}\mathbf{W} = \mathbf{I}$ 保证变换可逆且保范数（Parseval 恒等式：$\|\mathbf{y}^*\| = \|\mathbf{y}\|$）。
+
+\textbf{多分辨率结构}。小波系数 $\mathbf{y}^*$ 可按分辨率层级组织：
+\[
+    \mathbf{y}^* = (\underbrace{v_0}_{\text{最粗}}, \underbrace{w_0, w_1, \ldots, w_{J-1}}_{\text{递增分辨率}}),
+\]
+对应空间分解 $V_J = V_0 \oplus W_0 \oplus W_1 \oplus \cdots \oplus W_{J-1}$。$v_0$ 是最粗尺度的逼近，$w_j$ 包含尺度 $2^{-j}$ 的细节信息。
+
 \subsection{自适应小波阈值 (Wavelet Shrinkage)}
 
 对一维离散信号 $\mathbf{y}$（$N=2^J$ 均匀样本），设 $\mathbf{W}$ 为 $N \times N$ 正交小波基矩阵，\textbf{小波变换} $\mathbf{y}^* = \mathbf{W}^\top \mathbf{y}$ 给出每个基上的系数。
@@ -938,7 +1283,14 @@ SURE 收缩（Donoho \& Johnstone, 1994）求解 Lasso 型问题：
 
 逆小波变换 $\hat{\mathbf{f}} = \mathbf{W}\hat{\boldsymbol{\theta}}$ 得光滑后信号。
 
-\subsection{小波 vs 光滑样条（图 5.17, 5.19）}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{Chapters/pic/ch_基展开和正则化/figure_5_17.png}
+\caption{上图：NMR 信号（黑）与小波收缩后信号（绿）叠绘。左下：使用 symmlet-8 基的原始信号小波变换系数（$V_0$ 至 $V_4$），竖条高度 = 系数值（正/负）。右下：经 S-PLUS 的 SureShrink 方法收缩后的小波系数——大部分噪声尺度的系数被阈值化为零，仅保留显著突起。来源：ESL Figure 5.17。}
+\label{fig:nmr_wavelet}
+\end{figure}
+
+\subsection{小波 vs 光滑样条（图 5.19）}
 
 \begin{center}
 \begin{tabular}{lll}
@@ -956,6 +1308,88 @@ SURE 收缩（Donoho \& Johnstone, 1994）求解 Lasso 型问题：
 
 图 5.19 对比了两类信号的拟合：NMR 尖峰信号中小波优于样条（精确定位尖峰，样条为迁就尖峰在整个域引入多余波动）；光滑信号中样条优于小波（小波为获得自适应性付出了额外方差的代价）。\textbf{两者的选择取决于信号的光滑 vs 稀疏性质。}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{Chapters/pic/ch_基展开和正则化/figure_5_19.png}
+\caption{小波光滑与光滑样条的对比（两例）。每面板对比 SURE-shrunk 小波拟合（实线）与交叉验证光滑样条拟合（虚线）。左：NMR 尖峰信号——小波精确定位尖峰，样条为捕捉尖峰产生额外波动。右：光滑信号——样条以更少有效参数获得相近拟合，小波因自适应性付出方差代价。来源：ESL Figure 5.19。}
+\label{fig:wavelet_vs_spline}
+\end{figure}
+
 \begin{remark}
 二维小波是现代图像压缩（如 JPEG2000）的核心技术。本章参考文献见 de Boor (1978)、Wahba (1990)、Daubechies (1992)、Donoho \& Johnstone (1994) 等。
 \end{remark}
+
+
+% ============ §5.10 本章小结 ============
+\section{本章小结}
+
+下图总结了本章从线性模型到核方法的完整方法论脉络：
+
+\begin{center}
+\fbox{%
+\begin{minipage}{0.94\textwidth}
+\[
+\underbrace{f(X) = \beta_0 + \sum_{j=1}^{p} \beta_j X_j}_{\text{线性模型：简单但局限}}
+\;\xrightarrow{\text{突破线性}}\;
+\underbrace{f(X) = \sum_{m=1}^{M} \beta_m\,h_m(X)}_{\text{基展开：统一框架}}
+\]
+\[
+\downarrow\; \text{基函数 } h_m \text{ 的选择 = 建模策略的选择}
+\]
+\[
+\begin{cases}
+\text{§5.2 样条:} & h_m(X) \text{ 为分段多项式 / 截断幂基 / B-样条} \\
+& \text{复杂度控制：选择节点数 } K \text{（离散）} \\
+& \text{关键改进：自然三次样条，边界线性约束 } \Rightarrow K \text{ 节点 } = K \text{ 个基函数} \\[6pt]
+\text{§5.4 光滑样条:} & \text{所有 } x_i \text{ 为节点 } + \lambda\int(f'')^2 \text{ 惩罚} \\
+& \text{复杂度控制：连续调节 } \lambda \text{（或 } \mathrm{df}_\lambda\text{），CV/GCV 自动选择} \\[6pt]
+\text{§5.8 核方法:} & h_m(x) = K(x, x_m) \text{（以训练点为中心的核函数）} \\
+& \text{表示定理：} \min_{f\in\mathcal{H}_K} \mathrm{RSS} + \lambda\|f\|_{\mathcal{H}_K}^2 \;\Rightarrow\; \hat{\boldsymbol{\alpha}} = (\mathbf{K}+\lambda\mathbf{I})^{-1}\mathbf{y} \\
+& \text{核技巧：隐式使用高维/无限维特征，计算量仅 } O(N^3) \\[6pt]
+\text{§5.9 小波:} & \psi_{j,k}(x) = 2^{j/2}\psi(2^j x - k) \text{（平移+缩放）} \\
+& \text{复杂度控制：}\ell_1 \text{ 软阈值化 } \hat{\theta}_j = \operatorname{sign}(y_j^*)(|y_j^*|-\lambda)_+ \\
+& \text{适合：平坦 + 局部尖峰的信号，计算 } O(N) \text{（金字塔算法）} \\[6pt]
+\text{§5.7 多维推广:} & \text{张量积基（维数灾难） } \to \text{ 加性模型（仅主效应） } \to \text{ ANOVA 分解（可控交互）}
+\end{cases}
+\]
+\[
+\downarrow\; \text{统一的复杂度控制策略（§5.1）}
+\]
+\[
+\boxed{\text{限制法（限制基函数数量）} \;\;|\;\; \text{选择法（自适应扫描字典）} \;\;|\;\; \text{正则化法（惩罚系数）}}
+\]
+\[
+\downarrow\; \text{方法论的本质：偏差-方差权衡}
+\]
+\[
+\boxed{\mathrm{EPE} = \mathrm{Bias}^2 + \mathrm{Var} + \sigma^2}
+\quad
+\begin{cases}
+\text{少基函数 / 大 } \lambda & \to \text{ 高偏差，低方差（欠拟合）} \\
+\text{多基函数 / 小 } \lambda & \to \text{ 低偏差，高方差（过拟合）} \\
+\text{CV / GCV / AIC} & \to \text{ 自动选择最优复杂度}
+\end{cases}
+\]
+\end{minipage}}
+\end{center}
+
+\medskip
+\textbf{本章核心要点：}
+
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{基展开} 是将非线性建模统一纳入线性框架的核心范式：$f(X) = \sum_m \beta_m h_m(X)$。基函数一经选定，所有线性方法（最小二乘、MLE、IRLS）照常使用。
+    
+    \item \textbf{样条} 是最经典的基展开实例。一维样条从分段多项式出发，通过截断幂基 $h_{M+\ell}(X) = (X-\xi_\ell)_+^{M-1}$ 实现节点的平滑过渡。三次样条（$M=4$）是实践标准——人眼无法察觉节点处的三阶不连续性。
+    
+    \item \textbf{自然三次样条} 通过边界线性约束 $f''(\xi_1) = f''(\xi_K) = 0$ 释放 4 个自由度，将基函数数从 $K+4$ 压缩为 $K$，显著降低边界方差——是本章最重要的实用改进。
+    
+    \item \textbf{光滑样条} 将节点选择从离散决策转化为连续调节：每个 $x_i$ 放一个节点 + $\lambda \int (f'')^2$ 惩罚。解为节点在所有唯一 $x_i$ 处的自然三次样条，有效自由度 $\mathrm{df}_\lambda = \operatorname{trace}(\mathbf{S}_\lambda) \in [2, N]$。CV/GCV 自动选择 $\lambda$，免去人工调参。
+    
+    \item \textbf{RKHS 与核方法} 将样条纳入更广阔的正则化框架。正定核 $K(x,y)$ 定义一个再生核 Hilbert 空间 $\mathcal{H}_K$，其范数天然偏好低频函数。\textbf{表示定理} 将无穷维优化 $\min_{f\in\mathcal{H}_K} \sum L(y_i, f(x_i)) + \lambda \|f\|_{\mathcal{H}_K}^2$ 化为 $N$ 维问题 $\min_{\boldsymbol{\alpha}} L(\mathbf{y}, \mathbf{K}\boldsymbol{\alpha}) + \lambda \boldsymbol{\alpha}^\top\mathbf{K}\boldsymbol{\alpha}$。高斯核 $K(x,y) = e^{-\nu\|x-y\|^2}$ 隐式映射到无限维空间，是实践中最重要的核函数。
+    
+    \item \textbf{小波} 通过 $\ell_1$ 阈值化（软阈值）实现稀疏压缩，与样条的 $\ell_2$ 光滑惩罚形成互补。小波适合平坦 + 局部尖峰的信号（如 NMR、图像边缘），计算复杂度 $O(N)$（金字塔算法，比 FFT 更快）。两者选择的根本判据：信号是整体光滑（用样条）还是局部稀疏（用小波）。
+    
+    \item \textbf{多维推广} 面临维数灾难：$d$ 维张量积样条需 $O(M^d)$ 个基函数。加性模型 $f(X) = \alpha + \sum_j f_j(X_j)$ 降至 $O(dM)$，但损失交互效应。ANOVA 分解提供中间地带：按需添加指定交互项。实践中从加性出发，以残差诊断和交叉验证为指导逐步增加交互。
+    
+    \item \textbf{复杂度控制的统一视角}：所有方法——限制基函数数（样条）、连续惩罚参数（光滑样条、核岭回归）、$\ell_1$ 稀疏化（Lasso、小波阈值）——本质上都是在偏差-方差曲线上寻找最优工作点。本章建立了理解后续章节（MARS、boosting、GAM、SVM、神经网络）所需的核心概念框架。
+\end{enumerate}
