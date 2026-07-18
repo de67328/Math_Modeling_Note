@@ -723,4 +723,10 @@
 \contentsline {subsection}{\numberline {15.10.5}交叉验证真的有效吗？——高维示例}{378}{subsection.15.10.5}%
 \contentsline {section}{\numberline {15.11}自助法（Bootstrap）}{378}{section.15.11}%
 \contentsline {subsection}{\numberline {15.11.1}基本思想}{378}{subsection.15.11.1}%
-\contentsline {subsection}{\numberline {15.11.2}Bootstrap 估计预测误差}{378}{subsection.15.11.2}%
+\contentsline {subsection}{\numberline {15.11.2}Bootstrap 估计预测误差}{380}{subsection.15.11.2}%
+\contentsline {subsection}{\numberline {15.11.3}示例：CV 与 Bootstrap 比较}{381}{subsection.15.11.3}%
+\contentsline {section}{\numberline {15.12}条件误差还是期望误差？}{382}{section.15.12}%
+\contentsline {section}{\numberline {15.13}本章小结}{383}{section.15.13}%
+\contentsline {subsection}{\numberline {15.13.1}核心框架}{383}{subsection.15.13.1}%
+\contentsline {subsection}{\numberline {15.13.2}方法选用指南}{384}{subsection.15.13.2}%
+\contentsline {subsection}{\numberline {15.13.3}关键结论}{384}{subsection.15.13.3}%

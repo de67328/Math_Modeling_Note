@@ -446,13 +446,13 @@ AIC$(\alpha)$ 给出测试误差曲线的估计，选择使 AIC 最小的 $\hat{
 
 \textbf{有效参数个数}定义为：
 \begin{equation}\label{eq:df_trace}
-    \mathrm{df}(\mathbf{S}) = \trace(\mathbf{S})
+    \mathrm{df}(\mathbf{S}) = \tr(\mathbf{S})
 \end{equation}
-即 $\mathbf{S}$ 对角元之和（也称有效自由度）。若 $\mathbf{S}$ 是向 $M$ 个特征张成的基集的正交投影矩阵，则 $\trace(\mathbf{S}) = M$。
+即 $\mathbf{S}$ 对角元之和（也称有效自由度）。若 $\mathbf{S}$ 是向 $M$ 个特征张成的基集的正交投影矩阵，则 $\tr(\mathbf{S}) = M$。
 
-可以证明，$\trace(\mathbf{S})$ 恰好是 $C_p$ 统计量中替代 $d$ 的正确量。在可加误差模型下：
+可以证明，$\tr(\mathbf{S})$ 恰好是 $C_p$ 统计量中替代 $d$ 的正确量。在可加误差模型下：
 \begin{equation}\label{eq:cov_trace}
-    \sum_{i=1}^{N} \Cov(\hat{y}_i, y_i) = \trace(\mathbf{S})\,\sigma_\varepsilon^2
+    \sum_{i=1}^{N} \Cov(\hat{y}_i, y_i) = \tr(\mathbf{S})\,\sigma_\varepsilon^2
 \end{equation}
 这引出了更一般的定义：
 \begin{equation}\label{eq:df_cov}
@@ -529,7 +529,7 @@ BIC（乘 $1/2$ 后）也称 Schwarz 准则。
 
     \item \textbf{AIC（Akaike 信息准则）：} $C_p$ 的泛化版——把 $\overline{\mathrm{err}}$ 换成对数似然损失，惩罚项仍是 $2d/N$。来自渐近理论（$N\to\infty$），适用于任何用极大似然拟合的模型。\textbf{记法：AIC = 「2 × 参数个数」的惩罚。}
 
-    \item \textbf{df（有效自由度）：} 回答「$d$ 到底该用多少」的问题。对线性模型 $d$ 就是参数个数；对正则化模型（岭回归、样条），系数被收缩了，实际「有效」参数少于名义 $d$。公式 $\mathrm{df} = \trace(\mathbf{S})$ 给出精确答案：$\hat{\mathbf{y}} = \mathbf{S}\mathbf{y}$，$\mathbf{S}$ 的对角元之和就是有效参数个数。\textbf{记法：df 就是 $\mathbf{S}$ 的迹。}
+    \item \textbf{df（有效自由度）：} 回答「$d$ 到底该用多少」的问题。对线性模型 $d$ 就是参数个数；对正则化模型（岭回归、样条），系数被收缩了，实际「有效」参数少于名义 $d$。公式 $\mathrm{df} = \tr(\mathbf{S})$ 给出精确答案：$\hat{\mathbf{y}} = \mathbf{S}\mathbf{y}$，$\mathbf{S}$ 的对角元之和就是有效参数个数。\textbf{记法：df 就是 $\mathbf{S}$ 的迹。}
 
     \item \textbf{BIC（贝叶斯信息准则）：} AIC 的「更严厉」版本——惩罚项从 $2$ 换成 $\log N$。由于 $\log N > 2$（$N \ge 8$），BIC 对复杂模型惩罚更重。来自贝叶斯推导（选择最大后验概率模型），具有渐近一致性。\textbf{记法：BIC = 「$\log N \times$ 参数个数」的惩罚。}
 \end{itemize}
@@ -691,9 +691,9 @@ CV 实际估计的是什么？$K=5$ 或 $10$ 时，每折的训练集与原训�
 
 GCV 为线性拟合方法在平方误差损失下的 LOOCV 提供方便的近似。对线性拟合 $\hat{\mathbf{y}} = \mathbf{S}\mathbf{y}$：
 \begin{equation}\label{eq:GCV}
-    \mathrm{GCV}(\hat{f}) = \frac{1}{N}\sum_{i=1}^{N} \left[\frac{y_i - \hat{f}(x_i)}{1 - \trace(\mathbf{S})/N}\right]^2
+    \mathrm{GCV}(\hat{f}) = \frac{1}{N}\sum_{i=1}^{N} \left[\frac{y_i - \hat{f}(x_i)}{1 - \tr(\mathbf{S})/N}\right]^2
 \end{equation}
-其中 $\trace(\mathbf{S})$ 是有效参数个数。当 $\trace(\mathbf{S})$ 比单个 $S_{ii}$ 更易计算时，GCV 有计算优势。在光滑问题中，GCV 还可缓解 CV 的欠光滑倾向。
+其中 $\tr(\mathbf{S})$ 是有效参数个数。当 $\tr(\mathbf{S})$ 比单个 $S_{ii}$ 更易计算时，GCV 有计算优势。在光滑问题中，GCV 还可缓解 CV 的欠光滑倾向。
 
 GCV 与 AIC 的联系：利用近似 $1/(1-x)^2 \approx 1+2x$ 可见其相似性。
 
@@ -808,12 +808,215 @@ $$
 
 设训练集为 $\mathbf{Z} = (z_1, z_2, \ldots, z_N)$，其中 $z_i = (x_i, y_i)$。基本做法是从 $\mathbf{Z}$ 中有放回地随机抽取 $N$ 个样本，形成一个 Bootstrap 样本 $\mathbf{Z}^{*b}$。重复 $B$ 次（如 $B=100$），对每个 $\mathbf{Z}^{*b}$ 拟合模型 $\hat{f}^{*b}(x)$。
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Chapters/pic/ch_模型评估与选择/figure_7_12.png}
+    \caption{Bootstrap 过程示意图。目标是从数据集计算出的量 $S(\mathbf{Z})$ 的统计准确性。$B$ 个训练集 $\mathbf{Z}^{*b}\;(b=1,\ldots,B)$ 各含 $N$ 个观测，均从原始数据集中有放回抽取。在每个 Bootstrap 训练集上计算 $S(\mathbf{Z}^{*b})$，用 $S(\mathbf{Z}^{*1}),\ldots,S(\mathbf{Z}^{*B})$ 来评估 $S(\mathbf{Z})$ 的统计准确性。}
+    \label{fig:7_12}
+\end{figure}
+
+\textbf{一个具体例子。} 设 $N=5$ 的数据为 $\mathbf{Z} = \{z_1, z_2, z_3, z_4, z_5\}$，欲估计 $\bar{z}$ 的标准误差。
+
+\begin{enumerate}
+    \item 从 $\mathbf{Z}$ 中有放回地抽 5 个样本，得 $\mathbf{Z}^{*1}$。例如抽到 $\{z_3, z_1, z_1, z_5, z_2\}$（$z_1$ 出现两次，$z_4$ 未出现）。计算 $\bar{z}^{*1}$。
+    \item 重复 $B=1000$ 次：$\mathbf{Z}^{*1}, \mathbf{Z}^{*2}, \ldots, \mathbf{Z}^{*1000}$，每次计算 $\bar{z}^{*b}$。
+    \item $\{ \bar{z}^{*1}, \ldots, \bar{z}^{*1000} \}$ 的样本标准差即为 $\bar{z}$ 标准误差的 Bootstrap 估计。
+\end{enumerate}
+
+对于预测误差估计，$S(\mathbf{Z})$ 就是模型在原始训练集上的某种误差度量。Bootstrap 的核心优势是\textbf{无需假设数据分布}——仅通过重抽样模拟「从总体中反复抽样」的过程。直观理解：总体 $F$ 不可知，样本 $\mathbf{Z}$ 是你对 $F$ 的全部认知，Bootstrap 把 $\mathbf{Z}$ 当作「迷你总体」，从中反复抽样来模拟从真总体反复抽样会发生什么——数据长什么样，Bootstrap 就照猫画虎，不需要假设正态或任何参数分布。
+
+\textbf{何时使用 Bootstrap？} 当公式推导困难或不可行时。典型场景：估计中位数或自定义复杂统计量的标准误差、小样本下正态假设不成立、对非线性自适应模型估计预测误差（解析准则如 $C_p$、AIC 失效）、以及任何需要评估统计量稳定性的场合。原则是「能用公式算就用公式，推不出就用 Bootstrap」，代价是计算量——需重复拟合 $B$ 次模型（通常 $B=200$ 或更多）。
+
+每次 Bootstrap 样本平均含有约 $0.632N$ 个不同的原始观测（其余为重复），这一点在后面 .632 估计的推导中起关键作用。
+
 \subsection{Bootstrap 估计预测误差}
 
-一种自然的做法是用 Bootstrap 样本上的表现来估计误差。但直接使用会出现问题——Bootstrap 样本与原始训练集有重叠。常用方法包括：
-\begin{itemize}
-    \item \textbf{留一 Bootstrap：} 对观测 $i$，仅使用不含 $i$ 的 Bootstrap 样本来预测 $i$。
-    \item \textbf{$.632$ 估计：} 结合训练误差和留一 Bootstrap 误差的加权平均。
-\end{itemize}
+一种自然的做法是用 Bootstrap 样本拟合模型后，在原始训练集上评估：
+\begin{equation}\label{eq:Err_boot}
+    \widehat{\mathrm{Err}}_{\text{boot}} = \frac{1}{B}\frac{1}{N}\sum_{b=1}^{B}\sum_{i=1}^{N} L\bigl(y_i, \hat{f}^{*b}(x_i)\bigr)
+\end{equation}
+但此估计通常很差——Bootstrap 样本与原始训练集有重叠，过拟合会导致估计过于乐观。例如对 1-NN 分类器，当预测变量与标签独立时（真实误差 50\%），$\widehat{\mathrm{Err}}_{\text{boot}}$ 的期望仅为约 $0.5 \times 0.368 = 0.184$。这是因为一个观测不在某次 Bootstrap 样本中的概率约为：
+\begin{equation}\label{eq:bootstrap_prob}
+    \Pr\{\text{观测 } i \in \text{Bootstrap 样本 } b\} = 1 - \left(1 - \frac{1}{N}\right)^N \approx 1 - e^{-1} = 0.632
+\end{equation}
 
-更详细的内容见第 7.11 节后续。
+\textbf{留一 Bootstrap（leave-one-out bootstrap）：} 对每个观测 $i$，仅使用不含 $i$ 的 Bootstrap 样本来预测 $i$：
+\begin{equation}\label{eq:Err_1}
+    \widehat{\mathrm{Err}}^{(1)} = \frac{1}{N}\sum_{i=1}^{N} \frac{1}{|C^{-i}|}\sum_{b \in C^{-i}} L\bigl(y_i, \hat{f}^{*b}(x_i)\bigr)
+\end{equation}
+其中 $C^{-i}$ 是不含观测 $i$ 的 Bootstrap 样本的索引集。留一 Bootstrap 解决了过拟合问题，但产生训练集大小偏差——每次 Bootstrap 样本平均仅含 $0.632N$ 个不同观测，其偏差大致类似于 2 折 CV。若学习曲线在 $N/2$ 处有显著斜率，留一 Bootstrap 会高估真实误差。
+
+\textbf{.632 估计：} 为缓解此偏差，将留一 Bootstrap 估计向训练误差方向拉回：
+\begin{equation}\label{eq:Err_632}
+    \widehat{\mathrm{Err}}^{(.632)} = .368\cdot\overline{\mathrm{err}} + .632\cdot\widehat{\mathrm{Err}}^{(1)}
+\end{equation}
+常数 .632 来自 \eqref{eq:bootstrap_prob}。但 .632 估计对过拟合严重的情况（如 1-NN 与独立标签）会低估误差——此时 $\widehat{\mathrm{Err}}^{(1)} = 0.5$，$\overline{\mathrm{err}}=0$，$\widehat{\mathrm{Err}}^{(.632)} = 0.316$，而真实误差为 0.5。
+
+\textbf{.632+ 估计：} 通过考虑过拟合程度来改进。定义无信息误差率 $\gamma$ 为预测变量与标签独立时的误差率，其估计为：
+\begin{equation}\label{eq:gamma}
+    \hat{\gamma} = \frac{1}{N^2}\sum_{i=1}^{N}\sum_{i'=1}^{N} L\bigl(y_i, \hat{f}(x_{i'})\bigr)
+\end{equation}
+相对过拟合率：
+\begin{equation}\label{eq:R_hat}
+    \hat{R} = \frac{\widehat{\mathrm{Err}}^{(1)} - \overline{\mathrm{err}}}{\hat{\gamma} - \overline{\mathrm{err}}}
+\end{equation}
+$\hat{R}$ 从 0（无过拟合）到 1（过拟合最严重）。.632+ 估计为：
+\begin{equation}\label{eq:Err_632plus}
+    \widehat{\mathrm{Err}}^{(.632+)} = (1 - \hat{w})\cdot\overline{\mathrm{err}} + \hat{w}\cdot\widehat{\mathrm{Err}}^{(1)},
+    \quad \hat{w} = \frac{.632}{1 - .368\hat{R}}
+\end{equation}
+权重 $\hat{w}$ 从 .632（无过拟合）到 1（严重过拟合），使 .632+ 在 .632 估计和留一 Bootstrap 之间自适应插值。
+
+\subsection{示例：CV 与 Bootstrap 比较}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Chapters/pic/ch_模型评估与选择/figure_7_13.png}
+    \caption{箱线图展示四个场景（图 7.3）下相对误差 $100 \cdot [\mathrm{Err}_{\hat{\alpha}} - \min_\alpha \mathrm{Err}(\alpha)]/[\max_\alpha \mathrm{Err}(\alpha) - \min_\alpha \mathrm{Err}(\alpha)]$ 的分布——即所选模型相对于最佳模型的误差百分比。每个箱线图代表 100 个训练集。上部为 10 折 CV，下部为 .632+ Bootstrap。}
+    \label{fig:7_13}
+\end{figure}
+
+\textbf{箱线图读法：} 每个箱子代表一种场景（如「reg/KNN」即回归+KNN）下 100 个训练集的相对误差分布。箱子中间的粗线为中位数，箱体上下沿为第 25 和 75 百分位（即中间 50\% 数据的范围），延伸出的须线（whisker）达到约 $\pm1.5\times$ 四分位距内的最远点，须线外的空心点为离群值。纵轴「\% Increase Over Best」表示：若最佳模型误差为 0.20，所选模型误差为 0.22，则相对误差为 $100 \times (0.22-0.20)/(\max-\min)$。数字越小说明选出的模型越接近最优。
+
+从图中可见，CV 和 Bootstrap 在所有四个场景中整体良好，与 AIC（图 7.7）相比略优或持平。对模型选择目的，任一度量的偏差不影响相对排序。
+
+然而作为\textbf{绝对误差估计}，AIC 平均高估 30\%--51\%，而 CV 仅高估 0\%--4\%，Bootstrap 与之相当。因此若需要准确的测试误差估计值，CV 或 Bootstrap 的额外计算代价是值得的。
+
+注意对树等自适应方法，CV 和 Bootstrap 可低估真实误差约 10\%（因为最优树的搜索受验证集影响强烈），此时只有独立测试集能提供无偏估计。
+
+% ============ §7.12 条件误差还是期望误差？ ============
+\section{条件误差还是期望误差？}
+
+CV 到底估计的是 $\mathrm{Err}_{\mathcal{T}}$（条件误差）还是 $\mathrm{Err}$（期望误差）？图 7.14 和图 7.15 给出了答案。
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Chapters/pic/ch_模型评估与选择/figure_7_14.png}
+    \caption{在图 7.3 右上场景的 100 次模拟中，条件预测误差 $\mathrm{Err}_{\mathcal{T}}$、10 折 CV 和留一 CV 曲线。粗红线为期望预测误差 $\mathrm{Err}$，粗黑线为期望 CV 曲线 $\E_{\mathcal{T}}\mathrm{CV}_{10}$ 和 $\E_{\mathcal{T}}\mathrm{CV}_N$。右下面板展示 CV 曲线与条件误差的平均绝对偏差 $\E_{\mathcal{T}}|\mathrm{CV}_K - \mathrm{Err}_{\mathcal{T}}|$（$K=10$ 蓝色，$K=N$ 绿色），以及与期望误差的偏差 $\E_{\mathcal{T}}|\mathrm{CV}_{10} - \mathrm{Err}|$（橙色）。}
+    \label{fig:7_14}
+\end{figure}
+
+图 7.14 的仿真表明：10 折 CV 对 $\mathrm{Err}$ 的估计优于对 $\mathrm{Err}_{\mathcal{T}}$ 的估计——10 折 CV 的黑曲线与 $\mathrm{Err}$（红色）几乎重合，而与各 $\mathrm{Err}_{\mathcal{T}}$ 的偏差更大。N 折（LOO）CV 的表现类似。
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.95\textwidth]{Chapters/pic/ch_模型评估与选择/figure_7_15.png}
+    \caption{CV 误差估计值与真实条件误差的散点图（100 个训练集，图 7.3 右上场景）。10 折 CV（蓝色）和留一 CV（绿色）分别展示。前三面板对应不同子集大小 $p$，水平和垂直线标于 $\mathrm{Err}(p)$ 处。图中散点几乎无相关性；右下面板显示大部分情形下相关性为负。}
+    \label{fig:7_15}
+\end{figure}
+
+图 7.15 更揭示了惊人事实：CV 误差与条件误差 $\mathrm{Err}_{\mathcal{T}}$ 之间的相关性往往是\textbf{负的}——CV 低的训练集反而可能泛化差。
+
+结论：仅凭一份训练集自身的数据，通常难以估计该特定训练集的条件测试误差。CV 和相关方法能合理估计的是\textbf{期望误差} $\mathrm{Err}$。这一现象对 Bootstrap 误差估计同样成立。
+
+简言之：CV 告诉我们「这个方法平均有多好」，而非「这一份数据训练的模型有多好」。从实践角度看这通常已足够——我们更关心方法的整体表现，而非某一次抽样的运气。
+
+% ============================================================
+\section{本章小结}
+
+\subsection{核心框架}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        node distance=1.2cm and 1.8cm,
+        box/.style={draw, rounded corners, fill=gray!8, text width=3.2cm, align=center, minimum height=0.9cm, font=\small},
+        goalbox/.style={draw, rounded corners, fill=blue!8, text width=3.8cm, align=center, minimum height=0.9cm, font=\small},
+        methodbox/.style={draw, rounded corners, fill=green!6, text width=3.2cm, align=center, minimum height=0.8cm, font=\footnotesize},
+        arrow/.style={->, >=stealth, thick},
+        dasharrow/.style={->, >=stealth, dashed, thick}
+    ]
+
+    % Left column: error types
+    \node[box, fill=red!8] (err) {$\overline{\mathrm{err}}$\\训练误差（可算，偏低）};
+    \node[box, below=of err] (errin) {$\mathrm{Err}_{\text{in}}$\\样本内误差};
+    \node[box, below=of errin] (errT) {$\mathrm{Err}_{\mathcal{T}}$\\条件测试误差};
+    \node[box, below=of errT] (Err) {$\mathrm{Err}$\\期望预测误差};
+
+    \draw[arrow] (err) -- (errin) node[midway, right, font=\footnotesize] {$+\;\hat{\omega}$};
+    \draw[arrow] (errT) -- (Err) node[midway, right, font=\footnotesize] {$\E_{\mathcal{T}}[\cdot]$};
+    \draw[dasharrow, gray] (errin.east) -- (errT.east) node[midway, right, font=\footnotesize\itshape, text=gray] {目的不同};
+
+    % Right top: two goals
+    \node[goalbox, right=1.8cm of errin] (sel) {\textbf{模型选择}\\挑最好的 $\alpha$\\只需相对排序};
+    \node[goalbox, below=0.8cm of sel] (ass) {\textbf{模型评估}\\估计泛化误差\\需要绝对值};
+
+    \draw[arrow, blue!60] (errin.east) -- (sel.west) node[midway, above, font=\footnotesize, text=blue!60] {$C_p$, AIC, BIC};
+    \draw[arrow, green!50!black] (errT.east) -- (ass.west) node[midway, above, font=\footnotesize, text=green!50!black] {CV, Bootstrap};
+    \draw[dasharrow, green!50!black] (errT.north east) -- (sel.south west) node[midway, below, font=\footnotesize\itshape, text=green!50!black, xshift=-0.5cm] {CV 也可用于选模型};
+
+    % Bottom: key insight
+    \node[box, fill=yellow!10, text width=9cm, below=0.8cm of Err] (insight) {\textbf{关键结论：} CV / Bootstrap 实际估计的是 $\mathrm{Err}$（期望误差），而非 $\mathrm{Err}_{\mathcal{T}}$。\\仅凭一份训练集无法估计该份训练集的条件误差。};
+
+    \end{tikzpicture}
+    \caption{第 7 章核心框架：四种误差量、两大目标、各类方法的对应关系。$C_p$/AIC/BIC 估计样本内误差 $\mathrm{Err}_{\text{in}}$，常用于模型选择（只需相对比较）；CV/Bootstrap 直接估计期望误差 $\mathrm{Err}$，既可用于模型选择（计算代价更高但更通用），也可用于模型评估（需绝对值）。}
+    \label{fig:ch7_summary}
+\end{figure}
+
+\subsection{方法选用指南}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        node distance=0.7cm and 1.2cm,
+        qbox/.style={draw, rounded corners, fill=gray!12, text width=4.2cm, align=center, minimum height=0.7cm, font=\small},
+        ansbox/.style={draw, rounded corners, fill=green!8, text width=3.6cm, align=center, minimum height=0.8cm, font=\small\bfseries},
+        smallbox/.style={draw, rounded corners, fill=green!4, text width=3cm, align=center, minimum height=0.7cm, font=\footnotesize},
+        note/.style={text width=11cm, align=left, font=\footnotesize},
+        arrow/.style={->, >=stealth, thick}
+    ]
+
+    \node[qbox] (q1) {目的：选模型还是评估模型？};
+
+    \node[qbox, below left=0.5cm and 0cm of q1] (q2a) {选模型\\（只需比大小）};
+    \node[qbox, below right=0.5cm and -4cm of q1] (q2b) {评估模型\\（要绝对误差值）};
+
+    \node[ansbox, below=of q2a] (a2a) {$C_p$ / AIC / BIC\\（解析，计算快）};
+    \node[smallbox, left=0.5cm of a2a] (a2cv) {也可用 CV / Bootstrap\\(计算重但更通用)};
+
+    \node[ansbox, below=of q2b] (a2b) {CV / Bootstrap\\（直接估计 $\mathrm{Err}$）};
+
+    \draw[arrow] (q1) -- (q2a);
+    \draw[arrow] (q1) -- (q2b);
+    \draw[arrow] (q2a) -- (a2a);
+    \draw[arrow] (q2b) -- (a2b);
+
+    \node[qbox, below=0.8cm of a2a, text width=4.5cm] (q3) {线性模型？平方误差损失？};
+
+    \node[ansbox, below left=0.5cm and 0cm of q3, text width=2.8cm] (a3a) {是 $\to C_p$};
+    \node[ansbox, below right=0.5cm and -3cm of q3, text width=2.8cm] (a3b) {否 $\to$ AIC/BIC};
+
+    \draw[arrow] (a2a) -- (q3);
+    \draw[arrow] (q3) -- (a3a);
+    \draw[arrow] (q3) -- (a3b);
+
+    \node[qbox, below=0.8cm of a2b, text width=4.5cm] (q4) {$N$ 小？需极准误差？};
+
+    \node[ansbox, below left=0.5cm and -4cm of q4, text width=2.8cm] (a4a) {5/10 折 CV（首选）};
+    \node[ansbox, below right=0.5cm and 0cm of q4, text width=2.8cm] (a4b) {.632+ Bootstrap};
+
+    \draw[arrow] (a2b) -- (q4);
+    \draw[arrow] (q4) -- (a4a);
+    \draw[arrow] (q4) -- (a4b);
+
+    \end{tikzpicture}
+    \caption{模型评估与选择方法的选用决策树。选模型：线性+平方误差用 $C_p$，否则 AIC/BIC（CV 也可但更慢）；评估：首选 CV，小样本或需精校用 .632+ Bootstrap。\textbf{核心：}$C_p$/AIC/BIC 估计 $\mathrm{Err}_{\text{in}}$ 用于比大小；CV/Bootstrap 直接估计 $\mathrm{Err}$ 可得绝对值，但所有方法估计的都是期望误差 $\mathrm{Err}$ 而非条件误差 $\mathrm{Err}_{\mathcal{T}}$。}
+    \label{fig:ch7_decision}
+\end{figure}
+
+\textbf{记忆要点：}\quad
+$C_p = \overline{\mathrm{err}} + 2\cdot\frac{d}{N}\hat{\sigma}_\varepsilon^2$（线性+平方误差）\;
+AIC $= -2\,\text{loglik}/N + 2d/N$（一般似然，渐近）\;
+BIC $= -2\,\text{loglik} + d\log N$（重罚，渐近一致）。
+CV 直接估计 $\mathrm{Err}$，最通用，误差估计最准（高估 0--4\% vs AIC 高估 30--50\%）。
+\textbf{关键局限：} 所有方法估计的都是期望误差 $\mathrm{Err}$，无法仅凭一份训练集估计该特定训练集的条件误差 $\mathrm{Err}_{\mathcal{T}}$。
+
+\subsection{关键结论}
+
+\begin{enumerate}
+    \item \textbf{偏差-方差权衡}是模型选择的根基：复杂模型偏差低但方差高，最优复杂度在两者之间。
+    \item $\overline{\mathrm{err}}$ 是唯一可算的，但它系统性偏低——所有方法本质上都是 $\widehat{\mathrm{Err}} = \overline{\mathrm{err}} + \hat{\omega}$。
+    \item \textbf{解析准则}（$C_p$, AIC, BIC）估计 $\mathrm{Err}_{\text{in}}$，适合模型选择，计算快但只适用于参数可数的模型。AIC 渐近选复杂模型，BIC 渐近一致。
+    \item \textbf{重抽样方法}（CV, Bootstrap）直接估计 $\mathrm{Err}$，适用任何模型和损失函数，但计算量大。CV 的正确做法是包裹整个建模流程。
+    \item \textbf{关键局限：} 所有方法估计的都是 $\mathrm{Err}$（期望误差），而非 $\mathrm{Err}_{\mathcal{T}}$（你手头这份训练集的条件误差）。独立的测试集是获得无偏 $\mathrm{Err}_{\mathcal{T}}$ 估计的唯一途径。
+\end{enumerate}

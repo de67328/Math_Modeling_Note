@@ -1107,5 +1107,30 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {15.10.5}交叉验证真的有效吗？——高维示例}{378}{subsection.15.10.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {15.11}自助法（Bootstrap）}{378}{section.15.11}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {15.11.1}基本思想}{378}{subsection.15.11.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {15.11.2}Bootstrap 估计预测误差}{378}{subsection.15.11.2}\protected@file@percent }
-\gdef \@abspage@last{378}
+\@writefile{lof}{\contentsline {figure}{\numberline {15.9}{\ignorespaces Bootstrap 过程示意图。目标是从数据集计算出的量 $S(\mathbf  {Z})$ 的统计准确性。$B$ 个训练集 $\mathbf  {Z}^{*b}\tmspace  +\thickmuskip {.2777em}(b=1,\ldots  ,B)$ 各含 $N$ 个观测，均从原始数据集中有放回抽取。在每个 Bootstrap 训练集上计算 $S(\mathbf  {Z}^{*b})$，用 $S(\mathbf  {Z}^{*1}),\ldots  ,S(\mathbf  {Z}^{*B})$ 来评估 $S(\mathbf  {Z})$ 的统计准确性。}}{379}{figure.caption.31}\protected@file@percent }
+\newlabel{fig:7_12}{{15.9}{379}{Bootstrap 过程示意图。目标是从数据集计算出的量 $S(\mathbf {Z})$ 的统计准确性。$B$ 个训练集 $\mathbf {Z}^{*b}\;(b=1,\ldots ,B)$ 各含 $N$ 个观测，均从原始数据集中有放回抽取。在每个 Bootstrap 训练集上计算 $S(\mathbf {Z}^{*b})$，用 $S(\mathbf {Z}^{*1}),\ldots ,S(\mathbf {Z}^{*B})$ 来评估 $S(\mathbf {Z})$ 的统计准确性。}{figure.caption.31}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {15.11.2}Bootstrap 估计预测误差}{380}{subsection.15.11.2}\protected@file@percent }
+\newlabel{eq:Err_boot}{{15.49}{380}{Bootstrap 估计预测误差}{equation.15.11.49}{}}
+\newlabel{eq:bootstrap_prob}{{15.50}{380}{Bootstrap 估计预测误差}{equation.15.11.50}{}}
+\newlabel{eq:Err_1}{{15.51}{380}{Bootstrap 估计预测误差}{equation.15.11.51}{}}
+\newlabel{eq:Err_632}{{15.52}{380}{Bootstrap 估计预测误差}{equation.15.11.52}{}}
+\newlabel{eq:gamma}{{15.53}{380}{Bootstrap 估计预测误差}{equation.15.11.53}{}}
+\newlabel{eq:R_hat}{{15.54}{381}{Bootstrap 估计预测误差}{equation.15.11.54}{}}
+\newlabel{eq:Err_632plus}{{15.55}{381}{Bootstrap 估计预测误差}{equation.15.11.55}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {15.11.3}示例：CV 与 Bootstrap 比较}{381}{subsection.15.11.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {15.10}{\ignorespaces 箱线图展示四个场景（图 7.3）下相对误差 $100 \cdot [\mathrm  {Err}_{\hat  {\alpha }} - \min _\alpha \mathrm  {Err}(\alpha )]/[\max _\alpha \mathrm  {Err}(\alpha ) - \min _\alpha \mathrm  {Err}(\alpha )]$ 的分布——即所选模型相对于最佳模型的误差百分比。每个箱线图代表 100 个训练集。上部为 10 折 CV，下部为 .632+ Bootstrap。}}{381}{figure.caption.32}\protected@file@percent }
+\newlabel{fig:7_13}{{15.10}{381}{箱线图展示四个场景（图 7.3）下相对误差 $100 \cdot [\mathrm {Err}_{\hat {\alpha }} - \min _\alpha \mathrm {Err}(\alpha )]/[\max _\alpha \mathrm {Err}(\alpha ) - \min _\alpha \mathrm {Err}(\alpha )]$ 的分布——即所选模型相对于最佳模型的误差百分比。每个箱线图代表 100 个训练集。上部为 10 折 CV，下部为 .632+ Bootstrap。}{figure.caption.32}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {15.12}条件误差还是期望误差？}{382}{section.15.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {15.13}本章小结}{383}{section.15.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {15.13.1}核心框架}{383}{subsection.15.13.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {15.13}{\ignorespaces 第 7 章核心框架：四种误差量、两大目标、各类方法的对应关系。$C_p$/AIC/BIC 估计样本内误差 $\mathrm  {Err}_{\text  {in}}$，常用于模型选择（只需相对比较）；CV/Bootstrap 直接估计期望误差 $\mathrm  {Err}$，既可用于模型选择（计算代价更高但更通用），也可用于模型评估（需绝对值）。}}{383}{figure.caption.35}\protected@file@percent }
+\newlabel{fig:ch7_summary}{{15.13}{383}{第 7 章核心框架：四种误差量、两大目标、各类方法的对应关系。$C_p$/AIC/BIC 估计样本内误差 $\mathrm {Err}_{\text {in}}$，常用于模型选择（只需相对比较）；CV/Bootstrap 直接估计期望误差 $\mathrm {Err}$，既可用于模型选择（计算代价更高但更通用），也可用于模型评估（需绝对值）。}{figure.caption.35}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {15.13.2}方法选用指南}{384}{subsection.15.13.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {15.14}{\ignorespaces 模型评估与选择方法的选用决策树。选模型：线性+平方误差用 $C_p$，否则 AIC/BIC（CV 也可但更慢）；评估：首选 CV，小样本或需精校用 .632+ Bootstrap。\textbf  {核心：}$C_p$/AIC/BIC 估计 $\mathrm  {Err}_{\text  {in}}$ 用于比大小；CV/Bootstrap 直接估计 $\mathrm  {Err}$ 可得绝对值，但所有方法估计的都是期望误差 $\mathrm  {Err}$ 而非条件误差 $\mathrm  {Err}_{\mathcal  {T}}$。}}{384}{figure.caption.36}\protected@file@percent }
+\newlabel{fig:ch7_decision}{{15.14}{384}{模型评估与选择方法的选用决策树。选模型：线性+平方误差用 $C_p$，否则 AIC/BIC（CV 也可但更慢）；评估：首选 CV，小样本或需精校用 .632+ Bootstrap。\textbf {核心：}$C_p$/AIC/BIC 估计 $\mathrm {Err}_{\text {in}}$ 用于比大小；CV/Bootstrap 直接估计 $\mathrm {Err}$ 可得绝对值，但所有方法估计的都是期望误差 $\mathrm {Err}$ 而非条件误差 $\mathrm {Err}_{\mathcal {T}}$。}{figure.caption.36}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {15.13.3}关键结论}{384}{subsection.15.13.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {15.11}{\ignorespaces 在图 7.3 右上场景的 100 次模拟中，条件预测误差 $\mathrm  {Err}_{\mathcal  {T}}$、10 折 CV 和留一 CV 曲线。粗红线为期望预测误差 $\mathrm  {Err}$，粗黑线为期望 CV 曲线 $\mathbb  {E}_{\mathcal  {T}}\mathrm  {CV}_{10}$ 和 $\mathbb  {E}_{\mathcal  {T}}\mathrm  {CV}_N$。右下面板展示 CV 曲线与条件误差的平均绝对偏差 $\mathbb  {E}_{\mathcal  {T}}|\mathrm  {CV}_K - \mathrm  {Err}_{\mathcal  {T}}|$（$K=10$ 蓝色，$K=N$ 绿色），以及与期望误差的偏差 $\mathbb  {E}_{\mathcal  {T}}|\mathrm  {CV}_{10} - \mathrm  {Err}|$（橙色）。}}{385}{figure.caption.33}\protected@file@percent }
+\newlabel{fig:7_14}{{15.11}{385}{在图 7.3 右上场景的 100 次模拟中，条件预测误差 $\mathrm {Err}_{\mathcal {T}}$、10 折 CV 和留一 CV 曲线。粗红线为期望预测误差 $\mathrm {Err}$，粗黑线为期望 CV 曲线 $\E _{\mathcal {T}}\mathrm {CV}_{10}$ 和 $\E _{\mathcal {T}}\mathrm {CV}_N$。右下面板展示 CV 曲线与条件误差的平均绝对偏差 $\E _{\mathcal {T}}|\mathrm {CV}_K - \mathrm {Err}_{\mathcal {T}}|$（$K=10$ 蓝色，$K=N$ 绿色），以及与期望误差的偏差 $\E _{\mathcal {T}}|\mathrm {CV}_{10} - \mathrm {Err}|$（橙色）。}{figure.caption.33}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {15.12}{\ignorespaces CV 误差估计值与真实条件误差的散点图（100 个训练集，图 7.3 右上场景）。10 折 CV（蓝色）和留一 CV（绿色）分别展示。前三面板对应不同子集大小 $p$，水平和垂直线标于 $\mathrm  {Err}(p)$ 处。图中散点几乎无相关性；右下面板显示大部分情形下相关性为负。}}{386}{figure.caption.34}\protected@file@percent }
+\newlabel{fig:7_15}{{15.12}{386}{CV 误差估计值与真实条件误差的散点图（100 个训练集，图 7.3 右上场景）。10 折 CV（蓝色）和留一 CV（绿色）分别展示。前三面板对应不同子集大小 $p$，水平和垂直线标于 $\mathrm {Err}(p)$ 处。图中散点几乎无相关性；右下面板显示大部分情形下相关性为负。}{figure.caption.34}{}}
+\gdef \@abspage@last{386}
