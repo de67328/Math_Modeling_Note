@@ -730,3 +730,28 @@
 \contentsline {subsection}{\numberline {15.13.1}核心框架}{383}{subsection.15.13.1}%
 \contentsline {subsection}{\numberline {15.13.2}方法选用指南}{384}{subsection.15.13.2}%
 \contentsline {subsection}{\numberline {15.13.3}关键结论}{384}{subsection.15.13.3}%
+\contentsline {chapter}{\numberline {第十六章\hspace {.3em}}模型推断与平均}{387}{chapter.16}%
+\contentsline {section}{\numberline {16.1}引言}{387}{section.16.1}%
+\contentsline {section}{\numberline {16.2}Bootstrap 与最大似然方法}{387}{section.16.2}%
+\contentsline {subsection}{\numberline {16.2.1}一个光滑示例}{387}{subsection.16.2.1}%
+\contentsline {subsection}{\numberline {16.2.2}非参数 Bootstrap 与参数 Bootstrap}{388}{subsection.16.2.2}%
+\contentsline {subsection}{\numberline {16.2.3}最大似然推断}{390}{subsection.16.2.3}%
+\contentsline {subsubsection}{基本定义}{390}{subsection.16.2.3}%
+\contentsline {subsubsection}{MLE 框架的完整定义体系}{390}{equation.16.2.10}%
+\contentsline {subsubsection}{Cramér-Rao 下界}{392}{figure.caption.39}%
+\contentsline {subsubsection}{正则条件与推导}{392}{Item.368}%
+\contentsline {subsubsection}{三个完整示例}{393}{equation.16.2.16}%
+\contentsline {subsubsection}{渐近正态性}{395}{equation.16.2.16}%
+\contentsline {subsubsection}{光滑示例的最大似然解}{395}{equation.16.2.19}%
+\contentsline {subsection}{\numberline {16.2.4}Bootstrap 与最大似然的比较}{395}{subsection.16.2.4}%
+\contentsline {section}{\numberline {16.3}贝叶斯方法}{396}{section.16.3}%
+\contentsline {subsection}{\numberline {16.3.1}基本框架}{396}{subsection.16.3.1}%
+\contentsline {subsection}{\numberline {16.3.2}光滑示例的贝叶斯分析}{396}{subsection.16.3.2}%
+\contentsline {subsection}{\numberline {16.3.3}Bootstrap 与贝叶斯推断的正式关系}{397}{subsection.16.3.3}%
+\contentsline {subsubsection}{四种方法的统一视角}{397}{Item.378}%
+\contentsline {subsection}{\numberline {16.3.4}Bootstrap 用法总览}{398}{subsection.16.3.4}%
+\contentsline {section}{\numberline {16.4}EM 算法}{398}{section.16.4}%
+\contentsline {subsection}{\numberline {16.4.1}两分量高斯混合模型}{399}{subsection.16.4.1}%
+\contentsline {subsection}{\numberline {16.4.2}EM 算法的一般形式}{399}{subsection.16.4.2}%
+\contentsline {section}{\numberline {16.5}MCMC：从后验抽样}{400}{section.16.5}%
+\contentsline {subsection}{\numberline {16.5.1}Gibbs 采样}{400}{subsection.16.5.1}%

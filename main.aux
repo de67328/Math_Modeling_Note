@@ -1133,4 +1133,65 @@
 \newlabel{fig:7_14}{{15.11}{385}{在图 7.3 右上场景的 100 次模拟中，条件预测误差 $\mathrm {Err}_{\mathcal {T}}$、10 折 CV 和留一 CV 曲线。粗红线为期望预测误差 $\mathrm {Err}$，粗黑线为期望 CV 曲线 $\E _{\mathcal {T}}\mathrm {CV}_{10}$ 和 $\E _{\mathcal {T}}\mathrm {CV}_N$。右下面板展示 CV 曲线与条件误差的平均绝对偏差 $\E _{\mathcal {T}}|\mathrm {CV}_K - \mathrm {Err}_{\mathcal {T}}|$（$K=10$ 蓝色，$K=N$ 绿色），以及与期望误差的偏差 $\E _{\mathcal {T}}|\mathrm {CV}_{10} - \mathrm {Err}|$（橙色）。}{figure.caption.33}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {15.12}{\ignorespaces CV 误差估计值与真实条件误差的散点图（100 个训练集，图 7.3 右上场景）。10 折 CV（蓝色）和留一 CV（绿色）分别展示。前三面板对应不同子集大小 $p$，水平和垂直线标于 $\mathrm  {Err}(p)$ 处。图中散点几乎无相关性；右下面板显示大部分情形下相关性为负。}}{386}{figure.caption.34}\protected@file@percent }
 \newlabel{fig:7_15}{{15.12}{386}{CV 误差估计值与真实条件误差的散点图（100 个训练集，图 7.3 右上场景）。10 折 CV（蓝色）和留一 CV（绿色）分别展示。前三面板对应不同子集大小 $p$，水平和垂直线标于 $\mathrm {Err}(p)$ 处。图中散点几乎无相关性；右下面板显示大部分情形下相关性为负。}{figure.caption.34}{}}
-\gdef \@abspage@last{386}
+\@writefile{toc}{\contentsline {chapter}{\numberline {第十六章\hspace  {.3em}}模型推断与平均}{387}{chapter.16}\protected@file@percent }
+\@writefile{lof}{\addvspace {10.0pt}}
+\@writefile{lot}{\addvspace {10.0pt}}
+\@writefile{toc}{\contentsline {section}{\numberline {16.1}引言}{387}{section.16.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {16.2}Bootstrap 与最大似然方法}{387}{section.16.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {16.2.1}一个光滑示例}{387}{subsection.16.2.1}\protected@file@percent }
+\newlabel{eq:8_1}{{16.1}{387}{一个光滑示例}{equation.16.2.1}{}}
+\newlabel{eq:8_2}{{16.2}{387}{一个光滑示例}{equation.16.2.2}{}}
+\newlabel{eq:8_3}{{16.3}{387}{一个光滑示例}{equation.16.2.3}{}}
+\newlabel{eq:8_4}{{16.4}{387}{一个光滑示例}{equation.16.2.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {16.1}{\ignorespaces （左）光滑示例的数据。（右）七个 B-样条基函数。竖直虚线指示三个结点的位置。}}{388}{figure.caption.37}\protected@file@percent }
+\newlabel{fig:8_1}{{16.1}{388}{（左）光滑示例的数据。（右）七个 B-样条基函数。竖直虚线指示三个结点的位置。}{figure.caption.37}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {16.2.2}非参数 Bootstrap 与参数 Bootstrap}{388}{subsection.16.2.2}\protected@file@percent }
+\newlabel{eq:8_5}{{16.5}{388}{非参数 Bootstrap 与参数 Bootstrap}{equation.16.2.5}{}}
+\newlabel{eq:8_6}{{16.6}{388}{非参数 Bootstrap 与参数 Bootstrap}{equation.16.2.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {16.2}{\ignorespaces （左上）数据的 B-样条光滑。（右上）B-样条光滑 $\pm 1.96\times $ 标准误差带。（左下）B-样条光滑的 10 次 Bootstrap 重复。（右下）由 Bootstrap 分布构造的 95\% 标准误差带。}}{389}{figure.caption.38}\protected@file@percent }
+\newlabel{fig:8_2}{{16.2}{389}{（左上）数据的 B-样条光滑。（右上）B-样条光滑 $\pm 1.96\times $ 标准误差带。（左下）B-样条光滑的 10 次 Bootstrap 重复。（右下）由 Bootstrap 分布构造的 95\% 标准误差带。}{figure.caption.38}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {16.2.3}最大似然推断}{390}{subsection.16.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{基本定义}{390}{subsection.16.2.3}\protected@file@percent }
+\newlabel{eq:likelihood}{{16.7}{390}{基本定义}{equation.16.2.7}{}}
+\newlabel{eq:loglik}{{16.8}{390}{基本定义}{equation.16.2.8}{}}
+\newlabel{eq:score}{{16.9}{390}{基本定义}{equation.16.2.9}{}}
+\newlabel{eq:info}{{16.10}{390}{基本定义}{equation.16.2.10}{}}
+\@writefile{toc}{\contentsline {subsubsection}{MLE 框架的完整定义体系}{390}{equation.16.2.10}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {16.3}{\ignorespaces MLE 框架的完整定义体系。自上而下：数据+模型 → 似然 → 对数似然 → 得分 → MLE；左下：大样本性质（一致性、有效性、渐近正态、不变性）；右下：三大检验（LRT、Wald、得分）；底部：扩展工具（Delta 方法、剖面似然、指数族）。}}{391}{figure.caption.39}\protected@file@percent }
+\newlabel{fig:MLE_framework}{{16.3}{391}{MLE 框架的完整定义体系。自上而下：数据+模型 → 似然 → 对数似然 → 得分 → MLE；左下：大样本性质（一致性、有效性、渐近正态、不变性）；右下：三大检验（LRT、Wald、得分）；底部：扩展工具（Delta 方法、剖面似然、指数族）。}{figure.caption.39}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Cramér-Rao 下界}{392}{figure.caption.39}\protected@file@percent }
+\newlabel{eq:CRLB}{{16.11}{392}{Cramér-Rao 下界}{equation.16.2.11}{}}
+\@writefile{toc}{\contentsline {subsubsection}{正则条件与推导}{392}{Item.368}\protected@file@percent }
+\newlabel{eq:cr_deriv1}{{16.13}{393}{正则条件与推导}{equation.16.2.13}{}}
+\newlabel{eq:cr_deriv2}{{16.14}{393}{正则条件与推导}{equation.16.2.14}{}}
+\newlabel{eq:cr_deriv3}{{16.15}{393}{正则条件与推导}{equation.16.2.15}{}}
+\newlabel{eq:cr_deriv4}{{16.16}{393}{正则条件与推导}{equation.16.2.16}{}}
+\@writefile{toc}{\contentsline {subsubsection}{三个完整示例}{393}{equation.16.2.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{渐近正态性}{395}{equation.16.2.16}\protected@file@percent }
+\newlabel{eq:asym_normal}{{16.17}{395}{渐近正态性}{equation.16.2.17}{}}
+\newlabel{eq:MLE_approx}{{16.18}{395}{渐近正态性}{equation.16.2.18}{}}
+\newlabel{eq:chisq}{{16.19}{395}{渐近正态性}{equation.16.2.19}{}}
+\@writefile{toc}{\contentsline {subsubsection}{光滑示例的最大似然解}{395}{equation.16.2.19}\protected@file@percent }
+\newlabel{eq:8_20}{{16.20}{395}{光滑示例的最大似然解}{equation.16.2.20}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {16.2.4}Bootstrap 与最大似然的比较}{395}{subsection.16.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {16.3}贝叶斯方法}{396}{section.16.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {16.3.1}基本框架}{396}{subsection.16.3.1}\protected@file@percent }
+\newlabel{eq:posterior}{{16.21}{396}{基本框架}{equation.16.3.21}{}}
+\newlabel{eq:predictive}{{16.22}{396}{基本框架}{equation.16.3.22}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {16.3.2}光滑示例的贝叶斯分析}{396}{subsection.16.3.2}\protected@file@percent }
+\newlabel{eq:gaussian_prior}{{16.23}{396}{光滑示例的贝叶斯分析}{equation.16.3.23}{}}
+\newlabel{eq:posterior_beta}{{16.24}{396}{光滑示例的贝叶斯分析}{equation.16.3.24}{}}
+\newlabel{eq:posterior_mu}{{16.25}{396}{光滑示例的贝叶斯分析}{equation.16.3.25}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {16.3.3}Bootstrap 与贝叶斯推断的正式关系}{397}{subsection.16.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{四种方法的统一视角}{397}{Item.378}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {16.3.4}Bootstrap 用法总览}{398}{subsection.16.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {16.4}EM 算法}{398}{section.16.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {16.4.1}两分量高斯混合模型}{399}{subsection.16.4.1}\protected@file@percent }
+\newlabel{eq:mix_model}{{16.27}{399}{两分量高斯混合模型}{equation.16.4.27}{}}
+\newlabel{eq:mix_density}{{16.28}{399}{两分量高斯混合模型}{equation.16.4.28}{}}
+\newlabel{eq:complete_lik}{{16.29}{399}{两分量高斯混合模型}{equation.16.4.29}{}}
+\newlabel{eq:responsibility}{{16.30}{399}{两分量高斯混合模型}{equation.16.4.30}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {16.4.2}EM 算法的一般形式}{399}{subsection.16.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {16.5}MCMC：从后验抽样}{400}{section.16.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {16.5.1}Gibbs 采样}{400}{subsection.16.5.1}\protected@file@percent }
+\gdef \@abspage@last{400}
