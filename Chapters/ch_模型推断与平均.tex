@@ -359,13 +359,60 @@ Bootstrap 本质上是\textbf{非参数或参数最大似然的计算机实现}�
     \end{equation}
 \end{enumerate}
 
-与频率学派不同，贝叶斯用先验分布表达先验不确定性，用后验分布表达剩余不确定性。
+\textbf{不确定性更新视角：} 公式中三个角色分工明确——\textbf{先验是起点}（数据前的信念），\textbf{似然是更新器}（数据如何修改信念），\textbf{后验是终点}（更新后的信念）。后验通常比先验更集中（数据提供了信息），但除非数据无穷，否则不确定性不会归零。
+
+\textbf{与频率学派的分歧在“谁随机”：} 频率学派认为参数 $\theta$ 固定未知、\textbf{数据随机}（依赖重复抽样视角）；贝叶斯认为数据已实现、固定不变，\textbf{参数随机}（有分布）。同样“给定数据做推断”，两派眼中的随机性归属完全相反。
 
 \textbf{预测分布}给出未来观测 $z^{\text{new}}$ 的预测：
 \begin{equation}\label{eq:predictive}
     \Pr(z^{\text{new}} \mid \mathbf{Z}) = \int \Pr(z^{\text{new}} \mid \theta)\cdot\Pr(\theta \mid \mathbf{Z})\,d\theta
 \end{equation}
 这比最大似然插值式预测 $\Pr(z^{\text{new}} \mid \hat{\theta})$ 更合理——后者未考虑 $\theta$ 估计的不确定性。
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=1.4cm and 1.6cm,
+    input/.style={draw, rounded corners, fill=blue!8, text width=3.1cm, align=center, minimum height=1.0cm, font=\small},
+    core/.style={draw, rounded corners, fill=orange!15, text width=6.6cm, align=center, minimum height=1.5cm, font=\small},
+    post/.style={draw, rounded corners, fill=green!12, text width=6.6cm, align=center, minimum height=1.0cm, font=\small},
+    app/.style={draw, rounded corners, fill=red!6, text width=3.0cm, align=center, minimum height=1.2cm, font=\small},
+    arrow/.style={->, >=stealth, thick}
+]
+% --- 输入行：先验 / 似然 / 数据 ---
+\node[input] (prior) {\textbf{先验} $\Pr(\theta)$\\先验不确定性（起点）\\可控制的建模选择};
+\node[input, right=0.5cm of prior] (like) {\textbf{似然} $\Pr(\mathbf{Z}\mid\theta)$\\数据生成机制\\模型选择};
+\node[input, right=0.5cm of like] (data) {\textbf{数据} $\mathbf{Z}$\\固定、已实现\\不可控};
+
+% --- 核心：贝叶斯公式 ---
+\node[core, below=1.7cm of like] (bayes) {\textbf{贝叶斯公式（更新器）}\\[4pt] $\Pr(\theta\mid\mathbf{Z}) \propto \Pr(\mathbf{Z}\mid\theta)\cdot\Pr(\theta)$};
+
+\draw[arrow] (prior.south) -- (bayes.north west);
+\draw[arrow] (like.south) -- (bayes.north);
+\draw[arrow] (data.south) -- (bayes.north east);
+
+% --- 后验 ---
+\node[post, below=of bayes] (postbox) {\textbf{后验} $\Pr(\theta\mid\mathbf{Z})$：剩余不确定性（终点）};
+\draw[arrow] (bayes) -- (postbox);
+
+% --- 三路应用 ---
+\node[app, below left=1.5cm and 1.0cm of postbox] (infer) {\textbf{推断}\\后验均值、可信区间};
+\node[app, below=1.5cm of postbox] (predict) {\textbf{预测}\\$\Pr(z^{\text{new}}\mid\mathbf{Z})$};
+\node[app, below right=1.5cm and 1.0cm of postbox] (decide) {\textbf{决策}\\模型平均、期望损失};
+
+\draw[arrow] (postbox.south west) -- (infer.north);
+\draw[arrow] (postbox.south) -- (predict.north);
+\draw[arrow] (postbox.south east) -- (decide.north);
+\end{tikzpicture}
+\end{center}
+
+\textbf{先验知识错了会怎样？} 需区分“错在哪”：
+\begin{itemize}
+    \item \textbf{先验的支撑不含真值}（如真实 $\theta = 5$，先验只在 $[0,1]$ 上有质量）：后验永远无法接近真值——真实 $\theta$ 处 $\Pr(\mathbf{Z}\mid\theta)\Pr(\theta) = 0$，数据再多也救不回来，先验“不可反驳”地错。
+    \item \textbf{先验形状偏了但支撑包含真值}（如真实 $\theta = 5$，先验集中在 3 附近）：数据足够多时，似然项越来越尖锐地压在真值附近，逐渐“淹没”先验（Bernstein--von Mises 定理），后验收敛到真值；但\textbf{小样本}下错误先验会显著带偏结论。
+\end{itemize}
+因此实践中倾向选\textbf{无信息/扩散先验}作为保守默认，并做\textbf{敏感性分析}（换几个先验看结论是否稳健）。频率学派“无先验”看似回避了此问题，代价是数据前无法融入知识、不确定性无法表达为概率——它只是把模型假设藏了起来，并非没有假设。
+
+\textbf{我们控制什么？目的是什么？} 贝叶斯中真正可控的是\textbf{先验}（最自由的建模选择）与\textbf{模型/似然}（分布族假设）；数据 $\mathbf{Z}$ 已实现、真实 $\theta$ 未知，均不可控。一旦选定先验与似然，后验就被贝叶斯公式\textbf{唯一确定}——贝叶斯里没有“最大化”（与 MLE 的优化不同），只有“乘起来、归一化”。目的分三层：\textbf{推断}（由后验回答 $\theta$ 的合理取值与不确定性）、\textbf{预测}（用后验做 $\Pr(z^{\text{new}}\mid\mathbf{Z})$）、\textbf{决策}（在期望损失意义下做最优决策、模型平均/选择，见 §8.8）。一句话：\textbf{贝叶斯是概率论的“推理引擎”——输入先验、似然与数据，引擎内部按贝叶斯公式唯一运转，输出后验、预测与决策。}
 
 \subsection{光滑示例的贝叶斯分析}
 
@@ -547,6 +594,149 @@ $\hat{\gamma}_i$ 称为观测 $i$ 对分量 2 的\textbf{责任（responsibility
 
 定义贝叶斯模型后，需要从后验分布抽样以做推断。除简单模型外，这通常很困难。本节讨论\textbf{马尔可夫链蒙特卡洛（MCMC）}方法。
 
+\subsection{背景与动机：为什么需要从后验分布抽样？}
+
+「定义贝叶斯模型后，需要从后验分布抽样以做推断」这句话的完整含义，需要拆开来看：
+
+\begin{enumerate}
+    \item \textbf{贝叶斯建模先给出后验分布。} 由贝叶斯公式
+    \[
+        \Pr(\theta \mid \mathbf{Z}) = \frac{\Pr(\mathbf{Z} \mid \theta)\,\Pr(\theta)}{\int \Pr(\mathbf{Z} \mid \theta)\,\Pr(\theta)\,d\theta}
+    \]
+    后验综合了先验知识 $\Pr(\theta)$ 与数据信息 $\Pr(\mathbf{Z}\mid\theta)$。
+    \item \textbf{所有推断都归结为对后验求期望。} 后验均值 $\E[\theta\mid\mathbf{Z}]$、后验方差、预测分布 $\Pr(z^{\text{new}}\mid\mathbf{Z})$ 等，都可以写成某个函数 $g(\theta)$ 在后验分布下的积分 $\int g(\theta)\,\Pr(\theta\mid\mathbf{Z})\,d\theta$。
+    \item \textbf{但这个积分常常算不出来。} 复杂模型（高维、非共轭、多模态）下，后验没有解析形式，分母（归一化常数）也无法计算。
+    \item \textbf{抽样替代积分（蒙特卡洛）。} 若能「从后验分布抽出大量样本」$\theta^{(1)}, \ldots, \theta^{(M)}$，则由大数定律
+    \[
+        \E[g(\theta)\mid\mathbf{Z}] \approx \frac{1}{M}\sum_{t=1}^{M} g(\theta^{(t)})
+    \]
+    完全绕开了解析积分。这就是「需要从后验分布抽样以做推断」。
+    \item \textbf{最后的问题：后验很难直接抽样。} 后验分布不标准、归一化常数未知，逆变换法等直接抽样手段不可行。MCMC 的解决办法是：\textbf{构造一条马尔可夫链，使它的平稳分布恰好是目标后验}，让链跑足够久，链上的状态就近似是来自后验的样本。
+\end{enumerate}
+
+\begin{remark}
+    整个动机链条：贝叶斯模型 → 需要后验期望 → 解析积分不可行 → 蒙特卡洛（抽样求期望）→ 无法直接抽样 → 构造以目标分布为平稳分布的马尔可夫链。EM 求点估计，MCMC 求分布，二者是同一类「隐变量迭代」思想的两面。
+\end{remark}
+
+\begin{qa}
+    \textbf{问：}这里的「推断」是什么意思？
+
+    \textbf{答：}「推断」（inference）就是\textbf{从数据对未知量做结论，并量化这种结论的不确定性}。贝叶斯框架下，数据 $\mathbf{Z}$ 与先验只给出一张「关于 $\theta$ 的分布图」——后验 $\Pr(\theta\mid\mathbf{Z})$。它本身不是答案，而是所有知识的载体；「做推断」就是从这张图里读出我们关心的具体问题的答案：
+
+    \begin{itemize}
+        \item $\theta$ 大概是多少？$\rightarrow$ 后验均值 $\E[\theta\mid\mathbf{Z}]$（类比频率学派的点估计）
+        \item 有多大把握？$\rightarrow$ 后验可信区间（$\theta$ 落在区间内的概率为 $95\%$，类比置信区间）
+        \item 新观测会怎样？$\rightarrow$ 预测分布 $\Pr(z^{\text{new}}\mid\mathbf{Z})$
+        \item 哪个模型更合理？$\rightarrow$ 模型后验概率 $\Pr(M_m\mid\mathbf{Z})$
+    \end{itemize}
+
+    换言之：\textbf{后验是「答案库」，推断是「查询」}。MCMC 抽样的意义在于——答案库里的量都是对后验的积分，算不出来；抽出大量样本后，用样本平均近似这些积分，就能完成查询。
+\end{qa}
+
+\subsection{先验如何作用：后验是「先验 $\times$ 似然」的目标分布}
+
+\textbf{「后验推不出来」的准确含义：} 后验的\textbf{公式永远存在}——它是贝叶斯公式的定义；推不出来的不是公式，而是\textbf{数值}。能否解析读出后验，取决于共轭性：
+
+\begin{itemize}
+    \item \textbf{共轭情形}（先验与似然是「好搭档」，如高斯先验 $\times$ 高斯似然）：分母积分能解析算出，后验有闭合形式（见 §8.3 光滑示例）——\textbf{不需要 MCMC}。
+    \item \textbf{非共轭情形}：分母 $\int \Pr(\mathbf{Z}\mid\theta)\Pr(\theta)\,d\theta$ 算不出来，后验的归一化常数、均值、方差、分位数全都没有解析数值。此时后验「存在但读不出来」，才需要 MCMC 数值读出。
+\end{itemize}
+
+\textbf{一个没有解析数值的简单例子：} 单个观测 $Y \sim N(\theta, 1)$（高斯似然），但先验取\textbf{Laplace（双指数）}分布 $\theta \sim \mathrm{Laplace}(0, b)$，密度正比于 $e^{-\abs{\theta}/b}$。共轭性被破坏，未归一化后验为
+\[
+    \Pr(\theta\mid y) \propto \underbrace{\exp\!\Bigl(-\tfrac{(y-\theta)^2}{2}\Bigr)}_{\text{似然}}\;\cdot\;\underbrace{\exp\!\Bigl(-\tfrac{\abs{\theta}}{b}\Bigr)}_{\text{先验}}
+\]
+归一化常数 $\int \exp\!\bigl(-\tfrac{(y-\theta)^2}{2} - \tfrac{\abs{\theta}}{b}\bigr)\,d\theta$ 没有闭合形式——即使似然是最「友善」的高斯，一旦先验换成 Laplace，后验便失去解析解，只能用抽样读出。
+
+\textbf{先验如何作用（核心）：} 后验正比于
+\begin{equation}\label{eq:prior_like_target}
+    \pi(\theta) \propto \Pr(\mathbf{Z}\mid\theta)\,\Pr(\theta)
+\end{equation}
+MCMC 的目标分布就是\textbf{这个乘积}（未归一化）。于是先验作为\textbf{乘法权重}直接塑造了被抽样的分布：先验密度高的区域乘积大、被访问得多；先验密度为 $0$ 的区域乘积恒为 $0$、抽样永远不会到达（即使似然很大）。先验从未消失，它内建在目标分布里。
+
+\textbf{MCMC 随机游走的形式化（Metropolis--Hastings 视角）：} 设 $\pi(\theta)$ 如 \eqref{eq:prior_like_target}。每一步 $t$：
+
+\begin{enumerate}
+    \item 从提议分布 $q(\theta'\mid\theta^{(t)})$ 提议候选 $\theta'$
+    \item 以接受概率接受：
+    \[
+        \alpha(\theta^{(t)}\to\theta') = \min\!\left\{1,\ \frac{\pi(\theta')\,q(\theta^{(t)}\mid\theta')}{\pi(\theta^{(t)})\,q(\theta'\mid\theta^{(t)})}\right\}
+    \]
+    \item 若接受则 $\theta^{(t+1)} = \theta'$，否则 $\theta^{(t+1)} = \theta^{(t)}$
+\end{enumerate}
+
+\textbf{两个关键观察：}
+
+\begin{enumerate}
+    \item \textbf{只需要未归一化的后验。} 接受概率中只出现\textbf{密度比值} $\pi(\theta')/\pi(\theta)$，归一化常数 $Z = \int\Pr(\theta)\Pr(\mathbf{Z}\mid\theta)\,d\theta$ 在比值中\textbf{被消掉}——这正是 MCMC 能工作的原因：只需知道 $\pi \propto$ 先验 $\times$ 似然，而无需算出那个算不出的积分。
+    \item \textbf{访问频率正比于 $\pi(\theta)$。} 链达到平稳后，在 $\theta$ 处停留的时间比例收敛到 $\pi(\theta)$，即\textbf{按正比于 $\Pr(\theta)\Pr(\mathbf{Z}\mid\theta)$ 的密度访问 $\theta$}。先验的乘法权重就这样进入每一步抽样：多访问先验支持的区域，永不去先验否决的区域。
+\end{enumerate}
+
+\begin{remark}
+    Gibbs 采样是 Metropolis--Hastings 的一个特例：其转移核即条件分布抽样，接受概率恒为 $1$。两种方法都只依赖「先验 $\times$ 似然」这个未归一化目标，区别仅在如何游走。
+\end{remark}
+
+\subsection{马尔可夫性质：如何体现？}
+
+马尔可夫性质指：\textbf{给定「现在」，过去与未来条件独立}，即
+\[
+    \Pr(U^{(t+1)} \mid U^{(t)}, U^{(t-1)}, \ldots, U^{(0)}) = \Pr(U^{(t+1)} \mid U^{(t)})
+\]
+一步转移只依赖当前状态，与更早的历史无关。
+
+在 Gibbs 采样（Algorithm 8.3）中，这一性质直接体现：生成 $U_k^{(t)}$ 时只用
+\[
+    U_1^{(t)}, \ldots, U_{k-1}^{(t)},\quad U_{k+1}^{(t-1)}, \ldots, U_K^{(t-1)}
+\]
+即只依赖「现在」的状态向量 $U^{(t-1)}$（以及本轮已更新的分量），不依赖 $U^{(t-2)}, U^{(t-3)}, \ldots$。整条样本序列 $\{U^{(0)}, U^{(1)}, U^{(2)}, \ldots\}$ 构成一条一阶马尔可夫链，其行为完全由转移核 $\Pr(U' \mid U)$ 描述。
+
+\begin{remark}
+    强调：马尔可夫链的相邻样本\textbf{不独立}（它们强烈相关），不能直接当作独立同分布样本。但链收敛后，从长远看访问各状态的比例收敛到目标分布——我们只需对长期的样本求平均。相关性只影响估计的效率（需要更多样本），不影响正确性。
+\end{remark}
+
+\subsection{为什么联合分布最终稳定？}
+
+分两层理解：
+
+\textbf{（1）目标联合分布是平稳分布（stationary / invariant distribution）。} 若从分布 $\pi$ 出发做一次转移后分布仍为 $\pi$，即满足\textbf{细致平衡}（detailed balance）
+\[
+    \pi(U)\,\Pr(U' \mid U) = \pi(U')\,\Pr(U \mid U')
+\]
+则 $\pi$ 是平稳分布。Gibbs 采样满足这一条件，直观理由是：若当前状态 $U$ 已服从目标联合分布 $\pi$，那么只把其中一个分量 $U_k$ 按其条件分布 $\Pr(U_k \mid U_{-k})$ 重新抽样，新向量 $(U_1, \ldots, U_k', \ldots, U_K)$ 仍然服从 $\pi$——因为「从条件分布重新抽样」保持联合分布不变。逐分量依次操作，每一步都保持 $\pi$ 不变，故 $\pi$ 是平稳分布。
+
+\textbf{（2）从任意初始分布收敛到平稳分布。} 在正则条件（不可约、非周期、正递归）下，马尔可夫链理论保证：无论从哪个初始状态 $U^{(0)}$ 出发，当 $t \to \infty$ 时 $U^{(t)}$ 的分布都收敛到唯一的平稳分布。直观上，每次转移都在状态分布空间上施加一次「混合」操作，反复施加会把任何初始分布「拉」向不动点——即平稳分布。因此需要一段 \textbf{burn-in}（烧入）期，丢弃开头未收敛的样本，只用收敛后的部分（式 \eqref{eq:8_50} 中从 $m$ 开始平均）。
+
+\subsection{一个具体的 Gibbs 采样例子}
+
+用一个离散二维例子直观展示整个过程。设目标联合分布 $\pi(x, y)$（$x, y \in \{0,1\}$）为：
+\[
+    \pi(0,0) = 0.1,\quad \pi(0,1) = 0.2,\quad \pi(1,0) = 0.3,\quad \pi(1,1) = 0.4
+\]
+边际为 $\pi(x{=}0) = 0.3$，$\pi(x{=}1) = 0.7$；$\pi(y{=}0) = 0.4$，$\pi(y{=}1) = 0.6$。由这些可算出所有条件分布，例如：
+\[
+    \pi(y \mid x):\quad \pi(0\mid 0) = \tfrac{1}{3},\ \pi(1\mid 0) = \tfrac{2}{3};\qquad
+    \pi(0\mid 1) = \tfrac{3}{7},\ \pi(1\mid 1) = \tfrac{4}{7}
+\]
+\[
+    \pi(x \mid y):\quad \pi(0\mid 0) = \tfrac{1}{4},\ \pi(1\mid 0) = \tfrac{3}{4};\qquad
+    \pi(0\mid 1) = \tfrac{1}{3},\ \pi(1\mid 1) = \tfrac{2}{3}
+\]
+
+假设从任意起点 $(x, y) = (0, 0)$ 出发（它可能远离高概率区域，对应未收敛的 burn-in 期），开始交替抽样：
+
+\begin{itemize}
+    \item 固定 $x = 0$，按 $\pi(y \mid x = 0)$ 抽 $y$：以概率 $2/3$ 抽到 $y = 1$，状态变为 $(0, 1)$。
+    \item 固定 $y = 1$，按 $\pi(x \mid y = 1)$ 抽 $x$：以概率 $2/3$ 抽到 $x = 1$，状态变为 $(1, 1)$。
+    \item 固定 $x = 1$，按 $\pi(y \mid x = 1)$ 抽 $y$：以概率 $4/7$ 抽到 $y = 1$，状态仍为 $(1, 1)$。
+    \item 继续迭代……
+\end{itemize}
+
+每一步都只依赖当前状态（马尔可夫性质），且每次条件抽样都让链在保持联合分布的意义下移动。长时间运行后，各状态被访问的频率收敛到目标联合分布：
+\[
+    \hat{\pi}(0,0) \to 0.1,\quad \hat{\pi}(0,1) \to 0.2,\quad \hat{\pi}(1,0) \to 0.3,\quad \hat{\pi}(1,1) \to 0.4
+\]
+于是 $\E[g(X,Y)] \approx \frac{1}{M}\sum_t g(x^{(t)}, y^{(t)})$。教材中的高斯混合例子（Algorithm 8.4）原理与此完全相同，只是把离散状态换成连续参数：从 $\Pr(\Delta_i \mid \theta, \mathbf{Z})$ 和 $\Pr(\mu_1, \mu_2 \mid \bm{\Delta}, \mathbf{Z})$ 交替抽样，最终收敛到参数的后验分布。
+
 \subsection{Gibbs 采样}
 
 设有随机变量 $U_1, U_2, \ldots, U_K$，从联合分布直接抽样困难，但从每个条件分布 $\Pr(U_j \mid U_1, \ldots, U_{j-1}, U_{j+1}, \ldots, U_K)$ 抽样容易。Gibbs 采样（Algorithm 8.3）交替从每个条件分布模拟，过程稳定后即从目标联合分布抽样。
@@ -560,3 +750,464 @@ $\hat{\gamma}_i$ 称为观测 $i$ 对分量 2 的\textbf{责任（responsibility
 \begin{remark}
     Gibbs 采样与 EM 算法紧密相关：主要区别在于 Gibbs 从条件分布\textbf{抽样}，而 EM 在条件分布上\textbf{取最大值}。两者都是处理隐变量问题的迭代算法，只是目的不同——EM 求点估计（MAP），Gibbs 求分布。
 \end{remark}
+
+\subsubsection{收敛性与边际密度估计}
+
+Gibbs 采样之所以有效，是因为它产生一条\textbf{马尔可夫链}，其\textbf{平稳分布（stationary distribution）}恰为 $U_1, \ldots, U_K$ 的真实联合分布——这正是「马尔可夫链蒙特卡洛」名称的由来。虽然不同 $t$ 的样本 $(U_1^{(t)}, \ldots, U_K^{(t)})$ 明显不独立，但在正则条件下该过程最终稳定，得到的随机变量确实是联合分布的一个样本。因为每一步都保持各个 $U_k$ 的边际分布不变，所以真实联合分布是此过程的平稳分布。
+
+达到平稳后，任何变量子集的边际密度都可以把密度估计方法应用于样本值来近似。若条件密度 $\Pr(U_k \mid U_\ell, \ell \neq k)$ 的显式形式已知，则 $U_k$ 边际密度的更好估计为（练习 8.3）：
+\begin{equation}\label{eq:8_50}
+    \widehat{\Pr}_{U_k}(u) = \frac{1}{M-m+1}\sum_{t=m}^{M} \Pr(u \mid U_\ell^{(t)},\ \ell \neq k)
+\end{equation}
+其中对序列的最后 $M-m+1$ 个成员求平均，以允许在达到平稳前有一段初始「烧入（burn-in）」期。
+
+\begin{remark}
+    我们不需要知道条件密度的显式形式，只需\textbf{能够从条件分布抽样}。这就是 Gibbs 采样的实用门槛：对贝叶斯推断而言，只要给定其他参数和数据 $\mathbf{Z}$ 时每个参数的条件后验易于抽样，即可应用。
+\end{remark}
+
+\subsubsection{高斯混合模型的 Gibbs 采样}
+
+在指数族模型中，从后验的 Gibbs 采样与 EM 算法有密切联系。关键是把 EM 中的隐数据 $\mathbf{Z}^m$ 视为 Gibbs 采样器的另一个参数。对高斯混合问题，取参数为 $(\theta, \bm{\Delta})$；为简洁固定 $\sigma_1^2, \sigma_2^2$ 和 $\pi$ 于其最大似然值，仅 $\mu_1, \mu_2$ 未知。Gibbs 采样器（Algorithm 8.4）为：
+
+\begin{enumerate}
+    \item 取初始值 $\theta^{(0)} = (\mu_1^{(0)}, \mu_2^{(0)})$
+    \item 对 $t = 1, 2, \ldots$：
+    \begin{enumerate}
+        \item[(a)] 对 $i = 1, \ldots, N$ 生成 $\Delta_i^{(t)} \in \{0, 1\}$，其中 $\Pr(\Delta_i^{(t)} = 1) = \hat{\gamma}_i(\theta^{(t)})$（由式 \eqref{eq:responsibility} 的责任）
+        \item[(b)] 令
+        \[
+            \hat{\mu}_1 = \frac{\sum_i (1-\Delta_i^{(t)})y_i}{\sum_i (1-\Delta_i^{(t)})},\qquad
+            \hat{\mu}_2 = \frac{\sum_i \Delta_i^{(t)}y_i}{\sum_i \Delta_i^{(t)}}
+        \]
+        并生成 $\mu_1^{(t)} \sim N(\hat{\mu}_1, \hat{\sigma}_1^2)$、$\mu_2^{(t)} \sim N(\hat{\mu}_2, \hat{\sigma}_2^2)$
+    \end{enumerate}
+    \item 直到联合分布 $(\bm{\Delta}^{(t)}, \mu_1^{(t)}, \mu_2^{(t)})$ 稳定
+\end{enumerate}
+
+步骤 2(a) 和 2(b) 与 EM 的 E 步、M 步相同，区别仅在于\textbf{抽样而非最大化}：2(a) 不是计算最大似然责任 $\gamma_i = \E(\Delta_i \mid \theta, \mathbf{Z})$，而是从 $\Pr(\Delta_i \mid \theta, \mathbf{Z})$ 模拟隐数据 $\Delta_i$；2(b) 不是计算后验 $\Pr(\mu_1, \mu_2 \mid \bm{\Delta}, \mathbf{Z})$ 的最大化者，而是从条件分布 $\Pr(\mu_1, \mu_2 \mid \bm{\Delta}, \mathbf{Z})$ 模拟。
+
+图 8.8 展示了 200 次 Gibbs 迭代：均值参数 $\mu_1$（下）、$\mu_2$（上）稳定后围绕最大似然估计 $\hat{\mu}_1, \hat{\mu}_2$ 均匀分布。更现实的做法是对 $\sigma_1^2, \sigma_2^2$ 和 $\pi$ 也放置先验，并加入单独的抽样步骤。注意均值参数的先验不能是\textbf{非正常先验}（improper prior），否则会导致退化后验——所有权重落到一个分量上。
+
+\begin{remark}
+    Gibbs 采样会围绕 MLE 波动（后验均值的中心是 $\hat{\mu}$），而不是停在 MLE 上——因为后验是分布而非点。这是贝叶斯「推断分布而非点估计」思想的直接体现。
+\end{remark}
+
+\subsubsection{其他 MCMC 方法}
+
+Gibbs 采样只是从后验抽样的一类方法。它利用「给定其余参数时的条件抽样」，当问题结构使这种抽样容易时很有用。其他方法不要求这种结构，例如\textbf{Metropolis--Hastings 算法}。这些计算贝叶斯方法已应用于高斯过程模型和神经网络等复杂学习算法。
+
+\subsection{MCMC 的实践：有限步收敛与诊断}
+
+平稳分布是 $t \to \infty$ 的极限性质，而所有 MCMC 使用都只有有限步。关键在于理解：我们并不需要「到达」平稳，只需要\textbf{任意精确的近似}，且这个近似由两部分误差控制：
+\[
+    \hat{\E}[g(\theta)\mid\mathbf{Z}] = \frac{1}{M}\sum_{t=1}^{M} g(\theta^{(t)}) \;\approx\; \E[g(\theta)\mid\mathbf{Z}]
+\]
+
+\textbf{误差的两个来源：}
+\begin{itemize}
+    \item \textbf{burn-in 误差：} 链从初始状态出发，需要一段时间「忘记起点」，分布才接近平稳。实践中丢弃开头 $m$ 个样本（烧入期，见式 \eqref{eq:8_50}）。
+    \item \textbf{蒙特卡洛误差：} 即使已收敛，$M$ 个样本的估计仍有方差，随 $1/\sqrt{M_{\mathrm{eff}}}$ 衰减，其中 $M_{\mathrm{eff}}$ 是\textbf{有效样本量}（effective sample size，ESS）。因为链内样本相关，$M_{\mathrm{eff}} \le M$，相关性越强越小。
+\end{itemize}
+
+\textbf{MCMC 与模拟退火的区别：} 模拟退火解决\textbf{优化}（把温度压到 $T \to 0$，使分布 $\pi(\theta)^{1/T}$ 收敛到众数，输出一个点）；MCMC 解决\textbf{采样}（还原整个分布，输出一串样本）。因此 MCMC 没有「模拟退火式的有限步保证」。但确有\textbf{退火式改进技巧}：\textbf{并行回火}（parallel tempering）同时跑几条不同温度的链，高温链分布平坦、易全局探索，低温链聚焦真实后验的模式，定期交换状态——用于帮助\textbf{多模态、高相关}的链更快混合，本质是增大谱隙、加速收敛，而非保证到达平稳。
+
+\textbf{数学视角：收敛其实是指数的。} 在正则条件下，有限步分布以几何速率逼近平稳：
+\[
+    \| \pi^{(t)} - \pi \|_{\mathrm{TV}} \le C\,\lambda_2^{\,t}
+\]
+其中 $\lambda_2$ 是转移核的第二大特征值，谱隙 $1 - \lambda_2$ 控制\textbf{混合时间}（mixing time）。收敛本身是指数的；问题是谱隙可能很小（高相关、多模态的链混合慢），此时需要的步数才多。
+
+\textbf{实践中的收敛诊断（有限步「是否够好」靠诊断而非保证）：}
+\begin{enumerate}
+    \item \textbf{轨迹图（trace plot）：} 看链是否稳定振荡、无漂移趋势。
+    \item \textbf{Gelman--Rubin 诊断 $\hat{R}$：} 跑多条不同起点的链，$\hat{R}$ 接近 1（通常 $< 1.1$）表示各链分布一致、起点影响已消失。
+    \item \textbf{自相关时间与有效样本量 ESS：} 判断需要多少样本才足够（ESS 越大越好）。
+\end{enumerate}
+对一般目标分布，「是否已收敛」在理论上不可判定（无免费午餐），故实践中靠诊断 + 多条链交叉验证 + 领域常识来确认。
+
+\begin{remark}
+    所有改善技巧（好的提议分布、参数化、并行回火）本质上都是在\textbf{增大谱隙、加速混合}，从而减小有限步近似的误差。
+\end{remark}
+
+% ============ §8.7 Bagging ============
+\section{Bagging}
+
+此前我们用 Bootstrap 评估参数估计或预测的精度。本节展示如何用 Bootstrap \textbf{改进估计或预测本身}。§8.4 中发现 Bootstrap 均值近似于后验平均，\textbf{Bagging}（bootstrap aggregation，Bootstrap 聚合）进一步利用这一联系。
+
+考虑回归问题：对训练数据 $\mathbf{Z} = \{(x_1, y_1), \ldots, (x_N, y_N)\}$ 拟合模型，得到输入 $x$ 处的预测 $\hat{f}(x)$。Bagging 在一组 Bootstrap 样本上平均这个预测，从而降低其方差。对每个 Bootstrap 样本 $\mathbf{Z}^{*b}$（$b = 1, \ldots, B$）拟合模型，得预测 $\hat{f}^{*b}(x)$，Bagging 估计定义为：
+\begin{equation}\label{eq:8_51}
+    \hat{f}_{\mathrm{bag}}(x) = \frac{1}{B}\sum_{b=1}^{B} \hat{f}^{*b}(x)
+\end{equation}
+
+记 $\hat{P}$ 为对每个数据点 $(x_i, y_i)$ 赋予等概率 $1/N$ 的经验分布。「真正的」Bagging 估计定义为 $\E_{\hat{P}}\hat{f}^*(x)$，其中 $\mathbf{Z}^* = \{(x_1^*, y_1^*), \ldots, (x_N^*, y_N^*)\}$ 且每个 $(x_i^*, y_i^*) \sim \hat{P}$。式 \eqref{eq:8_51} 是真实 Bagging 估计的蒙特卡洛估计，$B \to \infty$ 时逼近之。
+
+\begin{remark}
+    Bagging 只对数据的\textbf{非线性或自适应}函数有效果。例如 B-样条光滑对数据是线性的，故使用参数 Bootstrap 时 $\hat{f}_{\mathrm{bag}}(x) \to \hat{f}(x)$（练习 8.4）——Bagging 只是复现原始光滑，没有改进。更典型的例子是回归树：每个 Bootstrap 树通常使用不同特征、可能有不同终结点数，Bagged 估计是这 $B$ 棵树预测的平均。
+\end{remark}
+
+\subsection{分类情形：投票 vs 平均概率}
+
+若树产生 $K$ 类分类器 $\hat{G}(x)$，可考虑底层指示向量函数 $\hat{f}(x)$（一个 1、其余 $K-1$ 个 0），使得 $\hat{G}(x) = \argmax_k \hat{f}_k(x)$。此时 Bagged 估计 $\hat{f}_{\mathrm{bag}}(x)$ 是 $K$ 维向量 $[p_1(x), \ldots, p_K(x)]$，其中 $p_k(x)$ 是预测第 $k$ 类的树的\textbf{比例}。Bagged 分类器选择「得票」最多的类：
+\begin{equation}
+    \hat{G}_{\mathrm{bag}}(x) = \argmax_k \hat{f}_{\mathrm{bag},k}(x)
+\end{equation}
+
+\begin{remark}
+    投票比例 $p_k(x)$ 未必是好的类概率估计。反例：若 $x$ 处类 1 的真实概率为 0.75，且每个 Bagged 分类器都准确预测类 1，则 $p_1(x) = 1$，这是错误的。许多分类器（如树的终结点类比例）已有估计类概率的底层函数 $\hat{f}(x)$——更好的策略是\textbf{平均这些概率}而非投票指示向量。这既改进了类概率估计，又往往降低 Bagged 分类器的方差（尤其小 $B$ 时，见图 8.10）。
+\end{remark}
+
+\subsection{例：树与模拟数据}
+
+生成 $N = 30$ 的样本，两类、$p = 5$ 个特征（标准高斯、两两相关 0.95）。响应按 $\Pr(Y=1 \mid x_1 \le 0.5) = 0.2$、$\Pr(Y=1 \mid x_1 > 0.5) = 0.8$ 生成，贝叶斯误差为 0.2。对训练样本及 200 个 Bootstrap 样本拟合分类树（不剪枝）。图 8.9 显示原始树和 11 棵 Bootstrap 树——它们完全不同（不同的分裂特征和切点）。图 8.10 显示测试误差：由于预测变量相关，树的方差很高，Bagging 成功平滑了方差并降低测试误差。
+
+\subsection{Bagging 为什么有效}
+
+平方误差损失下，Bagging 能戏剧性地降低不稳定过程（如树）的方差。设训练观测独立同分布地来自分布 $P$，考虑理想聚合估计 $f_{\mathrm{ag}}(x) = \E_P\hat{f}^*(x)$（$x$ 固定，Bootstrap 数据集从真实总体 $P$ 而非数据抽样）。它是不可用于实践的分析工具。可以写：
+\begin{equation}\label{eq:8_52}
+    \begin{aligned}
+        \E_P[Y - \hat{f}^*(x)]^2 &= \E_P[Y - f_{\mathrm{ag}}(x) + f_{\mathrm{ag}}(x) - \hat{f}^*(x)]^2 \\
+        &= \E_P[Y - f_{\mathrm{ag}}(x)]^2 + \E_P[\hat{f}^*(x) - f_{\mathrm{ag}}(x)]^2 \\
+        &\geq \E_P[Y - f_{\mathrm{ag}}(x)]^2
+    \end{aligned}
+\end{equation}
+右边多出的误差来自 $\hat{f}^*(x)$ 围绕其均值 $f_{\mathrm{ag}}(x)$ 的方差。因此\textbf{真实总体聚合从不增加均方误差}。这提示 Bagging（从训练数据抽样）通常会降低均方误差。
+
+\textbf{三层概念对照：} 上述推导容易混淆，这里明确区分三个对象：
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+名称 & 定义 & 从哪抽样 & 能否实现 \\
+\midrule
+理想聚合 $f_{\mathrm{ag}}(x)$ & $\E_P\hat{f}^*(x)$ & 真实总体 $P$ & 否（$P$ 未知）\\
+真 Bagging & $\E_{\hat P}\hat{f}^*(x)$ & 经验分布 $\hat{P}$ & 仍是期望 \\
+实际 Bagging & $\frac{1}{B}\sum_b \hat{f}^{*b}(x)$ & 训练数据重抽样 & 是 \\
+\bottomrule
+\end{tabular}
+\end{center}
+实际 Bagging 是「真 Bagging」的蒙特卡洛估计（$B \to \infty$ 时逼近之）；「真 Bagging」是「理想聚合」用经验分布 $\hat P$ 替换 $P$ 的插件版本。平时所说的 Bagging 即第三行——从训练集抽样。
+
+\textbf{推导 \eqref{eq:8_52} 的要点：} 交叉项之所以消失，是因为 $\E_P[\hat{f}^*(x)] = f_{\mathrm{ag}}(x)$（$f_{\mathrm{ag}}$ 正是 $\hat{f}^*$ 的期望），故
+\[
+    \E_P[(Y - f_{\mathrm{ag}}(x))(f_{\mathrm{ag}}(x) - \hat{f}^*(x))] = 0
+\]
+于是分解为「偏差 + 方差」，而方差项 $\ge 0$，去掉它只会更小——这正是「平均消除方差、不影响偏差」的数学来源。
+
+\textbf{两个常见误区：}
+\begin{itemize}
+    \item \textbf{「正常不就应该从训练集抽样吗？」} 对——实际 Bagging 就是从训练集（经验分布 $\hat P$）抽样。理想聚合从真实总体 $P$ 抽样，只是为推导而构造的思想实验，不是实践算法。
+    \item \textbf{「理想聚合不可用是因为抽到了测试集数据？」} 错——不可用的原因是\textbf{真实总体 $P$ 未知}、无法从它抽样，与测试集无关。实际做法是\textbf{插件原则}：用经验分布 $\hat P$（训练数据）代替未知的 $P$。
+\end{itemize}
+
+\textbf{「真实总体聚合从不增加均方误差」的理解：} 不等式 \eqref{eq:8_52} 的比较对象是\textbf{任意单个 Bootstrap 模型 $\hat{f}^*$}：
+\[
+    \underbrace{\E_P[Y-\hat{f}^*(x)]^2}_{\text{随机抽一个 Bootstrap 模型的期望误差}}
+    \;\ge\;
+    \underbrace{\E_P[Y-f_{\mathrm{ag}}(x)]^2}_{\text{聚合模型 }f_{\mathrm{ag}}\text{ 的误差}}
+\]
+左侧是「从 $P$ 抽一个 Bootstrap 数据集、训练一个模型 $\hat{f}^*$」的期望误差；右侧是所有这些模型平均值 $f_{\mathrm{ag}}$ 的误差。结论：聚合模型的 MSE 不超过随机单个 Bootstrap 模型的期望 MSE。
+
+\textbf{机理：方差项正是单个模型的方差。} 分解式中第二项 $\E_P[\hat{f}^*(x)-f_{\mathrm{ag}}(x)]^2$ 就是单个模型围绕其均值（聚合值）波动的方差，它 $\ge 0$，故「单个模型误差 = 聚合误差 + 单模型方差」。平均把这种抖动（方差）消掉，而 $f_{\mathrm{ag}}$ 本身是均值、没有围绕均值的波动——所以 MSE 不增。直觉：某 $x$ 处 10 棵 Bootstrap 树的预测在 $0.1, 0.3, \ldots, 0.9$ 间大幅抖动、真值为 $0.5$，随机挑一棵可能误差很大，平均后约 $0.5$、几乎无偏差。
+
+\textbf{两点边界（教材用词是「提示」而非严格保证）：}
+\begin{itemize}
+    \item \textbf{比较对象不是原始模型 $\hat{f}$：} 不等式比较的是 $f_{\mathrm{ag}}$ 与随机单模型 $\hat{f}^*$；而实际 Bagging 想改进的是用全部数据训练的原模型 $\hat{f}$（比单个重抽样模型更稳定）。故「提示」Bagging 通常会降低 MSE，是理想情形下的推断。
+    \item \textbf{仅在平方损失下成立：} 0-1 损失下偏差与方差不可加，见下节。
+\end{itemize}
+
+\subsubsection{0-1 损失下不成立}
+
+上述论证在 0-1 损失分类下不成立，因为偏差和方差不可加。此时 Bagging 一个好分类器可以更好，但 Bagging 一个差分类器可能更差。简单反例（随机化规则）：设对所有 $x$ 有 $Y = 1$，分类器 $\hat{G}(x)$ 以概率 0.4 预测 1、以概率 0.6 预测 0。则 $\hat{G}$ 的误分类率为 0.6，而 Bagged 分类器的误分类率为 1.0。
+
+分类情形可用「独立弱学习者的共识」理解（Dietterich, 2000a）。设二分类中贝叶斯最优决策为 $G(x) = 1$，每个弱学习者 $G_b^*$ 有错误率 $e_b = e < 0.5$，$S_1(x) = \sum_{b=1}^{B} I(G_b^*(x) = 1)$ 为类 1 的共识票。弱学习者独立时 $S_1(x) \sim \mathrm{Bin}(B, 1-e)$，故 $\Pr(S_1 > B/2) \to 1$（$B$ 增大）。这被普及为「\textbf{众智（Wisdom of Crowds）}」——多样化且独立的人群的集体知识通常超过任何个人，且可通过投票利用。
+
+\begin{remark}
+    关键前提是「独立」——而 Bagged 树并不独立。第 15 章的\textbf{随机森林}正是通过降低抽样树之间的相关性来改进 Bagging。
+\end{remark}
+
+\subsubsection{Bagging 不生效的情形}
+
+Bagging 一个模型会\textbf{丢失模型的简单结构}——Bagged 树不再是树，解释性丧失。更稳定的过程（如最近邻）受 Bagging 影响很小；而最受益于 Bagging 的不稳定模型恰恰因强调可解释性而不稳定，这种可解释性在 Bagging 中丢失了。
+
+图 8.12 展示 Bagging 无帮助的例子：100 个数据点、两个特征两类，被线性边界 $x_1 + x_2 = 1$ 分开，选择单个轴对齐分裂分类器。将 0-1 决策规则在 $B = 50$ 个 Bootstrap 样本上 Bagging 得到的边界（蓝线）未能捕捉真实边界。Bagging 估计的是单分裂规则的平均类概率，无法在单个复现中实现——如同「一个女人不可能有 2.4 个孩子」。Bagging 一定程度上扩大了基础分类器的模型空间，但在此类需要更大模型类扩展的例子中无济于事。\textbf{「Boosting」正是扩展模型类的方法}，见第 10 章。
+
+% ============ §8.8 模型平均与 Stacking ============
+\section{模型平均与 Stacking}
+
+在 §8.4 中我们将估计量的 Bootstrap 值视为对应参数的后验值（一种非参数贝叶斯分析）。如此看来，Bagged 估计 \eqref{eq:8_51} 是近似的后验贝叶斯均值，而训练样本估计 $\hat{f}(x)$ 对应后验的\textbf{众数}。由于后验均值（而非众数）最小化平方误差损失，Bagging 常能降低均方误差就不足为奇了。
+
+更一般地讨论\textbf{贝叶斯模型平均（Bayesian model averaging）}。对训练集 $\mathbf{Z}$ 有一组候选模型 $M_m$（$m = 1, \ldots, M$），它们可以是同类型不同参数值（如线性回归的子集），或不同模型（如神经网络和回归树）。
+
+设 $\zeta$ 是感兴趣的某个量（如固定特征值 $x$ 处的预测 $f(x)$）。$\zeta$ 的后验分布为：
+\begin{equation}\label{eq:8_53}
+    \Pr(\zeta \mid \mathbf{Z}) = \sum_{m=1}^{M} \Pr(\zeta \mid M_m, \mathbf{Z})\,\Pr(M_m \mid \mathbf{Z})
+\end{equation}
+后验均值为：
+\begin{equation}\label{eq:8_54}
+    \E(\zeta \mid \mathbf{Z}) = \sum_{m=1}^{M} \E(\zeta \mid M_m, \mathbf{Z})\,\Pr(M_m \mid \mathbf{Z})
+\end{equation}
+即各模型预测以模型后验概率为权重的加权平均。
+
+此框架引出一系列模型平均策略：
+\begin{itemize}
+    \item \textbf{委员会方法（committee methods）：} 对每个模型的预测取简单无加权平均，本质上是给每个模型相等的概率。
+    \item \textbf{BIC 加权：} §7.7 表明 BIC 准则可用于估计后验模型概率，适用于同一参数模型、不同参数值的情形。BIC 依据拟合好坏和参数数量给各模型权重。
+    \item \textbf{完整贝叶斯：} 若每个模型 $M_m$ 有参数 $\theta_m$，
+    \begin{equation}\label{eq:8_55}
+        \Pr(M_m \mid \mathbf{Z}) \propto \Pr(M_m)\,\Pr(\mathbf{Z} \mid M_m) \propto \Pr(M_m)\int \Pr(\mathbf{Z} \mid \theta_m, M_m)\,\Pr(\theta_m \mid M_m)\,d\theta_m
+    \end{equation}
+    原则上可指定先验 $\Pr(\theta_m \mid M_m)$ 并数值计算后验概率作为权重，但没有实际证据表明这比简单得多的 BIC 近似更值得。
+\end{itemize}
+
+\textbf{BIC 的定义式与渐进：} 最常用的权重来自 \textbf{BIC 准则}（§7.7）。BIC 定义为
+\begin{equation}\label{eq:BIC_bma}
+    \mathrm{BIC}_m = -2\,\ell(\hat{\theta}_m) + d_m\log N
+\end{equation}
+其中 $\hat{\theta}_m$ 是模型 $m$ 的最大似然估计，$\ell(\hat{\theta}_m)$ 是最大对数似然，$d_m$ 是模型 $m$ 的参数个数，$N$ 是样本量。第一项 $-2\ell$ 衡量拟合好坏（越小越好），第二项 $d_m\log N$ 是复杂度惩罚（参数越多惩罚越大）——BIC 在「拟合」与「复杂度」之间取平衡。
+
+\textbf{BIC 的渐近合理性（Laplace 近似）：} 在正则条件下，BIC 是「对数边际似然 $\log\Pr(\mathbf{Z}\mid M_m)$」的近似：
+\[
+    \log\Pr(\mathbf{Z}\mid M_m) = \ell(\hat{\theta}_m) - \tfrac{d_m}{2}\log N + O_P(1)
+\]
+即 $\mathrm{BIC}_m = -2\log\Pr(\mathbf{Z}\mid M_m) + \text{const}$。于是模型后验概率可近似为（先验均匀时）
+\[
+    \Pr(M_m\mid\mathbf{Z}) \propto e^{-\mathrm{BIC}_m/2}
+\]
+这就是 BIC 作为 BMA 权重的基础：与 §7.7 模型选择一致——BIC 最小的模型后验概率最大。
+
+\begin{remark}
+    BMA 的深层动机不只是「让预测更有效」，而是\textbf{把「选哪个模型」的不确定性也纳入预测}——不把模型选择当作确定的一步，而是对候选模型平均。这与本章「量化不确定性」的主线一脉相承。
+\end{remark}
+
+\subsection{频率学派视角}
+
+给定预测 $\hat{f}_1(x), \ldots, \hat{f}_M(x)$，在平方误差损失下求权重 $w = (w_1, \ldots, w_M)$ 使得：
+\begin{equation}\label{eq:8_56}
+    \hat{w} = \argmin_w \E_P\left[Y - \sum_{m=1}^{M} w_m \hat{f}_m(x)\right]^2
+\end{equation}
+解是 $Y$ 对 $\hat{F}(x)^T \equiv [\hat{f}_1(x), \ldots, \hat{f}_M(x)]$ 的\textbf{总体线性回归}：
+\begin{equation}\label{eq:8_57}
+    \hat{w} = \E_P[\hat{F}(x)\hat{F}(x)^T]^{-1}\,\E_P[\hat{F}(x)Y]
+\end{equation}
+且完整回归的误差不超过任何单个模型：
+\begin{equation}\label{eq:8_58}
+    \E_P\left[Y - \sum_{m=1}^{M}\hat{w}_m \hat{f}_m(x)\right]^2 \leq \E_P[Y - \hat{f}_m(x)]^2,\quad \forall m
+\end{equation}
+即在总体层面，组合模型从不使事情变差。
+
+但总体回归 \eqref{eq:8_57} 不可得，自然地用训练集上的线性回归替代——但有简单反例说明这不奏效。若 $\hat{f}_m(x)$ 表示在 $M$ 个总输入中大小为 $m$ 的最佳输入子集的预测，则线性回归会把所有权重放在最大的模型上（$\hat{w}_M = 1$，其余为 0）。问题在于没有通过考虑各模型的复杂度（本例中输入数量 $m$）把它们放在同等的地位。
+
+\textbf{为什么训练集回归会偏爱复杂模型？} 直接原因有两点：
+\begin{enumerate}
+    \item \textbf{嵌套结构：} 大模型（$m$ 大的子集）通常嵌套小模型，在训练集上拟合更好，其预测与 $y$ 的相关性更强；
+    \item \textbf{共线性：} 各模型预测高度共线，最小二乘回归把权重几乎全部推给「训练集上最能解释 $y$」的那个模型。
+\end{enumerate}
+但训练集拟合好 $\ne$ 泛化好——复杂模型过拟合训练集，测试集上未必最优。因此直接在训练集上回归得到的权重反映的是\textbf{训练拟合能力}而非\textbf{泛化能力}，这正是 Stacking 需要改用「样本外」预测的原因。
+
+\subsection{Stacking}
+
+\textbf{堆叠泛化（stacked generalization），或 stacking} 是解决上述问题的方法。设 $\hat{f}_m^{-i}(x)$ 为使用模型 $m$、去掉第 $i$ 个训练观测后对 $x$ 的预测。Stacking 的权重估计来自 $y_i$ 对 $\hat{f}_m^{-i}(x_i)$（$m = 1, \ldots, M$）的最小二乘回归：
+\begin{equation}\label{eq:8_59}
+    \hat{w}^{\mathrm{st}} = \argmin_w \sum_{i=1}^{N}\left[y_i - \sum_{m=1}^{M} w_m \hat{f}_m^{-i}(x_i)\right]^2
+\end{equation}
+最终预测为 $\sum_m \hat{w}_m^{\mathrm{st}}\hat{f}_m(x)$。通过使用交叉验证预测 $\hat{f}_m^{-i}(x)$，Stacking 避免了对复杂度更高的模型给予不公平的高权重。
+
+\textbf{为什么必须用「样本外」预测（而非训练集预测）赋权？} 若直接用训练集预测 $\hat{f}_m(x_i)$ 做回归，就掉进上文的陷阱——复杂模型在训练集上表现好而被过度偏爱。$\hat{f}_m^{-i}(x_i)$ 是模型 $m$ 在「没见过」的点 $x_i$ 上的预测（留一交叉验证预测），公平反映其真实预测能力，不受过拟合偏袒。
+
+\textbf{Bootstrap 版本是否可行？—— 可行，是同一思想。} 除了留一，也可以用 Bootstrap 样本训练模型、在\textbf{袋外样本（out-of-bag, OOB）}上预测，再对 $y$ 做最小二乘回归赋权（\textbf{Bootstrap stacking}）。留一、K 折交叉验证、Bootstrap OOB 都是「用样本外预测公平赋权」这一思想的不同实现。教材选留一，是因为它简单，且与 §7.10 的留一交叉验证模型选择联系最直接（把权重限制为 one-hot 即退化为 LOOCV 选模型）。
+
+\begin{remark}
+    将权重限制为\textbf{非负且和为 1} 可得到更好结果——若把权重解释为 \eqref{eq:8_54} 的后验模型概率，这似乎合理，且导致可解的二次规划问题。
+\end{remark}
+
+Stacking 与留一交叉验证的模型选择（§7.10）联系紧密：若把 \eqref{eq:8_59} 的最小化限制在「一个单位权重、其余为零」的权重向量上，就得到留一交叉验证误差最小的模型选择 $\hat{m}$。Stacking 不是选择单个模型，而是以估计的最优权重组合它们——通常预测更好，但可解释性不如只选 $M$ 个模型之一。
+
+Stacking 的思想比上述更一般：组合模型时可用任何学习方法而不只是线性回归，权重也可依赖输入位置 $x$。这样，学习方法被「堆叠」在彼此之上以改进预测性能。
+
+\subsection{小结：模型组合方法的谱系}
+
+§8.8 讨论了几种「组合多个模型」的策略。它们共享同一目标——用多个模型提升预测——但在「权重从哪来」「是否使用样本外信息」上各不相同，形成一条谱系：
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=1.1cm and 1.5cm,
+    root/.style={draw, rounded corners, fill=blue!10, text width=5.2cm, align=center, minimum height=0.9cm, font=\small\bfseries},
+    branch/.style={draw, rounded corners, fill=orange!10, text width=3.8cm, align=center, minimum height=1.0cm, font=\small},
+    leaf/.style={draw, rounded corners, fill=green!8, text width=3.6cm, align=center, minimum height=0.9cm, font=\footnotesize},
+    bad/.style={draw, rounded corners, fill=red!10, text width=3.6cm, align=center, minimum height=0.9cm, font=\footnotesize},
+    arrow/.style={->, >=stealth, thick}
+]
+\node[root] (top) {组合多个模型\\$\{\hat{f}_1, \ldots, \hat{f}_M\}$};
+
+\node[branch, below left=1.3cm and 0.5cm of top] (bma) {贝叶斯模型平均\\权重 = 模型后验概率};
+\node[branch, below=1.3cm of top] (freq) {频率学派最优权重\\权重 = 线性回归};
+\node[branch, below right=1.3cm and 0.5cm of top] (stack) {Stacking\\权重 = 样本外回归};
+
+\node[leaf, below=of bma] (bic) {BIC 加权\\$\Pr(M_m\mid\mathbf{Z})$\\$\propto e^{-\mathrm{BIC}_m/2}$};
+\node[leaf, below=0.5cm of bic] (full) {完整贝叶斯\\式 \eqref{eq:8_55}};
+\node[bad, below=of freq] (train) {训练集回归 $\times$\\偏爱复杂模型};
+\node[leaf, below=of stack] (loo) {留一 / K 折 / OOB\\公平赋权 $\checkmark$};
+
+\draw[arrow] (top.south west) -- (bma.north);
+\draw[arrow] (top.south) -- (freq.north);
+\draw[arrow] (top.south east) -- (stack.north);
+\draw[arrow] (bma.south) -- (bic.north);
+\draw[arrow] (bic.south) -- (full.north);
+\draw[arrow] (freq.south) -- (train.north);
+\draw[arrow] (stack.south) -- (loo.north);
+\end{tikzpicture}
+\end{center}
+
+\textbf{三者的关系与取舍：}
+\begin{itemize}
+    \item \textbf{贝叶斯模型平均}：权重 = 模型后验概率（委员会 / BIC / 完整贝叶斯），把「选模型」的不确定性平均掉；权重的统计意义最清晰，但需指定先验或做近似。
+    \item \textbf{频率学派最优权重}：理论上最优权重来自总体回归 \eqref{eq:8_57}，但 $P$ 未知；直接训练集回归偏爱复杂模型，不可用。
+    \item \textbf{Stacking}：用样本外预测（留一 / K 折 / OOB）回归赋权，绕开「偏爱复杂模型」问题，是频率学派想法的可用实现，也最灵活（可用任意学习器组合、权重可依赖 $x$）。
+\end{itemize}
+
+\textbf{频率学派赋权思路的演进：}
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=1.3cm and 1.0cm,
+    sbox/.style={draw, rounded corners, text width=3.8cm, align=center, minimum height=1.2cm, font=\small},
+    arrow/.style={->, >=stealth, thick}
+]
+\node[sbox, fill=blue!8] (wstar) {\textbf{总体回归} $\hat{w}^*$\\最优权重\\但依赖未知总体 $P$};
+\node[sbox, fill=red!10, right=of wstar] (train) {\textbf{训练集回归替代}\\偏爱复杂模型 $\times$\\不可用};
+\node[sbox, fill=green!12, right=of train] (stack) {\textbf{Stacking}\\留一样本外预测\\公平赋权 $\checkmark$};
+
+\draw[arrow] (wstar) -- (train) node[midway, above, font=\footnotesize] {自然替代};
+\draw[arrow] (train) -- (stack) node[midway, above, font=\footnotesize] {反例失败};
+\end{tikzpicture}
+\end{center}
+
+\textbf{Stacking 的机制：}
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=1.0cm and 0.8cm,
+    box/.style={draw, rounded corners, align=center, font=\small},
+    arrow/.style={->, >=stealth, thick}
+]
+\node[box, fill=blue!8, text width=6.0cm] (data) {\textbf{训练数据} $\mathbf{Z} = \{(x_i, y_i)\}_{i=1}^{N}$};
+\node[box, fill=orange!10, below=of data, text width=12.5cm] (models) {模型 $1$：$\hat{f}_1$ \quad 模型 $2$：$\hat{f}_2$ \quad $\cdots$ \quad 模型 $M$：$\hat{f}_M$};
+\node[box, fill=green!8, below=of models, text width=12.5cm] (preds) {留一预测矩阵 $\hat{f}_m^{-i}(x_i)$（$i = 1,\ldots,N$，$m = 1,\ldots,M$）\\样本外预测，不受过拟合偏袒};
+\node[box, fill=green!12, below=of preds, text width=9.0cm] (reg) {最小二乘回归 $y_i$ 对 $\hat{f}_m^{-i}(x_i)$\\$\Rightarrow$ 权重 $\hat{w}^{\mathrm{st}}$（式 \eqref{eq:8_59}）};
+\node[box, fill=blue!10, below=of reg, text width=8.5cm] (final) {\textbf{最终预测}：$\hat{f}_{\mathrm{stack}}(x) = \sum_{m=1}^{M}\hat{w}_m^{\mathrm{st}}\hat{f}_m(x)$};
+
+\draw[arrow] (data) -- (models);
+\draw[arrow] (models) -- (preds);
+\draw[arrow] (preds) -- (reg);
+\draw[arrow] (reg) -- (final);
+\end{tikzpicture}
+\end{center}
+
+\begin{remark}
+    若把 Stacking 的权重限制为 one-hot，就退化为留一交叉验证模型选择；若限制为等权，就退化为委员会方法。因此 Stacking 是「委员会（等权）」与「选最优模型（one-hot）」之间的连续统一体——用数据学出最优权重。
+\end{remark}
+
+% ============ §8.9 随机搜索：Bumping ============
+\section{随机搜索：Bumping}
+
+本章最后一个方法不涉及平均或组合模型，而是寻找\textbf{更好的单个模型}的技术。\textbf{Bumping} 使用 Bootstrap 抽样在模型空间中随机移动。
+
+与 Bagging 类似，抽取 Bootstrap 样本并各拟合一个模型，但\textbf{不平均预测}，而是选择在训练数据上拟合最好的 Bootstrap 模型。具体地，抽取 Bootstrap 样本 $\mathbf{Z}^{*1}, \ldots, \mathbf{Z}^{*B}$ 并各拟合模型，得到输入点 $x$ 处的预测 $\hat{f}^{*b}(x)$（$b = 1, \ldots, B$），然后选择在原始训练集上平均预测误差最小的模型。平方误差下，选择来自 Bootstrap 样本 $\hat{b}$ 的模型：
+\begin{equation}\label{eq:8_60}
+    \hat{b} = \argmin_b \sum_{i=1}^{N}[y_i - \hat{f}^{*b}(x_i)]^2
+\end{equation}
+对应预测为 $\hat{f}^{*\hat{b}}(x)$。按惯例把原始训练样本也包含在 Bootstrap 样本集合中，使方法在原始模型训练误差最低时自由选择之。
+
+\begin{remark}
+    通过扰动数据，Bumping 试图把拟合过程移到模型空间的良好区域。若少数数据点导致过程找到差解，任何省略这些点的 Bootstrap 样本都应产生更好的解。
+\end{remark}
+
+\textbf{例：XOR 问题（图 8.13）。} 两类、两个输入特征，特征表现出纯交互作用。在 $x_1 = 0$ 处分裂、再在每个分块内于 $x_2 = 0$ 处分裂（或反之），树分类器即可完美判别。然而贪心短视的 CART 算法（§9.2）尝试在任一特征上找最佳分裂再分裂所得分块。由于数据平衡，$x_1$ 或 $x_2$ 上的所有初始分裂看起来都没用，过程在顶层本质上产生随机分裂。Bumping 通过 Bootstrap 抽样打破类别平衡，在合理数量的 Bootstrap 样本（此处 20）下，碰巧至少产生一棵初始分裂接近 $x_1 = 0$ 或 $x_2 = 0$ 的树。仅用 20 个 Bootstrap 样本，Bumping 就找到了接近最优的分裂（图 8.13 右面板）。若加入若干与类别标签无关的噪声特征，贪心树生长算法的这一缺陷会加剧——它无法区分 $x_1, x_2$ 与其他特征，会严重迷失。
+
+\begin{remark}
+    由于 Bumping 在训练数据上比较不同模型，必须确保模型复杂度大致相同（树的情形即每个 Bootstrap 样本生长相同终结点数量的树）。Bumping 也有助于难以优化拟合准则的问题（如缺乏光滑性）——技巧是在 Bootstrap 样本上优化一个更方便的不同准则，再选择在训练样本上对目标准则产生最佳结果的模型。
+\end{remark}
+
+% ============ 本章小结 ============
+\section{本章小结}
+
+\subsection{核心框架：两条主线}
+
+第 8 章围绕「从数据量化不确定性」与「用数据改进预测」两条主线展开：频率学派与贝叶斯学派提供两种推断视角，Bootstrap 是连接二者的计算工具，EM 与 MCMC 处理隐变量问题，而 Bagging、模型平均与 Bumping 属于模型利用层面的改进。
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=1.0cm and 1.2cm,
+    ch/.style={draw, rounded corners, fill=blue!12, text width=5.2cm, align=center, minimum height=0.9cm, font=\small\bfseries},
+    theme/.style={draw, rounded corners, fill=orange!10, text width=3.6cm, align=center, minimum height=1.1cm, font=\small},
+    tool/.style={draw, rounded corners, fill=green!10, text width=3.6cm, align=center, minimum height=1.1cm, font=\small},
+    leaf/.style={draw, rounded corners, fill=gray!8, text width=3.4cm, align=center, minimum height=0.9cm, font=\footnotesize},
+    arrow/.style={->, >=stealth, thick}
+]
+\node[ch] (root) {第 8 章：模型推断与平均};
+
+\node[theme, below left=1.3cm and 0.3cm of root] (infer) {推断：\\量化不确定性};
+\node[tool, below=1.3cm of root] (boot) {Bootstrap：计算桥梁\\连接两种学派};
+\node[theme, below right=1.3cm and 0.3cm of root] (improve) {改进：\\提升预测};
+
+\node[leaf, below=of infer] (mle) {频率学派\\MLE / EM（点估计）};
+\node[leaf, below=0.5cm of mle] (bayes) {贝叶斯学派\\先验 → 后验 / MCMC};
+\node[leaf, below=of boot] (unify) {无信息先验下\\后验 ≈ 似然 ≈ Bootstrap};
+\node[leaf, below left=0.5cm and -2cm of improve] (bag) {Bagging\\平均降方差};
+\node[leaf, below= 4.0cm of improve] (avg) {模型平均 / Stacking\\加权组合};
+\node[leaf, below right=2.0cm and -2cm of improve] (bump) {Bumping\\找更好单模型};
+
+\draw[arrow] (root.south west) -- (infer.north);
+\draw[arrow] (root.south) -- (boot.north);
+\draw[arrow] (root.south east) -- (improve.north);
+\draw[arrow] (infer.south) -- (mle.north);
+\draw[arrow] (mle.south) -- (bayes.north);
+\draw[arrow] (boot.south) -- (unify.north);
+\draw[arrow] (improve.south west) -- (bag.north);
+\draw[arrow] (improve.south) -- (avg.north);
+\draw[arrow] (improve.south east) -- (bump.north);
+\end{tikzpicture}
+\end{center}
+
+\subsection{方法选用指南}
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=0.9cm and 1.4cm,
+    need/.style={draw, rounded corners, fill=blue!8, text width=3.2cm, align=center, minimum height=0.8cm, font=\small},
+    meth/.style={draw, rounded corners, fill=green!10, text width=6.2cm, align=center, minimum height=0.8cm, font=\small},
+    arrow/.style={->, >=stealth, thick}
+]
+\node[need] (n1) {想要点估计};
+\node[need, below=of n1] (n2) {想要不确定性区间};
+\node[need, below=of n2] (n3) {模型存在隐变量};
+\node[need, below=of n3] (n4) {降低预测方差};
+\node[need, below=of n4] (n5) {组合多个模型};
+\node[need, below=of n5] (n6) {更好的单个模型};
+
+\node[meth, right=of n1] (m1) {MLE（频率） 或 MAP（贝叶斯）};
+\node[meth, right=of n2] (m2) {Bootstrap（频率） 或 后验 + MCMC（贝叶斯）};
+\node[meth, right=of n3] (m3) {EM 求 MLE，或 Gibbs 从后验抽样};
+\node[meth, right=of n4] (m4) {Bagging（平均、消除单模型方差）};
+\node[meth, right=of n5] (m5) {模型平均 BMA，或 Stacking（样本外加权）};
+\node[meth, right=of n6] (m6) {Bumping（Bootstrap 扰动搜索）};
+
+\draw[arrow] (n1) -- (m1);
+\draw[arrow] (n2) -- (m2);
+\draw[arrow] (n3) -- (m3);
+\draw[arrow] (n4) -- (m4);
+\draw[arrow] (n5) -- (m5);
+\draw[arrow] (n6) -- (m6);
+\end{tikzpicture}
+\end{center}
+
+\subsection{关键结论}
+
+\begin{enumerate}
+    \item \textbf{两种学派的根本分歧是「谁随机」：} 频率学派参数固定、数据随机（重复抽样视角），输出点估计 + 置信区间；贝叶斯学派数据固定、参数随机，输出整个后验分布 + 可信区间。贝叶斯的核心动机是\textbf{量化不确定性}。
+    \item \textbf{Bootstrap 是「穷人的贝叶斯后验」：} 无信息先验下，后验 $\approx$ 似然 $\approx$ Bootstrap 分布。Bootstrap 既是评估工具（标准误、置信区间），也是改进工具（Bagging）——同一工具，两种用途。
+    \item \textbf{EM 与 MCMC 是同一隐变量结构的两面：} EM 用「期望 + 最大化」求 MLE 点估计（频率）；Gibbs 把「最大化」换成「抽样」，从后验分布抽样（贝叶斯）。区别是「点」与「分布」。
+    \item \textbf{MCMC 的实践本质：} 平稳分布是极限，有限步只能给任意精度的近似；误差来自 burn-in 与蒙特卡洛（ESS）；靠 trace、$\hat{R}$、自相关诊断；谱隙 $1-\lambda_2$ 决定混合速度。
+    \item \textbf{Bagging 降方差、不扩模型类：} 平方损失下理想聚合不增 MSE（消掉单模型方差）；但 Bagging 平均救不了表达能力不足的基础模型——这正是第 10 章 Boosting 的动机。
+    \item \textbf{模型组合的三条路线：} BMA（权重 = 模型后验概率，BIC 近似）、频率最优权重（总体回归，因 $P$ 未知不可用）、Stacking（样本外预测公平赋权）。Stacking 是「等权委员会」与「选最优模型」之间的连续统一体。
+    \item \textbf{Bumping 帮助贪心算法跳出局部最优：} 通过 Bootstrap 扰动在模型空间随机移动，选择训练误差最小的模型（XOR 例），本质是随机化的模型搜索。
+\end{enumerate}
