@@ -207,14 +207,39 @@ Boosting 的成功并不神秘，关键在式 \eqref{eq:10_1}：Boosting 是在�
     (e^{\beta} - e^{-\beta}) \cdot \sum_{i=1}^{N} w_i^{(m)} I(y_i \neq G(x_i)) + e^{-\beta} \cdot \sum_{i=1}^{N} w_i^{(m)}.
 \end{equation}
 
-\textbf{第二步}：把该 $G_m$ 代回式 \eqref{eq:10_9} 解 $\beta$，得
+\textbf{第二步}：把第一步得到的 $G_m$ \textbf{固定}，代回式 \eqref{eq:10_9}，把 $\beta$ 解出来。此时 $G(x_i)$ 已知，只需关于 $\beta$ 极小化。先把求和按「分类是否正确」拆成两部分——注意对 $y_i \in \{\pm 1\}$、$G_m(x_i) \in \{\pm 1\}$，恒有 $y_i G_m(x_i) = 1$（正确分类）或 $-1$（误分类）：
+\begin{itemize}
+    \item 若 $y_i = G_m(x_i)$（正确），则 $y_i G_m(x_i) = 1$，该项贡献 $w_i^{(m)} e^{-\beta}$；
+    \item 若 $y_i \neq G_m(x_i)$（误分类），则 $y_i G_m(x_i) = -1$，该项贡献 $w_i^{(m)} e^{\beta}$。
+\end{itemize}
+于是准则 \eqref{eq:10_9} 化为
+\[
+    Q(\beta) = e^{-\beta}\underbrace{\sum_{y_i = G_m(x_i)} w_i^{(m)}}_{W^+} + e^{\beta}\underbrace{\sum_{y_i \neq G_m(x_i)} w_i^{(m)}}_{W^-},
+\]
+其中 $W^+$、$W^-$ 分别为正确分类、误分类观测的\textbf{权重和}，且 $W^+ + W^- = \sum_{i=1}^{N} w_i^{(m)}$。注意 $W^+$、$W^-$ 均\textbf{与 $\beta$ 无关}（$w_i^{(m)}$ 只依赖 $f_{m-1}$），故可按普通常数对 $\beta$ 求导。
+
+对 $\beta$ 求导并令其为零：
+\[
+    \frac{dQ}{d\beta} = -W^+ e^{-\beta} + W^- e^{\beta} \overset{!}{=} 0
+    \;\Longrightarrow\;
+    W^- e^{\beta} = W^+ e^{-\beta}
+    \;\Longrightarrow\;
+    e^{2\beta} = \frac{W^+}{W^-},
+\]
+两边取对数得
+\[
+    \beta = \frac{1}{2}\log\frac{W^+}{W^-}.
+\]
+再把加权误差率 \eqref{eq:10_13} 用进来：$\mathrm{err}_m = \frac{W^-}{W^+ + W^-}$，故 $W^+ = (1 - \mathrm{err}_m)(W^+ + W^-)$、$W^- = \mathrm{err}_m (W^+ + W^-)$，代入即得
 \begin{equation}\label{eq:10_12}
-    \beta_m = \frac{1}{2}\log\frac{1 - \mathrm{err}_m}{\mathrm{err}_m},
+    \beta_m = \frac{1}{2}\log\frac{1 - \mathrm{err}_m}{\mathrm{err}_m}.
 \end{equation}
 其中 $\mathrm{err}_m$ 为最小化后的加权误差率
 \begin{equation}\label{eq:10_13}
     \mathrm{err}_m = \frac{\sum_{i=1}^{N} w_i^{(m)} I(y_i \neq G_m(x_i))}{\sum_{i=1}^{N} w_i^{(m)}}.
 \end{equation}
+
+\textbf{这是极小点吗？} 二阶导数 $Q''(\beta) = W^+ e^{-\beta} + W^- e^{\beta} > 0$ 恒正，故 $Q(\beta)$ 是 $\beta$ 的\textbf{凸函数}，上述驻点是\textbf{唯一全局极小点}。此外，$\beta_m > 0$ 当且仅当 $\mathrm{err}_m < \frac{1}{2}$——这正是「\textbf{弱分类器}（略优于随机猜测）」假设所保证的：若基分类器误差率超过 $\frac{1}{2}$，则 $\beta_m \le 0$，权重更新方向反转，boosting 失效。这也解释了为何 $w_i^{(m)}$ 与 $\beta$ 无关是推导的关键——它把式 \eqref{eq:10_9} 的联合极小化化成了「先找使加权误差率最小的 $G_m$，再闭式求 $\beta_m$」的两步。\textbf{直觉}：$\beta_m$ 是「对 $G_m$ 有多信任」的度量——$G_m$ 越准（$\mathrm{err}_m \to 0$），$\beta_m$ 越大，最终投票 \eqref{eq:10_1} 中其权重越高；纯随机（$\mathrm{err}_m = \frac{1}{2}$）时 $\beta_m = 0$，该分类器不参与投票。
 
 随后更新逼近 $f_m(x) = f_{m-1}(x) + \beta_m G_m(x)$，使下一步权重变为
 \begin{equation}\label{eq:10_14}
@@ -264,13 +289,80 @@ AdaBoost.M1 最初并非从上一节的角度提出，其与基于指数损失�
     \item \textbf{二项偏差} $L(y, f) = \log\bigl(1 + e^{-2yf}\bigr)$（负二项对数似然）：对大负边际的惩罚近似\textbf{线性}增长，影响力更均匀地分布于全部数据，因而\textbf{稳健得多}。
 \end{itemize}
 
+\paragraph{二项偏差 $\log(1+e^{-2yf})$ 真的是「负二项对数似然」吗？}
+
+\textbf{是}。它正是把类概率写成 logistic 形式后的负对数似然。设 $p = \Pr(Y=1 \mid x)$，取 logistic 形式
+\[
+    p = \frac{1}{1+e^{-2f}}, \qquad \Pr(Y=-1 \mid x) = 1-p = \frac{1}{1+e^{2f}},
+\]
+（这里用 $2f$ 是因为 $f$ 定义为 log-odds 的\textbf{一半}，见式 \eqref{eq:10_16}--\eqref{eq:10_17}）。对单个观测的负对数似然为
+\[
+    -\log \Pr(Y=y \mid x) = \begin{cases} \log(1+e^{-2f}), & y = 1,\\ \log(1+e^{2f}), & y = -1, \end{cases}
+\]
+由于 $y \in \{\pm 1\}$ 时 $-2yf$ 分别等于 $-2f$ 与 $+2f$，两种情形可统一写成
+\[
+    L(y, f) = -\log \Pr(Y = y \mid x) = \log\bigl(1 + e^{-2yf}\bigr),
+\]
+即\textbf{负二项对数似然}（二项偏差）。它也叫「logistic 损失」。它与指数损失 $e^{-yf}$ 的关系：对 $\log(1+e^{-2yf})$ 做大负边际近似得 $2\cdot(-yf) = 2|yf|$（线性），而指数损失近似得 $e^{|yf|}$（指数）——这正是 §10.6 所说「二项偏差对大负边际惩罚线性、指数损失指数增长」的由来。
+
+三个损失函数随边际 $yf(x)$ 的变化如图：
+\begin{center}
+\begin{tikzpicture}[>=stealth, font=\small]
+    % 坐标轴与刻度（先画，避免被 clip 裁剪）
+    \draw[->, thick] (-2.6,0) -- (2.7,0) node[below right] {$yf(x)$（边际）};
+    \draw[->, thick] (0,-0.12) -- (0,3.45) node[above left] {损失};
+    \draw (-2,0.05) -- (-2,-0.05) node[below] {$-2$};
+    \draw (-1,0.05) -- (-1,-0.05) node[below] {$-1$};
+    \draw (1,0.05) -- (1,-0.05) node[below] {$1$};
+    \draw (2,0.05) -- (2,-0.05) node[below] {$2$};
+    \draw (0.05,1) -- (-0.05,1) node[left] {$1$};
+    \draw (0.05,2) -- (-0.05,2) node[left] {$2$};
+    \draw (0.05,3) -- (-0.05,3) node[left] {$3$};
+    % 曲线（clip 在坐标轴范围内，允许函数超出顶部被截断）
+    \begin{scope}
+        \clip (-2.6,-0.2) rectangle (2.6,3.4);
+        % 误分类损失：阶梯（yf<0 取 1，yf>=0 取 0）
+        \draw[very thick, black] (-2.5,1) -- (0,1);
+        \draw[very thick, black] (0,0) -- (2.5,0);
+        % 指数损失 exp(-yf)，0 处 =1，无需缩放
+        \draw[red, thick, domain=-2.5:2.5, samples=200] plot (\x, {exp(-\x)});
+        % 二项偏差 log(1+e^{-2yf})/log 2，缩放使其过 (0,1)
+        \draw[blue, thick, domain=-2.5:2.5, samples=200] plot (\x, {ln(1+exp(-2*\x))/ln(2)});
+    \end{scope}
+    % 误分类损失在 yf=0 处：I(yf<0)=0，故 (0,0) 实心、(0,1) 空心
+    \filldraw[black] (0,0) circle (1.6pt);
+    \filldraw[white] (0,1) circle (1.6pt);
+    \draw (0,1) circle (1.6pt);
+    % 图例（右上角空白区）
+    \draw[black, very thick] (1.05,2.95) -- (1.45,2.95) node[right, black] {误分类 $I(yf<0)$};
+    \draw[red, thick] (1.05,2.6) -- (1.45,2.6) node[right, red] {指数 $e^{-yf}$};
+    \draw[blue, thick] (1.05,2.25) -- (1.45,2.25) node[right, blue] {二项偏差 $\log(1+e^{-2yf})$};
+\end{tikzpicture}
+\\[2pt]
+\small\textbf{图：}二分类的三种损失函数（缩放后均过 $(0,1)$ 点，对应原书图 10.4）。误分类损失是「对负边际罚 1、正边际不罚」的阶梯；指数损失与二项偏差都是它的\textbf{单调连续逼近}，且都随边际变负而增大——指数损失上升\textbf{指数级}（对误分类、尤其是标签噪声的观测施加极大影响力），二项偏差上升近似\textbf{线性}（影响力更均匀、更稳健）。
+\end{center}
+
 \subsection{平方误差损失不适合分类}
 
 平方误差损失 $L(y, f) = (y - f)^2$ 的总体风险极小化者为
 \begin{equation}\label{eq:10_19}
     f^*(x) = \argmin_{f(x)} \E_{Y \mid x}(Y - f(x))^2 = \E(Y \mid x) = 2\cdot \Pr(Y = 1 \mid x) - 1,
 \end{equation}
-分类规则仍取 $G(x) = \sgn[f(x)]$。但平方误差\textbf{不是误分类误差的好替代}：它不是边际 $yf(x)$ 的单调递减函数——当 $y_i f(x_i) > 1$ 时它反而\textbf{二次增大}，把越来越多误差加在「越来越确定被正确分类」的观测上，从而\textbf{相对削弱}了真正误分类（$y_i f(x_i) < 0$）观测的影响力。若目标是类别判定，应采用单调递减的替代损失。第 12 章图 12.4 给出二次损失的修改——「Huber 化的平方 hinge 损失」（Rosset et al., 2004b），兼具二项偏差、二次损失与 SVM hinge 损失的良好性质：与二次损失 \eqref{eq:10_19} 有相同的总体极小化、$yf(x) > 1$ 时取零、$yf(x) < -1$ 时变为线性。
+分类规则仍取 $G(x) = \sgn[f(x)]$。
+
+\paragraph{$\E(Y \mid x) = 2\Pr(Y = 1 \mid x) - 1$ 这个等号怎么成立的？}
+
+这完全来自二分类的\textbf{编码约定} $Y \in \{-1, 1\}$。设 $p = \Pr(Y = 1 \mid x)$，则 $\Pr(Y = -1 \mid x) = 1 - p$。按（离散）期望的定义把 $Y$ 的两个取值 $1$ 与 $-1$ 及其条件概率代入：
+\[
+    \E(Y \mid x) = \sum_y y \cdot \Pr(Y = y \mid x)
+    = 1 \cdot p + (-1) \cdot (1 - p)
+    = p - 1 + p
+    = 2p - 1
+    = 2\Pr(Y = 1 \mid x) - 1.
+\]
+\textbf{直觉}：$Y$ 的两个取值 $+1$、$-1$ 关于 $0$ 对称，因此条件期望就是「两类概率之差的加权平衡点」——当 $\Pr(Y=1\mid x) = \frac{1}{2}$（两类等可能）时 $\E(Y\mid x) = 0$（在 $0$ 处平衡）；当类 $1$ 概率趋向 $1$ 时，期望趋向 $+1$；趋向 $0$ 时趋向 $-1$。它把区间 $[0,1]$ 上的概率线性映射到 $[-1,1]$ 上的期望，故 $\sgn[\E(Y\mid x)] = \sgn[2p-1]$ 恰好实现贝叶斯分类规则（$p > \frac{1}{2}$ 判类 $1$）。
+
+但平方误差\textbf{不是误分类误差的好替代}：它不是边际 $yf(x)$ 的单调递减函数——当 $y_i f(x_i) > 1$ 时它反而\textbf{二次增大}，把越来越多误差加在「越来越确定被正确分类」的观测上，从而\textbf{相对削弱}了真正误分类（$y_i f(x_i) < 0$）观测的影响力。若目标是类别判定，应采用单调递减的替代损失。第 12 章图 12.4 给出二次损失的修改——「Huber 化的平方 hinge 损失」（Rosset et al., 2004b），兼具二项偏差、二次损失与 SVM hinge 损失的良好性质：与二次损失 \eqref{eq:10_19} 有相同的总体极小化、$yf(x) > 1$ 时取零、$yf(x) < -1$ 时变为线性。
 
 \subsection{K 类分类的损失}
 
@@ -295,15 +387,82 @@ AdaBoost.M1 最初并非从上一节的角度提出，其与基于指数损失�
     \item 平方误差 $L(y, f) = (y - f)^2$ 的总体解是 $f(x) = \E(Y \mid x)$；
     \item 绝对损失 $L(y, f) = \abs{y - f}$ 的总体解是 $f(x) = \mathrm{median}(Y \mid x)$；对称误差分布下两者相同。
 \end{itemize}
-但有限样本下，平方误差在拟合过程中对绝对残差 $\abs{y_i - f(x_i)}$ 大的观测施加\textbf{过重}的权重，因而\textbf{不稳健}：对长尾误差分布、尤其对严重误测的 $y$（离群点），性能严重退化；绝对损失等更稳健准则在这些情形表现好得多。稳健统计文献提出了各种对严重离群点强抵抗、对高斯误差又几乎与最小二乘同样有效的回归损失。其中之一是 M-回归的 \textbf{Huber 损失}（Huber, 1964）：
+但有限样本下，平方误差在拟合过程中对绝对残差 $\abs{y_i - f(x_i)}$ 大的观测施加\textbf{过重}的权重，因而\textbf{不稳健}：对长尾误差分布、尤其对严重误测的 $y$（离群点），性能严重退化；绝对损失等更稳健准则在这些情形表现好得多。稳健统计文献提出了各种对严重离群点强抵抗、对高斯误差又几乎与最小二乘同样有效的回归损失。
+
+\subsubsection{Huber 损失}
+
+其中最具代表性的是 M-回归的 \textbf{Huber 损失}（Huber, 1964）：
 \begin{equation}\label{eq:10_23}
     L(y, f(x)) = \begin{cases} [y - f(x)]^2, & \abs{y - f(x)} \le \delta,\\ 2\delta\abs{y - f(x)} - \delta^2, & \text{否则}. \end{cases}
 \end{equation}
-它在零附近是二次的（像平方误差）、大残差处是线性的（像绝对损失），兼具二者优点。
+它在零附近是二次的（像平方误差）、大残差处是线性的（像绝对损失），兼具二者优点。三种回归损失随残差 $y - f(x)$ 的变化对比如下（$\delta = 1$）：
+
+\begin{center}
+\begin{tikzpicture}[>=stealth, font=\small]
+    % 坐标轴与刻度（先画，避免被 clip 裁剪）
+    \draw[->, thick] (-3.6,0) -- (3.7,0) node[below right] {$y - f(x)$（残差）};
+    \draw[->, thick] (0,-0.15) -- (0,8.6) node[above left] {损失};
+    \foreach \x in {-3,-2,-1,1,2,3} \draw (\x,0.05) -- (\x,-0.05) node[below] {$\x$};
+    \foreach \y in {2,4,6,8} \draw (0.05,\y) -- (-0.05,\y) node[left] {$\y$};
+    % 曲线（clip：允许平方误差顶部被截断）
+    \begin{scope}
+        \clip (-3.6,-0.3) rectangle (3.6,8.5);
+        % 平方误差 (y-f)^2
+        \draw[green!50!black, thick, domain=-3:3, samples=150] plot (\x, {\x*\x});
+        % 绝对损失 |y-f|
+        \draw[blue, thick, domain=-3:3, samples=150] plot (\x, {abs(\x)});
+        % Huber（δ=1）：|r|<=1 为 r^2，否则 2|r|-1（分段绘制保证在 ±1 处精确衔接）
+        \draw[red, very thick, domain=-3:-1, samples=50] plot (\x, {-2*\x - 1});
+        \draw[red, very thick, domain=-1:1, samples=100] plot (\x, {\x*\x});
+        \draw[red, very thick, domain=1:3, samples=50] plot (\x, {2*\x - 1});
+    \end{scope}
+    % δ 衔接点标注
+    \fill (1,1) circle (1.6pt);
+    \fill (-1,1) circle (1.6pt);
+    \draw[dashed, gray] (1,0) -- (1,1);
+    \draw[dashed, gray] (-1,0) -- (-1,1);
+    \node[below, gray] at (1,0) {$\delta$};
+    \node[below, gray] at (-1,0) {$-\delta$};
+    % 图例
+    \draw[green!50!black, thick] (1.65,8.05) -- (2.05,8.05) node[right, green!50!black] {平方误差 $(y-f)^2$};
+    \draw[blue, thick] (1.65,7.55) -- (2.05,7.55) node[right, blue] {绝对损失 $|y-f|$};
+    \draw[red, very thick] (1.65,7.05) -- (2.05,7.05) node[right, red] {Huber（$\delta = 1$）};
+\end{tikzpicture}
+\\[2pt]
+\small\textbf{图：}三种回归损失函数（对应原书图 10.5）。Huber 损失在 $\abs{y-f} \le \delta$ 内为二次（与平方误差重合）、在 $\abs{y-f} > \delta$ 处变为线性（与绝对损失平行），并在 $\pm\delta$ 处光滑衔接。
+\end{center}
+
+\textbf{Huber 的两段在 $\pm\delta$ 处光滑衔接：} 当 $\abs{y - f(x)} = \delta$ 时两段取值都为 $\delta^2$，且内段导数 $2\delta$ 恰等于外段斜率 $2\delta$，故函数与导数都连续。其导数为
+\[
+    \pdv{L}{f} = \begin{cases} -2\,[y - f(x)], & \abs{y - f(x)} \le \delta,\\ -2\delta \cdot \sgn[y - f(x)], & \text{否则}, \end{cases}
+\]
+即残差的\textbf{影响力}在 $\abs{y-f} \le \delta$ 内随残差线性增长（像最小二乘）、一旦超过 $\delta$ 便\textbf{饱和为常数} $2\delta$（像绝对损失）——这正是其稳健性的来源：大离群点的梯度贡献被「封顶」，不再随残差二次放大。$\delta$ 是「多少残差视为正常」的阈值，常取 $1.345$（使高斯误差下相对渐近效率约 $95\%$）。
 
 \begin{remark}[稳健性与算法优雅性的权衡]
 当稳健性是关切点（数据挖掘尤甚，见 §10.7），回归的平方误差、分类的指数损失从统计角度看不是最优准则。但它们在\textbf{前向分阶段加性建模}中导致优雅的模块化 boosting 算法：平方误差下每步只需把基学习器拟合到当前残差 $y_i - f_{m-1}(x_i)$；指数损失下对输出 $y_i$ 做加权拟合、权重 $w_i = \exp(-y_i f_{m-1}(x_i))$。直接换用其他稳健准则得不到这样简单的可行 boosting 算法；但 §10.10.2 将展示如何基于\textbf{任意可微损失}导出简单优雅的 boosting 算法，从而为数据挖掘构造高度稳健的 boosting 程序。
 \end{remark}
+
+\paragraph{既然 AdaBoost 是指数损失，那我能设计一个基于 Huber 的 boost 吗？}
+
+\textbf{能}，而且这正是从「AdaBoost = 指数损失」到「梯度提升 GBM（§10.10）」的演进动因之一。
+
+\textbf{框架层面：任意损失都可以 boost。} Boosting 的本质不是「指数损失」，而是\textbf{前向分阶段加性建模}（Algorithm 10.2）——对\textbf{任意}损失 $L$ 都可定义。指数损失的特殊之处只在：二分类 + 离散弱分类器时该子问题有\textbf{闭式解}（加权误差率 → $\beta_m = \frac12\log\frac{1-\mathrm{err}_m}{\mathrm{err}_m}$）。这是指数损失的「运气」，不是 boosting 的必要条件。
+
+\textbf{经典前向分阶段 + Huber 的困难：} 如上文所述，用 Huber 替换平方误差确实能稳健化提升树，但子问题不再好解——平方误差化简为「把树拟合到残差」；Huber 化简不出残差拟合：给区域 $R_{jm}$ 后，式 \eqref{eq:10_30} 的解是 \textbf{Huber location 估计}（M-估计），需迭代（IRLS）；树诱导（找区域）需用近似准则 \eqref{eq:10_27}。
+
+\textbf{现代解法：梯度提升（§10.10）。} 对任意可微损失，梯度提升用\textbf{负梯度作「伪残差」}，绕过子问题不可解：
+\[
+    r_{im} = -\Bigl[\frac{\partial L(y_i, f(x_i))}{\partial f(x_i)}\Bigr]_{f = f_{m-1}}.
+\]
+对 Huber 损失，伪残差为
+\[
+    r_{im} = \begin{cases} 2\bigl(y_i - f_{m-1}(x_i)\bigr), & \abs{\text{残差}} \le \delta,\\ 2\delta\,\sgn\bigl(y_i - f_{m-1}(x_i)\bigr), & \abs{\text{残差}} > \delta, \end{cases}
+\]
+即小残差按普通残差处理、大残差被「封顶」缩水到 $\pm 2\delta$（winsorized）——这正是 Huber 提升的稳健机制。每步把树拟合到该伪残差，再在各叶节点线性搜索最优 $\gamma$。现代实现早已内置：LightGBM 的 `objective='huber'`、XGBoost 的 pseudo-Huber 都直接支持。
+
+\textbf{若想做「分类的 Huber boost」：} Huber 原生是\textbf{回归}损失（定义在 $y \in \R$）。用于二分类需写成\textbf{边际损失} $\rho(yf(x))$——即「Huber 化的平方 hinge」：$yf > 1$ 时为零、$yf < -1$ 时线性、中间二次（§10.6 提到的图 12.4，Rosset et al., 2004b）。它与平方损失有相同的总体极小化，但兼具二项偏差、二次损失与 SVM hinge 的优点，同样可用梯度提升实现。
+
+\textbf{一句话总结：} 可以设计，而且已经存在。指数损失让 AdaBoost 闭式、优雅但不稳健；Huber（或二项偏差、绝对损失）让 boosting 稳健，代价是每步子问题变难——连接「损失 → 算法」的桥就是梯度提升的伪残差技巧。
 
 % ============ §10.7 数据挖掘的「现成」程序 ============
 \section{数据挖掘的「现成」程序}
@@ -336,20 +495,6 @@ AdaBoost.M1 最初并非从上一节的角度提出，其与基于指数损失�
 
 但树有一缺陷妨碍它成为理想工具：\textbf{不准确}——其预测精度很少能与数据能达到的最佳水平相比。如 §10.1 所见，boosting 树能显著（常是戏剧性地）提升其精度，同时保留其大部分数据挖掘所需性质；被牺牲的优点是\textbf{速度、可解释性}，以及（对 AdaBoost 而言）对重叠类分布、尤其对训练数据\textbf{错误标注}的稳健性。\textbf{梯度提升模型（GBM）}是树提升的推广，试图缓解这些问题，成为数据挖掘中准确有效的现成程序。
 
-% ============ §10.8 示例：Spam 数据 ============
-\section{示例：Spam 数据}
-
-在深入梯度提升细节前，先在二分类问题上展示其能力。Spam 数据见第 1 章，第 9 章多个方法都以它为示例（§9.1.2、§9.2.5、§9.3.1、§9.4.1）。
-
-对这批数据应用梯度提升得到测试误差率 \textbf{$4.5\%$}（与 §9.1.2 相同的测试集）。作为对比：加性 logistic 回归 $5.5\%$、完全生长并经交叉验证剪枝的 CART 树 $8.7\%$、MARS $5.5\%$。这些估计的标准误约 $0.6\%$；梯度提升显著优于所有其他方法（McNemar 检验，练习 10.6）。
-
-这里建模的量是 spam 对 email 的对数优势
-\begin{equation}\label{eq:10_24}
-    f(x) = \log\frac{\Pr(\text{spam} \mid x)}{\Pr(\text{email} \mid x)}
-\end{equation}
-（见 §10.13）。图 10.6 展示全部 57 个预测变量的\textbf{相对重要性}谱：字符 `!`、`\$`、`hp`、`remove` 的出现频率被估计为最相关的四个预测变量；`857`、`415`、`table`、`3d` 几乎无关。图 10.7 展示所选重要预测变量的\textbf{部分依赖}：两个与 spam 正相关（`!` 和 `remove`）、两个负相关（`edu` 和 `hp`），这些依赖基本单调，与加性 logistic 回归得到的对应函数大体一致（图 9.1，书内 p.303）。
-
-用 $J = 2$ 个终端节点的树运行梯度提升模型，对对数优势产生\textbf{纯加性（主效应）模型}，误差率 $4.7\%$，而完整梯度提升模型（$J = 5$）为 $4.5\%$。虽不显著，这略高的误差率提示某些重要预测变量间可能存在\textbf{交互}；可通过双变量部分依赖图诊断。图 10.8 即其一：当 `hp` 频率很低时 spam 对数优势大幅升高；`hp` 频率高时对数优势低得多且随 `!` 近似恒定；随 `hp` 频率下降，与 `!` 的函数关系增强。
 
 % ============ §10.9 Boosting 树 ============
 \section{Boosting 树}
@@ -371,6 +516,31 @@ AdaBoost.M1 最初并非从上一节的角度提出，其与基于指数损失�
     \end{equation}
     得到 $\hat R_j = \tilde R_j$ 后，再用原始准则更精确地估计 $\gamma_j$。
 \end{itemize}
+
+\paragraph{误分类损失下 $\hat\gamma_j$ 取「众数类」是什么？}
+
+\textbf{众数类（modal class）}就是区域内\textbf{出现次数最多的类别}（统计中的\textbf{众数} mode）。原因是误分类损失 $L(y, \gamma) = I(y \neq \gamma)$（0--1 损失）在区域 $R_j$ 内的经验风险为
+\[
+    \sum_{x_i \in R_j} I(y_i \neq \gamma) = \underbrace{N_j}_{\text{落入 }R_j\text{ 的观测数}} - \underbrace{\#\{y_i = \gamma\}}_{\text{类别恰为 }\gamma\text{ 的观测数}},
+\]
+其中 $N_j$ 与 $\gamma$ 无关。因此最小化该风险 $\iff$ \textbf{最大化「类别等于 $\gamma$」的计数} $\iff$ 取出现频率最高的类。
+
+\textbf{直觉}：误分类损失每错一个样本罚 $1$。把一个区域 $R_j$ 的预测定成某个类 $\gamma$ 时，付出的代价 = 区域内「不是 $\gamma$」的样本数。显然应把 $\gamma$ 定成区域内样本最多的那个类，使「被罚错」的样本数最少。若区域内各类计数相同（如各 $50\%$），则任取其一即可。
+
+\textbf{与各损失的最优「位置估计」对应：} 给定区域求最优常数，本质是一个「位置」估计问题，损失函数决定了答案：
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{损失} & \textbf{最优 $\hat\gamma_j$} & \textbf{统计量} \\
+\midrule
+平方误差 $[y-\gamma]^2$ & $\bar y_j$（均值） & 期望 \\
+绝对损失 $\abs{y-\gamma}$ & $\mathrm{median}$（中位数） & 中位数 \\
+误分类损失 $I(y\neq\gamma)$ & \textbf{众数类}（modal class） & 众数 \\
+\bottomrule
+\end{tabular}
+\end{center}
+三类损失分别对应「均值 / 中位数 / 众数」这三种中心趋势统计量。
+
 §9.2 对分类树描述了这样的策略：生长树（确定 $R_j$）时用 \textbf{Gini 指数}替代误分类损失。
 
 \textbf{提升树模型}是这种树的\textbf{和}：
@@ -382,6 +552,18 @@ AdaBoost.M1 最初并非从上一节的角度提出，其与基于指数损失�
     \hat\Theta_m = \argmin_{\Theta_m} \sum_{i=1}^{N} L\bigl(y_i, f_{m-1}(x_i) + T(x_i; \Theta_m)\bigr),
 \end{equation}
 给定当前模型 $f_{m-1}(x)$ 求区域集与常数 $\Theta_m = \{R_{jm}, \gamma_{jm}\}_1^{J_m}$。
+
+\paragraph{为什么式 \eqref{eq:10_28} 的提升树模型没有显式权重 $\beta_m$？}
+
+权重\textbf{并没有消失}——它被\textbf{吸收}进树的叶节点常数 $\gamma_{jm}$ 里了。回忆 §10.2 的一般加性展开
+\[
+    f(x) = \sum_{m=1}^{M} \beta_m\, b(x; \gamma_m),
+\]
+其中 $\beta_m$ 是展开系数（权重）。对树 $T(x;\Theta_m) = \sum_{j=1}^{J} \gamma_{jm} I(x \in R_{jm})$，若写成 $\beta_m T(x;\Theta_m)$，则每叶项变为 $\beta_m \gamma_{jm}$——两个自由标量的乘积仍是自由标量，可重新标度 $\tilde\gamma_{jm} := \beta_m \gamma_{jm}$ 吸收掉 $\beta_m$。\textbf{只要叶节点值 $\gamma_{jm}$ 不受约束（可取任意实数），显式 $\beta_m$ 就是冗余的}，式 \eqref{eq:10_28} 直接令 $\beta_m = 1$ 不失一般性。
+
+\textbf{权重「藏」在哪：} 每棵树的\textbf{整体幅度}体现在其叶节点值 $\gamma_{jm}$ 上——例如平方误差损失下，$\hat\gamma_{jm}$ 是第 $j$ 区域残差的均值（式 \eqref{eq:10_30}），它同时扮演了「拟合残差」与「最优步长」两个角色。前向分阶段每步加的 $T(x;\Theta_m)$，其幅度已由 (10.30) 的最优位置估计确定，无需额外系数。
+
+\textbf{何时必须显式 $\beta_m$：} 只有当下文的\textbf{缩放分类树}（AdaBoost 情形，$\gamma_{jm} \in \{-1, 1\}$）才需要显式 $\beta_m$——因为叶子被\textbf{限制}在 $\pm 1$，幅度无法由 $\gamma_{jm}$ 携带，只能靠外挂的 $\beta_m$。这正是 §10.9 中「二分类 + 指数损失」一项里写 $\beta_m T(x;\Theta_m)$ 的原因；而一般的（不限幅）提升树则无需此系数。
 
 给定区域 $R_{jm}$，求每区域最优常数通常直截了当：
 \begin{equation}\label{eq:10_30}
@@ -430,4 +612,370 @@ AdaBoost.M1 最初并非从上一节的角度提出，其与基于指数损失�
 \begin{equation}\label{eq:10_35}
     g_{im} = \Bigl[\frac{\partial L(y_i, f(x_i))}{\partial f(x_i)}\Bigr]_{f(x_i) = f_{m-1}(x_i)}.
 \end{equation}
+步长 $\rho_m$ 是如下问题的解：
+\begin{equation}\label{eq:10_36}
+    \rho_m = \argmin_{\rho} L(f_{m-1} - \rho g_m),
+\end{equation}
+随后更新 $f_m = f_{m-1} - \rho_m g_m$ 并进入下一次迭代。最速下降可视为\textbf{非常贪心}的策略——$-g_m$ 是 $\R^N$ 中 $L(f)$ 在 $f = f_{m-1}$ 处下降最快的局部方向。
+
+\paragraph{为什么要取「使损失最小」的步长 $\rho_m$？}
+
+方向已定为负梯度 $-g_m$（损失下降最快的局部方向），剩下只需决定\textbf{走多远}。沿这条直线把 $L$ 看成 $\rho$ 的一元函数 $L(f_{m-1} - \rho g_m)$：对（局部）凸的 $L$，它随 $\rho$ 增大\textbf{先降后升}，谷底就是该方向上的最优步长——此时新点 $f_m = f_{m-1} - \rho_m g_m$ 的损失最小，也就是\textbf{沿这个方向损失下降得最多}（与 $f_{m-1}$ 相比的损失下降量最大）：
+
+\begin{center}
+\begin{tikzpicture}[>=stealth, font=\small, scale=0.85]
+    % 同心椭圆等高线 L = f1^2 + 4 f2^2（中心为极小点 f*）
+    \draw[gray!55, thin] (0,0) ellipse (1.41 and 0.71);   % c=2
+    \draw[gray!55, thin] (0,0) ellipse (2.47 and 1.23);   % c=6.08（f_m 所在）
+    \draw[gray!55, thin] (0,0) ellipse (4.24 and 2.12);   % c=18.01（f_{m-1} 所在）
+    \draw[gray!55, thin] (0,0) ellipse (5.48 and 2.74);   % c=30
+    % 坐标轴
+    \draw[->] (-6.3,0) -- (6.3,0) node[below right] {$f_1$};
+    \draw[->] (0,-3.6) -- (0,3.6) node[above left] {$f_2$};
+    \fill (0,0) circle (1.8pt) node[below left] {$f^*$};
+    % 一维搜索线（过 f_{m-1}，沿 -g_m 方向延长）
+    \draw[red!60!black, dashed, thick] (5.25,3.6) -- (0.35,-3.12);
+    \node[red!60!black] at (4.55,2.85) {$-g_m$ 方向};
+    % 起点 f_{m-1} 与最优步长点 f_m
+    \fill (3.5,1.2) circle (1.8pt) node[above right] {$f_{m-1}$};
+    \fill (2.317,-0.422) circle (1.8pt) node[below right] {$f_m$};
+    % 负梯度步长箭头
+    \draw[blue, very thick, ->] (3.5,1.2) -- (2.317,-0.422)
+        node[midway, above left, blue] {$-\rho_m g_m$};
+\end{tikzpicture}
+\\[2pt]
+\small\textbf{图（等高线视角）：}最速下降的一步。从 $f_{m-1}$ 沿负梯度方向 $-g_m$（与等高线垂直）做一维线搜索，$f_m$ 取该直线上损失最小的点（直线与等高线\textbf{相切}处）。梯度只给方向，$\rho_m$ 决定走多远。
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}[>=stealth, font=\small, scale=1.0]
+    \draw[->] (-0.12,0) -- (0.52,0) node[below right] {$\rho$};
+    \draw[->] (0,-2.5) -- (0,14.5) node[above left] {$L(f_{m-1}-\rho g_m)$};
+    % 沿 -g_m 方向的损失曲线（本例 L = f1^2 + 4 f2^2，f_{m-1}=(3.5,1.2)）
+    \draw[red!70!black, thick, domain=0:0.28, samples=150]
+        plot (\x, {12.25*(1-2*\x)*(1-2*\x) + 5.76*(1-8*\x)*(1-8*\x)});
+    % 起点：rho=0 时损失 = L(f_{m-1})
+    \fill (0,18.01) circle (1.8pt) node[left] {$L(f_{m-1})$};
+    % 谷底：rho_m
+    \draw[dashed] (0.169,0) -- (0.169,6.08);
+    \fill (0.169,6.08) circle (1.8pt);
+    \node[above right] at (0.169,6.08) {$\rho_m$（损失最小）};
+    \node[below] at (0.169,-0.1) {$\rho_m$};
+\end{tikzpicture}
+\\[2pt]
+\small\textbf{图（剖面视角）：}沿 $-g_m$ 方向的损失 $L(f_{m-1}-\rho g_m)$ 随 $\rho$ 变化：先降后升，谷底 $\rho_m$ 处损失最小——即相对旧点 $f_{m-1}$ 的损失下降量在该方向上最大。
+\end{center}
+
+\subsection{梯度提升}
+
+前向分阶段提升（Algorithm 10.2）同样是\textbf{贪心}策略：给定当前模型 $f_{m-1}$ 及其拟合 $f_{m-1}(x_i)$，每步选出的树是使 \eqref{eq:10_29} 减少最多的解树。因此树预测 $T(x_i;\Theta_m)$ 与负梯度 \eqref{eq:10_35} 的分量\textbf{类似}。主要区别是树的各分量 $t_m = \{T(x_1;\Theta_m), \ldots, T(x_N;\Theta_m)\}^T$ \textbf{不独立}——它们被约束为某棵 $J_m$ 终端节点决策树的预测，而负梯度是\textbf{无约束}的最大下降方向。分阶段方法中 \eqref{eq:10_30} 的解类似于最速下降中的线搜索 \eqref{eq:10_36}；区别是 \eqref{eq:10_30} 对 $t_m$ 中对应每个独立终端区域的分量分别做线搜索。
+
+若唯一目标是极小化训练损失 \eqref{eq:10_33}，最速下降是首选：梯度 \eqref{eq:10_35} 对任何可微损失都\textbf{易于计算}，而 \eqref{eq:10_29} 对 §10.6 讨论的稳健准则很难求解。遗憾的是梯度 \eqref{eq:10_35} 只在训练点 $x_i$ 处有定义，而最终目标是让 $f_M(x)$ \textbf{泛化}到训练集未出现的新数据。
+
+解决这一困境的办法是：在第 $m$ 次迭代诱导一棵预测 $t_m$ 尽量接近负梯度的树 $T(x;\Theta_m)$。用平方误差度量接近程度：
+\begin{equation}\label{eq:10_37}
+    \tilde\Theta_m = \argmin_{\Theta} \sum_{i=1}^{N} \bigl(-g_{im} - T(x_i;\Theta)\bigr)^2,
+\end{equation}
+即\textbf{用最小二乘把树 $T$ 拟合到负梯度值} \eqref{eq:10_35}。§10.9 已述最小二乘决策树诱导有快速算法。\eqref{eq:10_37} 解出的区域 $\tilde R_{jm}$ 虽与 \eqref{eq:10_29} 的真正解 $R_{jm}$ 不完全相同，但通常足够相似以达同样目的（前向分阶段与自上而下树诱导本身都是近似过程）。构造树 \eqref{eq:10_37} 后，各区域常数由 \eqref{eq:10_30} 给出。
+
+\paragraph{式 \eqref{eq:10_37} 中「谁和谁」在比较？}
+
+是\textbf{负梯度 $-g_{im}$（理想目标）}与\textbf{树的预测 $T(x_i;\Theta)$（受限近似）}在比较，用平方误差度量二者的差距：
+\begin{itemize}
+    \item \textbf{$-g_{im}$（负梯度）}：对每个训练点 $x_i$，它给出「$f(x_i)$ 该往哪个方向、降多少，损失 $L$ 才下降最快」——这是\textbf{自由、理想}的逐点目标，但\textbf{只定义在 $N$ 个训练点上}，无法外推到新数据。
+    \item \textbf{$T(x_i;\Theta)$（树的预测）}：候选树在 $x_i$ 处的输出——它是定义在整个输入空间上的分段常数函数，\textbf{可以泛化}到任意新点。
+\end{itemize}
+于是式 \eqref{eq:10_37} 做的事是：\textbf{把 $-g_{im}$ 当作「回归目标 $y$」、把树当作「回归器」}，用最小二乘拟合一棵使二者尽量接近的树——即「让树去模仿/逼近负梯度这个理想方向」。
+
+\textbf{为什么这能解决困境？} 最速下降的更新 $f_m = f_{m-1} - \rho_m g_m$ 依赖负梯度，但 $g_m$ 只定义在训练点；把树拟合成负梯度的近似 $T(x;\Theta_m) \approx -g_m$ 后，树作为\textbf{可泛化函数}可以评估任意 $x$，于是「在函数空间沿负梯度方向下降一步」变成了「把树拟合到负梯度再累加进 $f_M$」。
+
+\textbf{为什么用最小二乘（而非原损失 $L$）度量接近程度？} 真正想解的是 \eqref{eq:10_29}（找使 $L$ 减少最多的树），但对稳健损失很难求解；而\textbf{最小二乘树诱导有快速算法}（§9.2），且对梯度做平方拟合在数值上等价于沿负梯度方向逼近极小点。因此 \eqref{eq:10_37} 是 \eqref{eq:10_29} 的一个\textbf{实用近似}——解出的 $\tilde R_{jm}$ 与真正最优区域 $R_{jm}$ 不完全相同，但通常足够好。
+
+\textbf{常用损失函数的梯度（表 10.2）：}
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{设定} & \textbf{损失函数} & $-\partial L(y_i, f(x_i))/\partial f(x_i)$ \\
+\midrule
+回归 & $\frac{1}{2}[y_i - f(x_i)]^2$ & $y_i - f(x_i)$ \\
+回归 & $\abs{y_i - f(x_i)}$ & $\sgn[y_i - f(x_i)]$ \\
+回归 & Huber & $y_i - f(x_i)$（$\abs{y_i - f(x_i)} \le \delta_m$）\\
+     &  & $\delta_m \sgn[y_i - f(x_i)]$（$\abs{y_i - f(x_i)} > \delta_m$）\\
+     &  & 其中 $\delta_m$ 是 $\abs{y_i - f(x_i)}$ 的 $\alpha$ 分位数 \\
+分类 & Deviance & 第 $k$ 分量：$I(y_i = \mathcal{G}_k) - p_k(x_i)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+平方误差损失下，负梯度即普通残差 $-g_{im} = y_i - f_{m-1}(x_i)$，故 \eqref{eq:10_37} 本身等价于标准最小二乘提升。绝对误差损失下负梯度是残差的符号，每步把树最小二乘拟合到当前残差的符号。Huber M-回归的负梯度是二者的折中（见表）。分类时损失取多项式偏差 \eqref{eq:10_22}，每步构造 $K$ 棵最小二乘树，每棵 $T_{km}$ 拟合各自负梯度向量 $g_{km}$：
+\begin{equation}\label{eq:10_38}
+    -g_{ikm} = \Bigl[\frac{\partial L(y_i, f_1(x_i), \ldots, f_K(x_i))}{\partial f_k(x_i)}\Bigr]_{f(x_i) = f_{m-1}(x_i)} = I(y_i = \mathcal{G}_k) - p_k(x_i),
+\end{equation}
+其中 $p_k(x)$ 由 \eqref{eq:10_21} 给出。每步虽建 $K$ 棵树，但它们通过 \eqref{eq:10_21} 相互关联；二分类（$K = 2$）只需一棵树（练习 10.10）。
+
+\subsection{梯度提升的实现}
+
+Algorithm 10.3 给出回归的通用梯度树提升算法；插入不同损失 $L(y, f(x))$ 得到具体算法。第 1 行初始化到最优常数模型（单终端节点树）；第 2(a) 行计算的负梯度分量称为\textbf{广义/伪残差} $r$。
+
+\textbf{Algorithm 10.3（梯度树提升算法）：}
+\begin{enumerate}
+    \item 初始化 $f_0(x) = \argmin_{\gamma} \sum_{i=1}^{N} L(y_i, \gamma)$。
+    \item 对 $m = 1$ 到 $M$：
+    \begin{enumerate}
+        \item 对 $i = 1, 2, \ldots, N$ 计算 $r_{im} = -\Bigl[\frac{\partial L(y_i, f(x_i))}{\partial f(x_i)}\Bigr]_{f = f_{m-1}}$。
+        \item 拟合回归树到目标 $r_{im}$，得到终端区域 $R_{jm},\; j = 1, 2, \ldots, J_m$。
+        \item 对 $j = 1, 2, \ldots, J_m$ 计算 $\gamma_{jm} = \argmin_{\gamma} \sum_{x_i \in R_{jm}} L\bigl(y_i, f_{m-1}(x_i) + \gamma\bigr)$。
+        \item 更新 $f_m(x) = f_{m-1}(x) + \sum_{j=1}^{J_m} \gamma_{jm} I(x \in R_{jm})$。
+    \end{enumerate}
+    \item 输出 $\hat f(x) = f_M(x)$。
+\end{enumerate}
+
+分类算法类似：每次迭代 $m$ 对每类用 \eqref{eq:10_38} 重复第 2(a)--(d) 行 $K$ 次，最后得到 $K$ 个（耦合的）树展开 $f_{kM}(x),\, k = 1, \ldots, K$，通过 \eqref{eq:10_21} 产生概率或按 \eqref{eq:10_20} 分类（练习 10.9）。两个基本调节参数是迭代次数 $M$ 与各组成树的大小 $J_m$。
+
+原始实现称为 \textbf{MART}（multiple additive regression trees，多元加性回归树），本书第一版如此称呼，本章许多图由 MART 产生。梯度提升在 R 的 \texttt{gbm} 包（Ridgeway, 1999）中实现并免费可用；另一 R 实现是 \texttt{mboost}（Hothorn and Bühlmann, 2006）；商业实现 TreeNet 来自 Salford Systems。
+
+% ============ §10.11 提升树的合适大小 ============
+\section{提升树的合适大小}
+
+历史上 boosting 被视为组合模型（这里是树）的技术，树构建算法被当作产生待组合模型的「原始构件」，每棵树的\textbf{最优大小}在构建时按常规方式（§9.2）单独估计：先诱导一棵很大的（过大）树，再用自底向上过程剪枝到估计的最优终端节点数。这一方法\textbf{隐含假设每棵树都是展开 \eqref{eq:10_28} 中的最后一棵}——除最后一棵树外这显然是很差的假设，结果是树通常\textbf{过大}，尤其在早期迭代，显著损害性能并增加计算。
+
+避免此问题的最简单策略是\textbf{限制所有树同大小}：$J_m = J\ \forall m$，每步诱导一棵 $J$ 终端节点回归树。于是 $J$ 成为整个提升过程的\textbf{元参数}，针对手头数据调整以最大化估计性能。
+
+有用 $J$ 值可通过考虑「目标」函数的性质获得：
+\begin{equation}\label{eq:10_39}
+    \eta = \argmin_{f} \E_{XY} L(Y, f(X)),
+\end{equation}
+期望取遍 $(X, Y)$ 的总体联合分布；$\eta(x)$ 是对未来数据预测风险最小的函数，即我们要逼近的对象。$\eta(X)$ 的一个相关性质是坐标变量 $X^T = (X_1, \ldots, X_p)$ 之间的\textbf{交互程度}，由它的 \textbf{ANOVA 展开}刻画：
+\begin{equation}\label{eq:10_40}
+    \eta(X) = \sum_{j} \eta_j(X_j) + \sum_{jk} \eta_{jk}(X_j, X_k) + \sum_{jkl} \eta_{jkl}(X_j, X_k, X_l) + \cdots.
+\end{equation}
+\eqref{eq:10_40} 第一项是对单个预测变量 $X_j$ 的函数，这些 $\eta_j(X_j)$ 是在所用损失下联合最佳逼近 $\eta(X)$ 的函数，每个称为 $X_j$ 的「\textbf{主效应}」；第二项是加入主效应后对 $\eta(X)$ 拟合最好的两变量函数，称为变量对 $(X_j, X_k)$ 的\textbf{二阶交互}；第三项代表三阶交互，依此类推。实践中遇到的许多问题\textbf{低阶交互占主导}；此时产生强高阶交互的模型（如大树）精度受损。
+
+\textbf{树的大小限制交互阶数}：基于树的近似的交互水平受 $J$ 限制——不可能出现高于 $J-1$ 阶的交互。由于提升模型对树是加性的 \eqref{eq:10_28}，此限制同样适用于它们。取 $J = 2$（单分裂「decision stump」）产生\textbf{只有主效应}的提升模型，不允许交互；$J = 3$ 还允许两变量交互，依此类推。因此 $J$ 的选择应反映 $\eta(x)$ 主导交互的阶数——这通常未知，但多数情况下偏低。图 10.9 用模拟例 \eqref{eq:10_2} 展示交互阶数（$J$ 的选择）的影响：生成函数是加性的（二次单项式之和），故 $J > 2$ 的提升模型招致不必要方差、测试误差更高。图 10.10 比较提升 stump 找到的坐标函数与真函数。
+
+虽然很多应用中 $J = 2$ 不够，但需要 $J > 10$ 的可能性不大。经验表明 boosting 中 $4 \le J \le 8$ 效果好，且对该范围内具体选择相当不敏感。可在验证集上试几个值取风险最低者微调 $J$，但这很少比直接用 $J \simeq 6$ 有显著改进。
+
+% ============ §10.12 正则化 ============
+\section{正则化}
+
+除组成树大小 $J$ 外，梯度提升的另一个元参数是提升迭代次数 $M$。每次迭代通常降低训练风险 $L(f_M)$，故 $M$ 足够大时该风险可任意小；但拟合训练数据过好会导致\textbf{过拟合}、损害未来预测风险。故存在极小化未来风险的最优 $M^*$，与应用相关。方便的估计 $M^*$ 的方法是：在验证样本上监控预测风险作为 $M$ 的函数，取使风险最小的 $M$ 作为 $M^*$ 的估计——这与神经网络常用的\textbf{早停}策略类似（§11.4）。
+
+\subsection{收缩}
+
+控制 $M$ 不是唯一的正则化策略；与岭回归和神经网络类似，也可用\textbf{收缩}（shrinkage，§3.4.1、§11.5）。boosting 中最简单的收缩实现：把每棵树的贡献缩放因子 $0 < \nu < 1$ 再加到当前逼近上，即把 Algorithm 10.3 第 2(d) 行替换为
+\begin{equation}\label{eq:10_41}
+    f_m(x) = f_{m-1}(x) + \nu\cdot\sum_{j=1}^{J} \gamma_{jm} I(x \in R_{jm}).
+\end{equation}
+参数 $\nu$ 可看作控制 boosting 过程的\textbf{学习率}。更小的 $\nu$（更多收缩）在相同迭代数 $M$ 下导致更大训练风险，故 $\nu$ 与 $M$ 都控制训练数据上的预测风险；但它们\textbf{不独立}——更小 $\nu$ 对应相同训练风险需要更大 $M$，二者存在\textbf{权衡}。
+
+经验上（Friedman, 2001）更小的 $\nu$ 偏好更好的测试误差、需要相应更大的 $M$。事实上最佳策略似乎是设 $\nu$ 很小（$\nu < 0.1$）再用早停选 $M$：对回归与概率估计较无收缩（$\nu = 1$）有显著改进；对 \eqref{eq:10_20} 的误分类风险改进较小但依然可观。代价是计算：更小 $\nu$ 需要更大 $M$，计算量正比于后者；但因每步诱导的树小且不剪枝，即便非常大的数据集上许多迭代通常也可行。图 10.11 用模拟例 \eqref{eq:10_2} 展示测试误差曲线（MART + 二项偏差，stump 或 6 终端节点树，有/无收缩）：收缩的益处明显，尤其跟踪二项偏差时——有收缩时每条测试误差曲线达到更低值且保持多个迭代。§16.2.1 将建立 boosting 前向分阶段收缩与正则化模型参数的 $\ell_1$ 惩罚（lasso）的联系，并论证 $\ell_1$ 惩罚可能优于 SVM 等使用的 $\ell_2$ 惩罚。
+
+\subsection{子采样}
+
+§8.7 已见 bootstrap 平均（bagging）通过平均改进噪声分类器性能；第 15 章详述这种「采样后平均」的降方差机制。梯度提升中可用同一装置\textbf{同时改进性能与计算效率}。\textbf{随机梯度提升}（Friedman, 1999）：每次迭代从训练观测中\textbf{不放回}采样比例 $\eta$，用该子样本生长下一棵树，其余算法相同。$\eta$ 的典型值可为 $\frac12$，$N$ 大时 $\eta$ 可远小于 $\frac12$。采样不仅把计算时间减少同比例 $\eta$，许多情况下还实际产生更准确的模型。图 10.12 用模拟例 \eqref{eq:10_2} 展示子采样效果（分类与回归两例）：两例中「采样 + 收缩」略优于其余；此处「子采样而无收缩」表现不佳。代价是现在要设\textbf{四个参数}：$J$、$M$、$\nu$、$\eta$。通常一些初步探索确定 $J$、$\nu$、$\eta$ 的合适值，留下 $M$ 作主要参数。
+
+% ============ §10.13 解释 ============
+\section{解释}
+
+单棵决策树高度可解释——整个模型可用简单的二维图形（二叉树）完全表示、易于可视化。树的线性组合 \eqref{eq:10_28} 丧失了这一重要特性，须以不同方式解释。
+
+\subsection{预测变量的相对重要性}
+
+数据挖掘应用中输入预测变量很少同等相关：往往只有少数对响应有实质影响，绝大多数无关、删掉也无妨。了解每个输入变量在预测响应中的\textbf{相对重要性或贡献}通常很有用。
+
+对单棵决策树 $T$，Breiman et al. (1984) 提出每个预测变量 $X_\ell$ 的相关性度量：
+\begin{equation}\label{eq:10_42}
+    \mathcal{I}_\ell^2(T) = \sum_{t=1}^{J-1} \hat\imath_t^2\, I(v(t) = \ell),
+\end{equation}
+对树的 $J-1$ 个内部节点求和。在每个内部节点 $t$，用一个输入变量 $X_{v(t)}$ 把该节点区域划分为两个子区域，每个子区域内用常数拟合响应；被选中的变量是在整个区域用常数拟合之上给出\textbf{最大平方误差风险改进} $\hat\imath_t^2$ 的那个。变量 $X_\ell$ 的平方相对重要性就是「以它作分裂变量的所有内部节点的平方改进之和」。
+
+该度量容易推广到加性树展开 \eqref{eq:10_28}——只需对树求平均：
+\begin{equation}\label{eq:10_43}
+    \mathcal{I}_\ell^2 = \frac{1}{M}\sum_{m=1}^{M} \mathcal{I}_\ell^2(T_m).
+\end{equation}
+由于平均的稳定化作用，此度量比单棵树的 \eqref{eq:10_42} 更可靠；且因收缩（§10.12.1），重要变量被与之高度相关的其他变量\textbf{掩盖}的问题大大减轻。注意 \eqref{eq:10_42}、\eqref{eq:10_43} 指\textbf{平方}相关性，实际相关性是各自的平方根。由于这些度量是相对的，习惯上把最大者赋为 100、其余按比例缩放。
+
+对 $K$ 类分类，诱导 $K$ 个独立模型 $f_k(x),\; k = 1, 2, \ldots, K$，每个是树之和
+\begin{equation}\label{eq:10_44}
+    f_k(x) = \sum_{m=1}^{M} T_{km}(x).
+\end{equation}
+此时 \eqref{eq:10_43} 推广为
+\begin{equation}\label{eq:10_45}
+    \mathcal{I}_{\ell k}^2 = \frac{1}{M}\sum_{m=1}^{M} \mathcal{I}_\ell^2(T_{km}),
+\end{equation}
+其中 $\mathcal{I}_{\ell k}$ 是 $X_\ell$ 在「把第 $k$ 类观测与其他类分开」中的相关性。$X_\ell$ 的\textbf{总体}相关性通过对所有类平均得到：
+\begin{equation}\label{eq:10_46}
+    \mathcal{I}_\ell^2 = \frac{1}{K}\sum_{k=1}^{K} \mathcal{I}_{\ell k}^2.
+\end{equation}
+
+\subsection{部分依赖图}
+
+识别出最相关变量后，下一步是理解逼近 $f(X)$ 对它们\textbf{联合取值}的依赖性质。把 $f(X)$ 作为其自变量的函数图形化，可对输入变量联合取值上的依赖给出全面概括。但可视化限于\textbf{低维}视图——一元或二元函数（连续、离散或混合）易展示；稍高维可通过固定除一两个自变量外的其余值、生成 trellis 图（Becker et al., 1996，R 中 lattice）展示；超过两三个变量则更难。
+
+一个有用的替代：查看一组图，每张显示逼近 $f(X)$ 对选定的\textbf{小变量子集}的部分依赖。虽然这类图通常无法全面刻画逼近，但常能提供有价值的线索，尤其当 $f(x)$ 由低阶交互 \eqref{eq:10_40} 主导时。
+
+考虑输入预测变量 $X^T = (X_1, \ldots, X_p)$ 的子向量 $X_S$（$|\mathcal{S}| = \ell < p$，索引集 $\mathcal{S} \subset \{1, \ldots, p\}$）。设 $\mathcal{C}$ 为补集，$\mathcal{S} \cup \mathcal{C} = \{1, \ldots, p\}$。一般函数 $f(X)$ 原则上依赖所有输入：$f(X) = f(X_S, X_{\mathcal{C}})$。$f(X)$ 对 $X_S$ 的\textbf{平均或部分依赖}定义为
+\begin{equation}\label{eq:10_47}
+    f_S(X_S) = \E_{X_{\mathcal{C}}} f(X_S, X_{\mathcal{C}}),
+\end{equation}
+即 $f$ 的\textbf{边际平均}，当 $X_S$ 与 $X_{\mathcal{C}}$ 无强交互时可作为选定子集对 $f(X)$ 影响的有用描述。部分依赖函数可用于解释任何「黑箱」学习方法的输出，可由下式估计：
+\begin{equation}\label{eq:10_48}
+    \bar f_S(X_S) = \frac{1}{N}\sum_{i=1}^{N} f(X_S, x_{i\mathcal{C}}),
+\end{equation}
+其中 $\{x_{1\mathcal{C}}, \ldots, x_{N\mathcal{C}}\}$ 是训练数据中出现的 $X_{\mathcal{C}}$ 值。这需要对每个待求 $\bar f_S(X_S)$ 的联合取值遍历一次数据，即使中等规模数据也可能计算密集。幸运的是对决策树，$\bar f_S(X_S)$ \eqref{eq:10_48} 可\textbf{直接从树本身快速计算}、无需引用数据（练习 10.11）。
+
+\begin{remark}[部分依赖 vs 条件期望]
+部分依赖 \eqref{eq:10_47} 表示在\textbf{考虑}（平均掉）其他变量 $X_{\mathcal{C}}$ 对 $f$ 的影响之后，$X_S$ 对 $f$ 的效应；它\textbf{不是}忽略 $X_{\mathcal{C}}$ 效应的条件期望
+\begin{equation}\label{eq:10_49}
+    \tilde f_S(X_S) = \E\bigl(f(X_S, X_{\mathcal{C}}) \mid X_S\bigr),
+\end{equation}
+后者是仅用 $X_S$ 函数对 $f(X)$ 的最佳最小二乘逼近。$\tilde f_S(X_S)$ 与 $\bar f_S(X_S)$ 仅当 $X_S$ 与 $X_{\mathcal{C}}$ 独立（罕见）时相同。例如若选定子集的效应纯加性
+\begin{equation}\label{eq:10_50}
+    f(X) = h_1(X_S) + h_2(X_{\mathcal{C}}),
+\end{equation}
+则 \eqref{eq:10_47} 给出 $h_1(X_S)$（差一个可加常数）；若效应纯乘性
+\begin{equation}\label{eq:10_51}
+    f(X) = h_1(X_S)\cdot h_2(X_{\mathcal{C}}),
+\end{equation}
+则 \eqref{eq:10_47} 给出 $h_1(X_S)$（差一个乘法常数）。反之 \eqref{eq:10_49} 两种情形都给不出 $h_1(X_S)$——事实上 \eqref{eq:10_49} 甚至可能对 $f(X)$ \textbf{完全无关}的变量子集产生强效应。
+\end{remark}
+
+对提升树逼近 \eqref{eq:10_28} 的选定变量子集查看部分依赖图，有助于对其性质给出定性描述。受计算机图形与人眼感知所限，子集 $X_S$ 的大小必须小（$\ell \approx 1, 2, 3$）。这样的子集数量众多，但只有从通常小得多的「高相关预测变量」集合中选出的那些才可能提供信息；且对 $f$ 效应近似加性 \eqref{eq:10_50} 或乘性 \eqref{eq:10_51} 的子集最具揭示性。
+
+对 $K$ 类分类，有 $K$ 个独立模型 \eqref{eq:10_44}（每类一个），每个通过下式与各自概率 \eqref{eq:10_21} 联系：
+\begin{equation}\label{eq:10_52}
+    f_k(X) = \log p_k(X) - \frac{1}{K}\sum_{l=1}^{K}\log p_l(X).
+\end{equation}
+故每个 $f_k(X)$ 是其相应概率在\textbf{对数尺度}上的单调增函数。对每个 $f_k(X)$ \eqref{eq:10_44} 在其最相关预测变量 \eqref{eq:10_45} 上做部分依赖图，有助于揭示实现该类别的对数优势如何依赖相应输入变量。
+
+\subsection{解释工具的谱系：树特有 vs 模型无关}
+
+部分依赖图（\eqref{eq:10_47}/\eqref{eq:10_48}）本身是\textbf{模型无关}的——它对任何「能对新点预测」的黑箱都适用（神经网络、SVM、随机森林、自定义模型皆可）。但它通常和\textbf{重要性度量}配套使用（先定位关键变量、再看其形状），而重要性度量则有树特有与通用之分：
+
+\begin{center}
+\begin{tikzpicture}[>=stealth, font=\small,
+    root/.style={draw, rounded corners=2pt, inner sep=5pt, align=center, fill=blue!6, thick},
+    treebox/.style={draw, rounded corners=2pt, inner sep=4pt, align=center, fill=orange!12},
+    genbox/.style={draw, rounded corners=2pt, inner sep=4pt, align=center, fill=green!12},
+    shapebox/.style={draw, rounded corners=2pt, inner sep=4pt, align=center, fill=blue!6}]
+  % 根：解释工具
+  \node[root] (root) at (0,0) {模型解释工具};
+  % 左侧：重要性度量（两大类）
+  \node[treebox] (tree) at (-3.4,-2.0) {树特有重要性\\分裂改进（\eqref{eq:10_42}/\eqref{eq:10_43}）};
+  \node[genbox] (gen) at (2.7,-2.0) {模型无关重要性\\置换重要性、SHAP 等};
+  % 右侧：形状刻画
+  \node[shapebox] (shape) at (8.0,-2.0) {形状刻画\\部分依赖图（\eqref{eq:10_47}/\eqref{eq:10_48}）\\trellis 图};
+  % 箭头
+  \draw[->, thick] (root) -- (tree);
+  \draw[->, thick] (root) -- (gen);
+  \draw[->, thick] (root) -- (shape);
+  % 下方说明：配套使用
+  \node[align=center, font=\small] at (0,-3.6)
+    {定位关键变量（重要性） + 刻画效应形状（部分依赖）\\二者配套，但重要性度量有树特有与通用之分};
+\end{tikzpicture}
+\\[2pt]
+\small\textbf{图：}解释工具的谱系。重要性度量负责「哪些变量重要」——树方法用分裂改进（\eqref{eq:10_42}/\eqref{eq:10_43}，树特有），其他模型用置换重要性、SHAP 等模型无关方法；部分依赖图负责「效应长什么样」，模型无关、任何黑箱都适用。
+\end{center}
+
+\begin{itemize}
+    \item \textbf{树特有（分裂改进）}：单棵树 $I_\ell^2(T)$（\eqref{eq:10_42}）按「以 $X_\ell$ 作分裂变量的内部节点平方误差改进」累加，多树平均得 \eqref{eq:10_43}——它\textbf{依赖树的分裂结构}，只适用于决策树/随机森林/提升树。
+    \item \textbf{模型无关（置换/SHAP）}：\textbf{置换重要性}通过打乱某变量后预测误差上升多少衡量其作用；\textbf{SHAP} 从博弈论 Shapley 值出发分配每个变量的贡献——二者只依赖模型预测，\textbf{任意模型适用}。
+    \item \textbf{配套使用}：对树模型，用 \eqref{eq:10_43} 选关键变量 + 部分依赖图看形状；对其他黑箱，用置换重要性/SHAP 选变量 + 部分依赖图看形状——\textbf{部分依赖图始终通用}。
+\end{itemize}
+
+% ============ §10.14 示例 ============
+\section{示例}
+
+本节在几个较大数据集上、按需要选用不同损失函数来展示梯度提升。
+
+\subsection{California Housing}
+
+该数据集（Pace and Barry, 1997，来自 Carnegie-Mellon StatLib 仓库）由加州 20,460 个社区（1990 年人口普查街区组）的聚合数据组成。响应 $Y$ 是每个社区的中位房价（单位 $10^5$ 美元）。预测变量包括：中位收入 MedInc、住房密度（房屋数 House、平均每房居住人数 AveOccup）、位置（经度 longitude、纬度 latitude）、以及反映房屋属性的若干量（平均房间数 AveRooms、平均卧室数 AveBedrms）。共 8 个数值预测变量。
+
+用 MART 拟合梯度提升模型：$J = 6$ 终端节点、学习率 \eqref{eq:10_41} $\nu = 0.1$、Huber 损失。随机分为训练集（80%）与测试集（20%）。图 10.13 展示平均绝对误差
+\begin{equation}\label{eq:10_53}
+    \mathrm{AAE} = \E\abs{y - \hat f_M(x)}
+\end{equation}
+作为训练与测试数据上迭代数 $M$ 的函数：测试误差随 $M$ 增大\textbf{单调下降}，早期较快、随后趋于几乎恒定。因此只要 $M$ 不太小，其具体取值并不关键（许多应用如此）；收缩策略 \eqref{eq:10_41} 倾向消除过拟合问题，对较大数据集尤其如此。
+
+800 次迭代后 $\mathrm{AAE} = 0.31$，可与最优常数预测器 $\mathrm{median}\{y_i\} = 0.89$ 相比。用更熟悉的量：该模型的平方复相关系数 $R^2 = 0.84$。Pace and Barry (1997) 用复杂的空间自回归过程（基于邻近社区中位房价预测，其余预测变量作协变量），经变换实验预测 $\log Y$ 得 $R^2 = 0.85$；以 $\log Y$ 为响应时梯度提升对应值为 $R^2 = 0.86$。
+
+图 10.14 展示 8 个预测变量的相对重要性：中位收入最相关；经度、纬度、平均每房居住人数约有其一半相关性；其余影响力较小。图 10.15 展示最相关非位置变量的单变量部分依赖图。注意这些图\textbf{不完全光滑}——这是基于树模型的后果：决策树产生不连续的分段常数模型 \eqref{eq:10_25}，树之和 \eqref{eq:10_28} 继承之（只是片段更多）。与本书多数方法不同，结果\textbf{不施加光滑约束}，可建模任意尖锐的不连续；曲线总体呈光滑趋势只是因为那是估计出对预测最好的形状。图中底部的刻度线是各变量数据分布的分位数；边缘数据密度较低（尤其较大值处）使曲线在该区域略欠确定。各图纵轴尺度相同，可视觉比较不同变量的相对重要性。
+
+中位房价对中位收入的部分依赖单调递增、主体近似线性；对平均每房居住人数总体单调递减（除小于 1 的情形）；对平均房间数\textbf{非单调}——约 3 个房间处最小、更小与更大都上升。房价对房龄的部分依赖很弱，与其重要性排名 \eqref{eq:10_46}（图 10.14）不一致，提示该弱主效应可能掩盖与其他变量更强的交互。图 10.16 展示房价对房龄与平均每房居住人数联合值的双变量部分依赖：二者明显交互——平均每房居住人数大于 2 时房价几乎不依赖房龄，小于 2 时对房龄强依赖。图 10.17 是拟合模型对经度与纬度联合值的双变量部分依赖（着色等高线图）：中位房价对加州位置有很强的依赖；该图不是「忽略其他预测变量效应的房价对位置图」\eqref{eq:10_49}，而是与其他社区和房屋属性效应\textbf{分离后}位置的影响 \eqref{eq:10_47}，可看作位置溢价——太平洋沿岸（尤其湾区、洛杉矶–圣地亚哥地区）溢价较大，加州北部、中央谷地与东南荒漠地区位置成本低得多。
+
+\subsection{New Zealand Fish}
+
+动植物生态学家用回归模型以环境变量预测物种存在、丰度与丰富度。近年兴趣从简单线性/参数模型转向更复杂模型：GAM（§9.1）、MARS（§9.4）与提升回归树（Leathwick et al., 2005, 2006）。此处建模新西兰周边海域鱼种 Black Oreo Dory 的存在与丰度。
+
+图 10.18 展示 17,000 次拖网（深水网捕鱼，最深 2 km）位置，红点为 Black Oreo 出现的 2,353 次拖网（占经常记录的百余种之一）。每次拖网记录各鱼种捕获量（kg）及若干环境测量：平均拖网深度 AvgDepth、水温与盐度（二者与深度强相关，故 Leathwick et al. (2006) 改用 TempResid 与 SalResid——二者对深度调整后的残差）、海表温度梯度 SSTGrad、反映生态系统生产力的卫星图像指标 Chla、沿海悬浮颗粒物 SusPartMatter（卫星测得）。
+
+分析目标是估计单次拖网发现 Black Oreo 的概率及期望捕获量（对拖网速度、距离、网目尺寸的变化标准化）。作者用 logistic 回归估计概率。对捕获量，自然做法是假设 Poisson 分布并对均值对数建模，但因零过多常不合适；尽管有零膨胀 Poisson（Lambert, 1992）等专门方法，他们选了更简单途径：若 $Y$ 为（非负）捕获量，
+\begin{equation}\label{eq:10_54}
+    \E(Y \mid X) = \E(Y \mid Y > 0, X)\cdot \Pr(Y > 0 \mid X),
+\end{equation}
+第二项由 logistic 回归估计，第一项仅用捕获为正的 2,353 次拖网估计。
+
+logistic 回归用梯度提升模型（GBM），二项偏差损失、深度 10 树、收缩因子 $\nu = 0.025$；正捕获回归对 $\log Y$ 用平方误差损失 GBM（同样深度 10 树、$\nu = 0.01$），再对预测取指数还原。两处都用 10 折交叉验证选择项数与收缩因子。
+
+图 10.19（左）展示 GBM 模型序列的平均二项偏差（10 折 CV 与测试数据），比用每项 8 自由度光滑样条拟合的 GAM 略有改进；右图为两模型的 ROC 曲线（§9.2.5）：性能看起来很接近，GBM 或稍有优势（AUC 略高）——等灵敏度/特异度点处 GBM 达 91%、GAM 90%。图 10.20 汇总 logistic GBM 拟合的变量贡献：Black Oreo 有明显深度范围、更常在冷水捕获。所用预测变量均在精细地理网格上可得（源自环境图集、卫星图像），因此可在网格上预测并导入 GIS 制图系统；图 10.21 展示存在性与捕获量的预测图。因其能建模交互、自动选择变量、且对离群点与缺失数据稳健，GBM 在该数据丰富且热忱的生态学界正迅速流行。
+
+\subsection{Demographics Data}
+
+本节用 MART 在多类分类问题上展示梯度提升。数据来自旧金山湾区 9,243 份购物中心顾客问卷（Impact Resources, Inc., Columbus, OH），含 14 个人口统计学问题。此例目标是用其余 13 个变量预测职业、识别区分不同职业类别的人口统计变量。随机分为训练集（80%）与测试集（20%），用 $J = 6$ 节点树、学习率 $\nu = 0.1$。
+
+图 10.22 展示 $K = 9$ 个职业类别及其误差率：总体误差率 $42.5\%$，可比的是「预测最多类别 Prof/Man（专业/管理）」的零模型率 $69\%$。预测最好的四类是 Retired、Student、Prof/Man、Homemaker。图 10.23 展示对所有类平均的预测变量相对重要性 \eqref{eq:10_46}；图 10.24 展示四个最好预测类别各自的相对重要性分布 \eqref{eq:10_45}——最相关预测变量通常随类别而不同，例外是 age（预测 Retired、Student、Prof/Man 时都排前三）。图 10.25 展示这三类 log-odds \eqref{eq:10_52} 对 age 的部分依赖：分离其他变量贡献后，老年人退休对数优势更高、学生相反；专业/管理人员对数优势在中年人最高。逐类检查部分依赖可得到合理结果。
+
+% ============ 本章总结 ============
+\section{本章总结}
+
+\textbf{Boosting} 是本章的主题：它把「弱学习器」（通常是小树）顺序地组合成强模型。本章的叙事可以概括为一条「从算法到理论再到工具」的链条。
+
+\begin{center}
+\begin{tikzpicture}[>=stealth, font=\small,
+    box/.style={draw, rounded corners=2pt, inner sep=5pt, align=center, fill=blue!6},
+    theory/.style={draw, rounded corners=2pt, inner sep=5pt, align=center, fill=orange!12},
+    tool/.style={draw, rounded corners=2pt, inner sep=5pt, align=center, fill=green!12},
+    arr/.style={->, thick}]
+  % 第一层：算法
+  \node[box] (a1) at (0,0) {AdaBoost.M1\\（Algorithm 10.1）};
+  \node[box] (a2) at (4.6,0) {前向分阶段\\加性建模（10.2）};
+  \node[box] (a3) at (9.2,0) {梯度提升 GBM\\（Algorithm 10.3）};
+  % 第二层：理论
+  \node[theory] (t1) at (0,-2.6) {指数损失\\$e^{-yf}$};
+  \node[theory] (t2) at (4.6,-2.6) {任意可微损失\\+ 负梯度（伪残差）};
+  \node[theory] (t3) at (9.2,-2.6) {稳健损失：二项偏差、Huber};
+  % 第三层：工具
+  \node[tool] (u1) at (0,-4.0) {加权投票 $G(x)=\sgn(\sum \alpha_m G_m)$};
+  \node[tool] (u2) at (4.6,-5.2) {拟合残差/伪残差 + 叶节点常数};
+  \node[tool] (u3) at (9.2,-4.0) {正则化：$J,\ M,\ \nu,\ \eta$\\+ 解释：重要性、部分依赖};
+  % 垂直箭头：算法 → 理论 → 工具
+  \draw[arr] (a1) -- (t1);
+  \draw[arr] (a2) -- (t2);
+  \draw[arr] (a3) -- (t3);
+  \draw[arr] (t1) -- (u1);
+  \draw[arr] (t2) -- (u2);
+  \draw[arr] (t3) -- (u3);
+  % 水平箭头：从左到右的推广
+  \draw[arr, dashed] (a1) -- (a2) node[midway, above] {等价};
+  \draw[arr, dashed] (a2) -- (a3) node[midway, above] {推广};
+  \draw[arr, dashed] (t1) -- (t2);
+  \draw[arr, dashed] (t2) -- (t3);
+  \draw[arr, dashed] (u1) -- (u2);
+  \draw[arr, dashed] (u2) -- (u3);
+\end{tikzpicture}
+\\[2pt]
+\small\textbf{图：}本章主线——AdaBoost.M1 等价于指数损失下的前向分阶段加性建模；把损失推广到任意可微损失并借助负梯度（伪残差）技巧，得到通用的梯度提升（GBM）；再配以稳健损失、正则化与解释工具，构成数据挖掘的「现成」强学习器。
+\end{center}
+
+\subsection{核心结论}
+
+\begin{itemize}
+    \item \textbf{Boosting = 前向分阶段拟合加性展开}：$f_M(x) = \sum_m \beta_m b(x;\gamma_m)$，顺序添加基学习器（通常是小树）、不回改已添加项。
+    \item \textbf{AdaBoost 的等价性}：AdaBoost.M1 恰是\textbf{指数损失} $e^{-yf}$ 下的前向分阶段加性建模；指数损失的总体极小化是类概率对数优势的一半。
+    \item \textbf{损失的选择}：指数损失不稳健（对标签噪声/大负边际极敏感）；二项偏差、Huber 等稳健损失让 boosting 更可靠，但失去闭式解——用\textbf{梯度提升}（负梯度作伪残差）处理任意可微损失。
+    \item \textbf{梯度提升的实质}：每步把树最小二乘拟合到当前负梯度（伪残差），再做叶节点最优常数；它是「函数空间的最速下降」被约束到树的可泛化近似。
+    \item \textbf{正则化三件套}：树的规模 $J$（限制交互阶数，通常 $4\le J\le 8$）、迭代数 $M$（早停）、学习率 $\nu$（收缩）、子采样 $\eta$（随机梯度提升）——四参数协同控制偏差-方差。
+    \item \textbf{解释}：相对重要性（\eqref{eq:10_43}）定位关键变量，部分依赖图（\eqref{eq:10_48}）刻画其形状与交互——树方法独有的快速计算使解释高效可行。
+    \item \textbf{定位}：boosting 是数据挖掘的「现成」强学习器，擅长混合类型数据、缺失值、无关变量与离群点，常显著优于单棵树与 GAM 等。
+\end{itemize}
 

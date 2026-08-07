@@ -809,13 +809,36 @@
 \contentsline {paragraph}{Boosting 拟合的「加性模型」是基于 GAM 吗？}{457}{equation.18.2.7}%
 \contentsline {section}{\numberline {18.3}前向分阶段加性建模}{457}{section.18.3}%
 \contentsline {section}{\numberline {18.4}指数损失与 AdaBoost}{458}{section.18.4}%
-\contentsline {section}{\numberline {18.5}为什么用指数损失}{459}{section.18.5}%
+\contentsline {section}{\numberline {18.5}为什么用指数损失}{460}{section.18.5}%
 \contentsline {section}{\numberline {18.6}损失函数与稳健性}{460}{section.18.6}%
-\contentsline {subsection}{\numberline {18.6.1}平方误差损失不适合分类}{460}{subsection.18.6.1}%
-\contentsline {subsection}{\numberline {18.6.2}K 类分类的损失}{461}{subsection.18.6.2}%
-\contentsline {subsection}{\numberline {18.6.3}回归的稳健损失}{461}{subsection.18.6.3}%
-\contentsline {section}{\numberline {18.7}数据挖掘的「现成」程序}{462}{section.18.7}%
-\contentsline {section}{\numberline {18.8}示例：Spam 数据}{463}{section.18.8}%
-\contentsline {section}{\numberline {18.9}Boosting 树}{463}{section.18.9}%
-\contentsline {section}{\numberline {18.10}通过梯度提升的数值优化}{465}{section.18.10}%
-\contentsline {subsection}{\numberline {18.10.1}最速下降}{465}{subsection.18.10.1}%
+\contentsline {paragraph}{二项偏差 $\log (1+e^{-2yf})$ 真的是「负二项对数似然」吗？}{461}{section.18.6}%
+\contentsline {subsection}{\numberline {18.6.1}平方误差损失不适合分类}{462}{subsection.18.6.1}%
+\contentsline {paragraph}{$\mathbb {E}(Y \mid x) = 2\Pr (Y = 1 \mid x) - 1$ 这个等号怎么成立的？}{462}{equation.18.6.20}%
+\contentsline {subsection}{\numberline {18.6.2}K 类分类的损失}{462}{subsection.18.6.2}%
+\contentsline {subsection}{\numberline {18.6.3}回归的稳健损失}{463}{subsection.18.6.3}%
+\contentsline {subsubsection}{Huber 损失}{463}{subsection.18.6.3}%
+\contentsline {paragraph}{既然 AdaBoost 是指数损失，那我能设计一个基于 Huber 的 boost 吗？}{464}{remark.18.4}%
+\contentsline {section}{\numberline {18.7}数据挖掘的「现成」程序}{465}{section.18.7}%
+\contentsline {section}{\numberline {18.8}Boosting 树}{467}{section.18.8}%
+\contentsline {paragraph}{误分类损失下 $\hat \gamma _j$ 取「众数类」是什么？}{467}{equation.18.8.27}%
+\contentsline {paragraph}{为什么式 \eqref {eq:10_28} 的提升树模型没有显式权重 $\beta _m$？}{468}{equation.18.8.29}%
+\contentsline {section}{\numberline {18.9}通过梯度提升的数值优化}{469}{section.18.9}%
+\contentsline {subsection}{\numberline {18.9.1}最速下降}{470}{subsection.18.9.1}%
+\contentsline {paragraph}{为什么要取「使损失最小」的步长 $\rho _m$？}{470}{equation.18.9.36}%
+\contentsline {subsection}{\numberline {18.9.2}梯度提升}{472}{subsection.18.9.2}%
+\contentsline {paragraph}{式 \eqref {eq:10_37} 中「谁和谁」在比较？}{472}{equation.18.9.37}%
+\contentsline {subsection}{\numberline {18.9.3}梯度提升的实现}{473}{subsection.18.9.3}%
+\contentsline {section}{\numberline {18.10}提升树的合适大小}{474}{section.18.10}%
+\contentsline {section}{\numberline {18.11}正则化}{475}{section.18.11}%
+\contentsline {subsection}{\numberline {18.11.1}收缩}{475}{subsection.18.11.1}%
+\contentsline {subsection}{\numberline {18.11.2}子采样}{475}{subsection.18.11.2}%
+\contentsline {section}{\numberline {18.12}解释}{476}{section.18.12}%
+\contentsline {subsection}{\numberline {18.12.1}预测变量的相对重要性}{476}{subsection.18.12.1}%
+\contentsline {subsection}{\numberline {18.12.2}部分依赖图}{477}{subsection.18.12.2}%
+\contentsline {subsection}{\numberline {18.12.3}解释工具的谱系：树特有 vs 模型无关}{478}{subsection.18.12.3}%
+\contentsline {section}{\numberline {18.13}示例}{479}{section.18.13}%
+\contentsline {subsection}{\numberline {18.13.1}California Housing}{479}{subsection.18.13.1}%
+\contentsline {subsection}{\numberline {18.13.2}New Zealand Fish}{480}{subsection.18.13.2}%
+\contentsline {subsection}{\numberline {18.13.3}Demographics Data}{480}{subsection.18.13.3}%
+\contentsline {section}{\numberline {18.14}本章总结}{481}{section.18.14}%
+\contentsline {subsection}{\numberline {18.14.1}核心结论}{481}{subsection.18.14.1}%
