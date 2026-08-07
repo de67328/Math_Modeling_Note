@@ -1,0 +1,433 @@
+\chapter{提升与加性树（Boosting and Additive Trees）}
+
+\textbf{Boosting} 是过去二十年最强大的学习思想之一，最初为分类问题设计，也可扩展至回归。其动机是组合多个「弱」分类器的输出，形成一个强大的「委员会」。从这一角度看，boosting 与 \textbf{Bagging}（§8.8）及其他基于委员会的方法相似；但本质不同——Bagging 是降方差、不扩模型类，而 boosting 是\textbf{通过前向分阶段方式拟合加性模型}，从而扩展模型类。
+
+% ============ §10.1 Boosting 方法 ============
+\section{Boosting 方法}
+
+考虑二分类问题，输出编码为 $Y \in \{-1, 1\}$。给定预测变量向量 $X$，分类器 $G(X)$ 输出 $\{-1, 1\}$ 之一。训练样本上的误差率为
+\begin{equation}\label{eq:10_err}
+    \overline{\mathrm{err}} = \frac{1}{N}\sum_{i=1}^{N} I(y_i \neq G(x_i)),
+\end{equation}
+未来预测的期望误差率为 $\E_{XY} I(Y \neq G(X))$。
+
+\textbf{弱分类器（weak classifier）}：误差率仅略好于随机猜测的分类器。Boosting 的目标是\textbf{顺序地}把弱分类算法应用到数据的反复修改版本上，产生弱分类器序列 $G_m(x),\, m = 1, 2, \ldots, M$，再通过\textbf{加权多数投票}组合所有预测：
+\begin{equation}\label{eq:10_1}
+    G(x) = \sgn\Bigl(\sum_{m=1}^{M} \alpha_m G_m(x)\Bigr),
+\end{equation}
+其中 $\alpha_1, \ldots, \alpha_M$ 由 boosting 算法计算，衡量各 $G_m(x)$ 的贡献；其作用是给序列中更准确的分类器更高影响力。整个流程可示意如下：
+
+\begin{center}
+\begin{tikzpicture}[>=stealth, font=\small,
+    dbox/.style={draw, rounded corners=2pt, inner sep=4pt, align=center, fill=blue!8},
+    cbox/.style={draw, rounded corners=2pt, inner sep=4pt, align=center, fill=orange!12},
+    fbox/.style={draw, rounded corners=2pt, inner sep=5pt, align=center, fill=green!10, thick}]
+  % 数据列：训练样本 → 反复修改的加权样本
+  \node[dbox] (tr) at (0,0)    {训练样本};
+  \node[dbox] (d1) at (0,-1.7) {加权样本$_1$};
+  \node[dbox] (d2) at (0,-3.4) {加权样本$_2$};
+  \node[dbox] (d3) at (0,-5.1) {加权样本$_3$};
+  \node at (0,-6.2) {$\vdots$};
+  \node[dbox] (dM) at (0,-7.3) {加权样本$_M$};
+  % 分类器列
+  \node[cbox] (g1) at (3.7,-1.7) {$G_1(x)$};
+  \node[cbox] (g2) at (3.7,-3.4) {$G_2(x)$};
+  \node[cbox] (g3) at (3.7,-5.1) {$G_3(x)$};
+  \node at (3.7,-6.2) {$\vdots$};
+  \node[cbox] (gM) at (3.7,-7.3) {$G_M(x)$};
+  % 最终分类器
+  \node[fbox] (F) at (7.8,-4.4) {最终分类器\\[2pt] $G(x) = \sgn\Bigl(\sum_{m=1}^{M} \alpha_m G_m(x)\Bigr)$};
+  % 数据 → 加权样本（更新权重）
+  \draw[->, thick] (tr) -- (d1) node[midway, right] {初始 $w_i = 1/N$};
+  \draw[->] (d1) -- (d2) node[midway, right] {更新权重 $w_i$};
+  \draw[->] (d2) -- (d3);
+  \draw[->, dashed] (d3) -- (dM);
+  % 加权样本 → 弱分类器
+  \draw[->] (d1) -- (g1);
+  \draw[->] (d2) -- (g2);
+  \draw[->] (d3) -- (g3);
+  \draw[->] (dM) -- (gM);
+  % 弱分类器 → 最终分类器（加权多数投票）
+  \draw[->] (g1) -- (F) node[midway, above, sloped] {$\alpha_1$};
+  \draw[->] (g2) -- (F) node[midway, above, sloped] {$\alpha_2$};
+  \draw[->] (g3) -- (F) node[midway, above, sloped] {$\alpha_3$};
+  \draw[->] (gM) -- (F) node[midway, below, sloped] {$\alpha_M$};
+\end{tikzpicture}
+\\[2pt]
+\small\textbf{图：}AdaBoost 示意：对训练数据的加权版本顺序训练弱分类器序列 $G_1(x), \ldots, G_M(x)$，每步把被 $G_m$ 误分类的观测权重放大，再以权重 $\alpha_m$ 进行加权多数投票，组合成最终分类器 $G(x) = \sgn\bigl(\sum_{m=1}^{M} \alpha_m G_m(x)\bigr)$。
+\end{center}
+
+\paragraph{sgn 怎么理解？}
+
+$\sgn(\cdot)$ 是\textbf{符号函数}：
+\[
+    \sgn(z) = \begin{cases} 1, & z > 0,\\ -1, & z < 0,\\ 0, & z = 0. \end{cases}
+\]
+在式 \eqref{eq:10_1} 中，每个弱分类器 $G_m(x) \in \{-1, 1\}$ 相当于对类标签\textbf{投一票}（$+1$ 投给类 $1$、$-1$ 投给类 $-1$），$\alpha_m > 0$ 是这一票的权重；于是 $\sum_{m=1}^{M} \alpha_m G_m(x)$ 就是\textbf{加权投票的净得分}——所有投 $+1$ 的权重之和减去所有投 $-1$ 的权重之和。\textbf{sgn 的作用}是把这个实值净得分翻译成最终类标签：净得分为正判为类 $1$、为负判为类 $-1$，即
+\[
+    G(x) = +1 \iff \sum_{m:\,G_m(x)=+1} \alpha_m > \sum_{m:\,G_m(x)=-1} \alpha_m.
+\]
+所以 $G(x) = \sgn\bigl(\sum_{m=1}^{M} \alpha_m G_m(x)\bigr)$ 的直观就是\textbf{加权多数投票}（weighted majority vote）。注意 sgn 只保留正负号、丢掉幅度信息——训练阶段 AdaBoost 实际拟合的是\textbf{连续值} $f(x) = \sum_{m=1}^{M} \beta_m G_m(x)$（§10.4），指数损失 $\exp(-y f(x))$ 依赖连续的 $f$ 而非其符号；sgn 只是最后一步的决策读出。
+
+数据修改方式：在每一步 boosting 中，对每个训练观测 $(x_i, y_i)$ 施加权重 $w_1, w_2, \ldots, w_N$。初始设 $w_i = 1/N$（第一步即在原始数据上照常训练）。对后续迭代 $m = 2, 3, \ldots, M$，被前一步分类器 $G_{m-1}(x)$ 误分类的观测权重\textbf{增加}，正确分类的观测权重\textbf{减少}。于是随着迭代进行，难以正确分类的观测获得越来越大的影响力，迫使每个后续分类器专注于先前分类器遗漏的样本。
+
+\textbf{Algorithm 10.1（AdaBoost.M1，离散 AdaBoost）：}
+\begin{enumerate}
+    \item 初始化观测权重 $w_i = 1/N,\; i = 1, 2, \ldots, N$。
+    \item 对 $m = 1$ 到 $M$：
+    \begin{enumerate}
+        \item 用权重 $w_i$ 在训练数据上拟合分类器 $G_m(x)$。
+        \item 计算加权误差率
+        \begin{equation}\label{eq:10_errm}
+            \mathrm{err}_m = \frac{\sum_{i=1}^{N} w_i I(y_i \neq G_m(x_i))}{\sum_{i=1}^{N} w_i}.
+        \end{equation}
+        \item 计算 $\alpha_m = \log\bigl((1 - \mathrm{err}_m)/\mathrm{err}_m\bigr)$。
+        \item 更新权重 $w_i \leftarrow w_i \cdot \exp\bigl[\alpha_m \cdot I(y_i \neq G_m(x_i))\bigr],\; i = 1, 2, \ldots, N$。
+    \end{enumerate}
+    \item 输出 $G(x) = \sgn\bigl[\sum_{m=1}^{M} \alpha_m G_m(x)\bigr]$。
+\end{enumerate}
+
+第 2(c) 行计算的 $\alpha_m$ 是最终分类器中给 $G_m$ 的权重：误分类观测的权重被放大 $\exp(\alpha_m)$ 倍，增强其对下一步分类器 $G_{m+1}$ 的影响力。
+
+\textbf{离散 AdaBoost}：因基分类器 $G_m(x)$ 返回离散类标签而得名（Friedman et al., 2000）。若基分类器改为返回实值预测（例如映射到 $[-1,1]$ 区间的概率），可相应修改得到「Real AdaBoost」。
+
+\begin{example}[模拟数据：stump 的威力]
+特征 $X_1, \ldots, X_{10}$ 为标准独立高斯，确定性目标
+\begin{equation}\label{eq:10_2}
+    Y = \begin{cases} 1, & \text{若 } \sum_{j=1}^{10} X_j^2 > \chi^2_{10}(0.5),\\ -1, & \text{否则}, \end{cases}
+\end{equation}
+其中 $\chi^2_{10}(0.5) = 9.34$ 是 10 自由度卡方随机变量的中位数（10 个标准高斯的平方和）。2000 个训练样本（每类约 1000 个），10000 个测试观测。弱分类器是「stump」——仅含两个终端节点的分类树。
+\begin{itemize}
+    \item 单独应用 stump：测试误差 $45.8\%$（随机猜测为 $50\%$），几乎无效。
+    \item 400 次 boosting 迭代后：误差降至 $5.8\%$，约为原误差率的 $\frac{1}{4}$。
+    \item 单个 244 节点的大分类树：误差率 $24.7\%$——boosting 完胜。
+\end{itemize}
+Breiman（NIPS Workshop, 1996）称「带树的 AdaBoost 是世界上最好的现成分类器」（见 Breiman, 1998），对数据挖掘应用尤其如此（§10.7 详述）。
+\end{example}
+
+\subsection{本章概览}
+
+本章的要点可概述如下：
+\begin{itemize}
+    \item AdaBoost 在基学习器上拟合\textbf{加性模型}，优化一种新颖的\textbf{指数损失}，该损失与（负）二项对数似然非常相似（§10.2--§10.4）。
+    \item 指数损失的\textbf{总体极小化}被证明是类概率的对数优势（§10.5）。
+    \item 给出比平方误差或指数损失更稳健的回归与分类损失函数（§10.6）。
+    \item 论证决策树是数据挖掘应用中 boosting 的理想基学习器（§10.7、§10.9）。
+    \item 发展一类\textbf{梯度提升模型（GBM）}，用于任意损失下对树进行 boosting（§10.10）。
+    \item 强调「慢学习」的重要性，通过每个新进入模型的项的\textbf{收缩（shrinkage）}（§10.12）及随机化（§10.12.2）实现。
+    \item 描述拟合模型的解释工具（§10.13）。
+\end{itemize}
+
+% ============ §10.2 Boosting 拟合加性模型 ============
+\section{Boosting 拟合加性模型}
+
+Boosting 的成功并不神秘，关键在式 \eqref{eq:10_1}：Boosting 是在一组初等「基」函数上\textbf{拟合加性展开}的方法。此处基函数即单个分类器 $G_m(x) \in \{-1, 1\}$。更一般地，基函数展开形如
+\begin{equation}\label{eq:10_3}
+    f(x) = \sum_{m=1}^{M} \beta_m b(x; \gamma_m),
+\end{equation}
+其中 $\beta_m$ 是展开系数，$b(x; \gamma) \in \R$ 通常是多元自变量 $x$ 的简单函数，由参数集 $\gamma$ 刻画（基展开详见第 5 章）。
+
+这类加性展开是书中许多学习技术的核心：
+\begin{itemize}
+    \item \textbf{单隐层神经网络}（第 11 章）：$b(x; \gamma) = \sigma(\gamma_0 + \gamma_1^T x)$，其中 $\sigma(t) = 1/(1 + e^{-t})$ 是 sigmoid 函数，$\gamma$ 参数化输入变量的线性组合。
+    \item \textbf{小波}（§5.9.1）：$\gamma$ 参数化「母小波」的位置与尺度平移。
+    \item \textbf{MARS}（§9.4）：截断幂样条基，$\gamma$ 参数化结点变量与结点值。
+    \item \textbf{树}：$\gamma$ 参数化内部结点的分裂变量与分裂点、以及终端结点的预测。
+\end{itemize}
+
+这类模型通常通过最小化训练数据上的平均损失（如平方误差或基于似然的损失）来拟合：
+\begin{equation}\label{eq:10_4}
+    \min_{\{\beta_m, \gamma_m\}_1^M} \frac{1}{N}\sum_{i=1}^{N} L\Bigl(y_i, \sum_{m=1}^{M} \beta_m b(x_i; \gamma_m)\Bigr).
+\end{equation}
+对许多损失 $L(y, f(x))$ 与基函数 $b(x; \gamma)$，这需要计算密集的数值优化技术。但若可以\textbf{快速求解仅拟合单个基函数的子问题}，则存在简单替代方案：
+\begin{equation}\label{eq:10_5}
+    \min_{\beta, \gamma} \sum_{i=1}^{N} L\bigl(y_i, \beta b(x_i; \gamma)\bigr).
+\end{equation}
+
+\paragraph{Boosting 拟合的「加性模型」是基于 GAM 吗？}
+
+\textbf{不是}。两者虽然都叫「加性」，但「加性」的含义不同：
+\begin{itemize}
+    \item \textbf{GAM（第 9 章）}：加性是\textbf{按特征}加性——$f(x) = \alpha + \sum_{j=1}^{p} f_j(X_j)$，每个预测变量 $X_j$ 贡献一个光滑函数 $f_j$，各项是\textbf{单个变量}的函数（主效应），交互需显式加入（如 $f_{jk}(X_j, X_k)$）。
+    \item \textbf{Boosting}：加性是\textbf{按基学习器}加性——$f(x) = \sum_{m=1}^{M} \beta_m b(x; \gamma_m)$，每个基函数 $b(x; \gamma_m)$ 都是\textbf{整个输入向量 $x$} 的函数（如完整树、完整 stump），可同时依赖任意特征组合，因而\textbf{天然包含交互}。
+\end{itemize}
+更准确的定位：两者都是「\textbf{基函数加性展开}」这一更一般框架（§10.2 开头视角，与第 5 章基展开同构）的特例，只是\textbf{基函数的选择与拟合方式不同}：
+\begin{itemize}
+    \item GAM 的基 = 预定义/数据驱动的\textbf{单变量光滑函数}，用 \textbf{backfitting}（交替更新，§9.1.1）\textbf{同时}拟合所有项；
+    \item Boosting 的基 = \textbf{自适应地从数据中学到的弱学习器}（每步贪心地选最好的基加入），用\textbf{前向分阶段}（Algorithm 10.2）\textbf{顺序}拟合——每次只加一项、不回改已添加的项。
+\end{itemize}
+所以不能把 boosting 理解成「基于 GAM」；更准确的说法是：boosting 用前向分阶段方式拟合「弱学习器基函数」上的加性展开，而 GAM 用 backfitting 拟合「特征光滑函数」上的加性展开。二者仅共享「把若干项加起来」的展开形式；分道扬镳之处在于\textbf{项长什么样}（单变量光滑函数 vs 全特征弱学习器）以及\textbf{怎么拟合}（同时交替更新 vs 顺序贪心添加）。这也解释了为什么 boosting 能自动捕捉交互而纯 GAM 不能——每项（如树）本身就可以是特征的非线性 + 交互函数。
+
+% ============ §10.3 前向分阶段加性建模 ============
+\section{前向分阶段加性建模}
+
+\textbf{前向分阶段建模（forward stagewise modeling）}通过\textbf{顺序添加}新基函数来逼近式 \eqref{eq:10_4} 的解，\textbf{不调整已添加项的参数与系数}（Algorithm 10.2）。每步迭代 $m$，求解要加入当前展开 $f_{m-1}(x)$ 的最优基函数 $b(x; \gamma_m)$ 及其系数 $\beta_m$，得到 $f_m(x)$ 后重复；之前添加的项不再修改。
+
+\textbf{Algorithm 10.2（前向分阶段加性建模，Forward Stagewise Additive Modeling）：}
+\begin{enumerate}
+    \item 初始化 $f_0(x) = 0$。
+    \item 对 $m = 1$ 到 $M$：
+    \begin{enumerate}
+        \item 计算 $(\beta_m, \gamma_m) = \argmin_{\beta, \gamma} \sum_{i=1}^{N} L\bigl(y_i, f_{m-1}(x_i) + \beta b(x_i; \gamma)\bigr)$。
+        \item 令 $f_m(x) = f_{m-1}(x) + \beta_m b(x; \gamma_m)$。
+    \end{enumerate}
+\end{enumerate}
+
+对\textbf{平方误差损失}
+\begin{equation}\label{eq:10_6}
+    L(y, f(x)) = (y - f(x))^2,
+\end{equation}
+有
+\begin{equation}\label{eq:10_7}
+    L\bigl(y_i, f_{m-1}(x_i) + \beta b(x_i; \gamma)\bigr) = (y_i - f_{m-1}(x_i) - \beta b(x_i; \gamma))^2 = (r_{im} - \beta b(x_i; \gamma))^2,
+\end{equation}
+其中 $r_{im} = y_i - f_{m-1}(x_i)$ 恰是当前模型对第 $i$ 个观测的\textbf{残差}。因此，平方误差损失下，每步加入的项 $\beta_m b(x; \gamma_m)$ 就是\textbf{对当前残差拟合最好的项}。这一思想是 §10.10.2「最小二乘回归提升」的基础。但如后文所示，平方误差损失一般不是分类的好选择，因此需要考虑其他损失准则。
+
+% ============ §10.4 指数损失与 AdaBoost ============
+\section{指数损失与 AdaBoost}
+
+下面证明 AdaBoost.M1（Algorithm 10.1）\textbf{等价于}使用损失
+\begin{equation}\label{eq:10_8}
+    L(y, f(x)) = \exp(-y f(x))
+\end{equation}
+的前向分阶段加性建模（Algorithm 10.2）。对 AdaBoost，基函数即单个分类器 $G_m(x) \in \{-1, 1\}$。使用指数损失，每步需求解分类器 $G_m$ 与相应系数 $\beta_m$：
+\begin{equation}\label{eq:10_9}
+    (\beta_m, G_m) = \argmin_{\beta, G} \sum_{i=1}^{N} w_i^{(m)} \exp\bigl(-\beta y_i G(x_i)\bigr), \qquad w_i^{(m)} = \exp\bigl(-y_i f_{m-1}(x_i)\bigr).
+\end{equation}
+由于每个 $w_i^{(m)}$ 既不依赖 $\beta$ 也不依赖 $G(x)$，可视为施加到每个观测上的\textbf{权重}；该权重依赖 $f_{m-1}(x_i)$，故随迭代 $m$ 变化。
+
+式 \eqref{eq:10_9} 的解分两步获得。
+
+\textbf{第一步}：对任意 $\beta > 0$，关于 $G_m$ 的最优解为
+\begin{equation}\label{eq:10_10}
+    G_m = \argmin_{G} \sum_{i=1}^{N} w_i^{(m)} I(y_i \neq G(x_i)),
+\end{equation}
+即\textbf{最小化加权误差率}的分类器。这是因为式 \eqref{eq:10_9} 的准则可写成
+\begin{equation}\label{eq:10_11}
+    (e^{\beta} - e^{-\beta}) \cdot \sum_{i=1}^{N} w_i^{(m)} I(y_i \neq G(x_i)) + e^{-\beta} \cdot \sum_{i=1}^{N} w_i^{(m)}.
+\end{equation}
+
+\textbf{第二步}：把该 $G_m$ 代回式 \eqref{eq:10_9} 解 $\beta$，得
+\begin{equation}\label{eq:10_12}
+    \beta_m = \frac{1}{2}\log\frac{1 - \mathrm{err}_m}{\mathrm{err}_m},
+\end{equation}
+其中 $\mathrm{err}_m$ 为最小化后的加权误差率
+\begin{equation}\label{eq:10_13}
+    \mathrm{err}_m = \frac{\sum_{i=1}^{N} w_i^{(m)} I(y_i \neq G_m(x_i))}{\sum_{i=1}^{N} w_i^{(m)}}.
+\end{equation}
+
+随后更新逼近 $f_m(x) = f_{m-1}(x) + \beta_m G_m(x)$，使下一步权重变为
+\begin{equation}\label{eq:10_14}
+    w_i^{(m+1)} = w_i^{(m)} \cdot e^{-\beta_m y_i G_m(x_i)}.
+\end{equation}
+利用恒等式 $-y_i G_m(x_i) = 2 \cdot I(y_i \neq G_m(x_i)) - 1$，式 \eqref{eq:10_14} 化为
+\begin{equation}\label{eq:10_15}
+    w_i^{(m+1)} = w_i^{(m)} \cdot e^{\alpha_m I(y_i \neq G_m(x_i))} \cdot e^{-\beta_m},
+\end{equation}
+其中 $\alpha_m = 2\beta_m$ 正是 AdaBoost.M1 第 2(c) 行定义的量。因子 $e^{-\beta_m}$ 对所有权重乘以同一常数，无影响。因此式 \eqref{eq:10_15} 等价于 Algorithm 10.1 的第 2(d) 行。
+
+\begin{remark}
+Algorithm 10.1 的第 2(a) 行可视为对式 \eqref{eq:10_11}（从而 \eqref{eq:10_10}）极小化的近似求解方法。故结论：\textbf{AdaBoost.M1 通过前向分阶段加性建模最小化指数损失准则 \eqref{eq:10_8}}。
+\end{remark}
+
+\begin{remark}[AdaBoost 不优化训练集误分类误差]
+对式 \eqref{eq:10_2} 的模拟数据，训练集误分类误差约在 250 次迭代后降到零（并保持为零），但平均指数损失 $\frac{1}{N}\sum_i \exp(-y_i f(x_i))$ 仍在持续下降；同时测试集误分类误差在 250 次迭代后仍继续改善。这说明 AdaBoost 优化的并非训练集误分类误差——指数损失对估计类概率的变化更敏感。
+\end{remark}
+
+% ============ §10.5 为什么用指数损失 ============
+\section{为什么用指数损失}
+
+AdaBoost.M1 最初并非从上一节的角度提出，其与基于指数损失的前向分阶段加性建模的等价性是提出五年后才被发现的。研究指数损失准则的性质，可以深入理解该过程并发现改进方向。
+
+指数损失在加性建模语境中的\textbf{主要吸引力是计算上的}：它导致简单、模块化的重新加权 AdaBoost 算法。但值得追问其统计性质：它估计什么？估计得好不好？第一个问题由求其\textbf{总体极小化}回答。可以证明（Friedman et al., 2000）：
+\begin{equation}\label{eq:10_16}
+    f^*(x) = \argmin_{f(x)} \E_{Y \mid x}\bigl(e^{-Y f(x)}\bigr) = \frac{1}{2}\log\frac{\Pr(Y = 1 \mid x)}{\Pr(Y = -1 \mid x)},
+\end{equation}
+即指数损失的总体极小化正是\textbf{类概率的对数优势（log-odds）的一半}。等价地
+\begin{equation}\label{eq:10_17}
+    \Pr(Y = 1 \mid x) = \frac{1}{1 + e^{-2 f^*(x)}}.
+\end{equation}
+因此 AdaBoost 估计的是（对数优势意义下的）类概率，而非简单的分类边界。
+
+\begin{remark}[边际与损失函数]
+记\textbf{边际} $y f(x)$。分类算法的目标是尽可能产生正边际。任何分类损失都应对负边际惩罚更重、对正边际奖励更轻。误分类损失 $I(yf(x) < 0)$ 对负边际罚 1、对正边际不罚；指数损失与二项偏差（deviance）都是它的单调连续逼近，且对越来越负的边际惩罚比奖励更重——区别只在程度上：二项偏差对大负边际的惩罚\textbf{线性}增长，而指数损失对这类观测的影响力\textbf{指数}增长，因此在训练过程中把更多影响力集中在负边际大的观测上。
+\end{remark}
+
+% ============ §10.6 损失函数与稳健性 ============
+\section{损失函数与稳健性}
+
+本节系统比较二分类的各种损失函数，并给出更稳健的替代准则。记响应 $y \in \{\pm 1\}$、预测为 $f(x)$、类预测为 $\sgn(f(x))$，\textbf{边际}为 $y f(x)$。分类算法的目标是尽可能产生正边际；任何分类损失都应\textbf{对负边际惩罚更重}（负边际观测已被误分类）、对正边际奖励更轻。
+
+\textbf{误分类损失} $L(y, f(x)) = I(yf(x) < 0)$：对负边际罚 1、对正边际不罚。指数损失与二项偏差（deviance）都可看作它的\textbf{单调连续逼近}，区别只在程度：
+\begin{itemize}
+    \item \textbf{指数损失} $L(y, f) = e^{-yf}$（式 \eqref{eq:10_8}）：对越来越负的边际惩罚呈\textbf{指数}增长，把更多影响力集中在负边际大的观测上——在含噪（贝叶斯误差不为零）或训练标签被错误标注的情形下，性能会显著下降。
+    \item \textbf{二项偏差} $L(y, f) = \log\bigl(1 + e^{-2yf}\bigr)$（负二项对数似然）：对大负边际的惩罚近似\textbf{线性}增长，影响力更均匀地分布于全部数据，因而\textbf{稳健得多}。
+\end{itemize}
+
+\subsection{平方误差损失不适合分类}
+
+平方误差损失 $L(y, f) = (y - f)^2$ 的总体风险极小化者为
+\begin{equation}\label{eq:10_19}
+    f^*(x) = \argmin_{f(x)} \E_{Y \mid x}(Y - f(x))^2 = \E(Y \mid x) = 2\cdot \Pr(Y = 1 \mid x) - 1,
+\end{equation}
+分类规则仍取 $G(x) = \sgn[f(x)]$。但平方误差\textbf{不是误分类误差的好替代}：它不是边际 $yf(x)$ 的单调递减函数——当 $y_i f(x_i) > 1$ 时它反而\textbf{二次增大}，把越来越多误差加在「越来越确定被正确分类」的观测上，从而\textbf{相对削弱}了真正误分类（$y_i f(x_i) < 0$）观测的影响力。若目标是类别判定，应采用单调递减的替代损失。第 12 章图 12.4 给出二次损失的修改——「Huber 化的平方 hinge 损失」（Rosset et al., 2004b），兼具二项偏差、二次损失与 SVM hinge 损失的良好性质：与二次损失 \eqref{eq:10_19} 有相同的总体极小化、$yf(x) > 1$ 时取零、$yf(x) < -1$ 时变为线性。
+
+\subsection{K 类分类的损失}
+
+响应 $Y$ 取值于无序集合 $\mathcal{G} = \{\mathcal{G}_1, \ldots, \mathcal{G}_K\}$（§2.4、§4.4）。只需类条件概率 $p_k(x) = \Pr(Y = \mathcal{G}_k \mid x)$ 即可构造贝叶斯分类器
+\begin{equation}\label{eq:10_20}
+    G(x) = \mathcal{G}_k, \quad \text{其中 } k = \argmax_{\ell} p_\ell(x).
+\end{equation}
+数据挖掘应用中常更关心类概率本身。如 §4.4，logistic 模型自然推广到 $K$ 类：
+\begin{equation}\label{eq:10_21}
+    p_k(x) = \frac{e^{f_k(x)}}{\sum_{\ell=1}^{K} e^{f_\ell(x)}},
+\end{equation}
+保证 $0 \le p_k(x) \le 1$ 且求和为 1。这里每类一个函数 $f_k$；因给所有 $f_k$ 加上同一 $h(x)$ 不改变模型，存在冗余。传统上令其中一个为零（如 $f_K(x) = 0$，见 (4.17)）；本书偏好保留对称性，施加约束 $\sum_{k=1}^{K} f_k(x) = 0$。二项偏差自然推广为 \textbf{K 类多项式偏差}：
+\begin{equation}\label{eq:10_22}
+    L(y, p(x)) = -\sum_{k=1}^{K} I(y = \mathcal{G}_k)\log p_k(x) = -\sum_{k=1}^{K} I(y = \mathcal{G}_k) f_k(x) + \log\Bigl(\sum_{\ell=1}^{K} e^{f_\ell(x)}\Bigr).
+\end{equation}
+与二分类情形一致，准则 \eqref{eq:10_22} 对错误预测的惩罚只随其错误程度\textbf{线性}增长。（Zhu et al., 2005 将指数损失推广到 $K$ 类，见练习 10.5。）
+
+\subsection{回归的稳健损失}
+
+回归中与「指数损失  二项对数似然」类比的是「\textbf{平方误差  绝对损失}」：
+\begin{itemize}
+    \item 平方误差 $L(y, f) = (y - f)^2$ 的总体解是 $f(x) = \E(Y \mid x)$；
+    \item 绝对损失 $L(y, f) = \abs{y - f}$ 的总体解是 $f(x) = \mathrm{median}(Y \mid x)$；对称误差分布下两者相同。
+\end{itemize}
+但有限样本下，平方误差在拟合过程中对绝对残差 $\abs{y_i - f(x_i)}$ 大的观测施加\textbf{过重}的权重，因而\textbf{不稳健}：对长尾误差分布、尤其对严重误测的 $y$（离群点），性能严重退化；绝对损失等更稳健准则在这些情形表现好得多。稳健统计文献提出了各种对严重离群点强抵抗、对高斯误差又几乎与最小二乘同样有效的回归损失。其中之一是 M-回归的 \textbf{Huber 损失}（Huber, 1964）：
+\begin{equation}\label{eq:10_23}
+    L(y, f(x)) = \begin{cases} [y - f(x)]^2, & \abs{y - f(x)} \le \delta,\\ 2\delta\abs{y - f(x)} - \delta^2, & \text{否则}. \end{cases}
+\end{equation}
+它在零附近是二次的（像平方误差）、大残差处是线性的（像绝对损失），兼具二者优点。
+
+\begin{remark}[稳健性与算法优雅性的权衡]
+当稳健性是关切点（数据挖掘尤甚，见 §10.7），回归的平方误差、分类的指数损失从统计角度看不是最优准则。但它们在\textbf{前向分阶段加性建模}中导致优雅的模块化 boosting 算法：平方误差下每步只需把基学习器拟合到当前残差 $y_i - f_{m-1}(x_i)$；指数损失下对输出 $y_i$ 做加权拟合、权重 $w_i = \exp(-y_i f_{m-1}(x_i))$。直接换用其他稳健准则得不到这样简单的可行 boosting 算法；但 §10.10.2 将展示如何基于\textbf{任意可微损失}导出简单优雅的 boosting 算法，从而为数据挖掘构造高度稳健的 boosting 程序。
+\end{remark}
+
+% ============ §10.7 数据挖掘的「现成」程序 ============
+\section{数据挖掘的「现成」程序}
+
+预测学习是数据挖掘的重要方面。各种方法各有擅长的情形，但实践中\textbf{事先很难知道}哪个程序对给定问题表现最好。表 10.1 汇总了若干学习方法的特性。
+
+\begin{table}[H]
+\centering
+\caption{不同学习方法的若干特性（表 10.1）。记号：好 = 表现好，一般 = 表现一般，差 = 表现差。}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{特性} & 神经网络 & SVM 核 & 树 & MARS & k-NN \\
+\midrule
+自然处理「混合」类型数据 & 差 & 差 & 好 & 好 & 差 \\
+处理缺失值 & 差 & 差 & 好 & 好 & 好 \\
+对输入空间离群点稳健 & 差 & 差 & 好 & 差 & 好 \\
+对输入单调变换不敏感 & 差 & 差 & 好 & 差 & 差 \\
+计算可扩展性（大 $N$） & 差 & 差 & 好 & 好 & 差 \\
+处理无关输入的能力 & 差 & 差 & 好 & 好 & 差 \\
+提取特征线性组合 & 好 & 好 & 差 & 差 & 一般 \\
+可解释性 & 差 & 差 & 一般 & 好 & 差 \\
+预测能力 & 好 & 好 & 差 & 一般 & 好 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+工业与商业数据挖掘应用对学习程序的要求尤其苛刻：数据集通常\textbf{非常大}（观测数与变量数都多），计算考量重要；数据通常\textbf{杂乱}——输入是定量、二值、分类变量的混合（后者常有多水平）、缺失值普遍、数值变量的分布常长尾且高度偏斜、常含大量严重误测（离群点）、各预测变量尺度差异巨大。此外，通常只有少量预测变量真正与预测相关，且缺乏可靠领域知识来构造相关特征或过滤无关特征——无关特征的加入会严重损害许多方法的性能。最后，数据挖掘一般需要\textbf{可解释}模型：不仅要给出预测，还要提供对输入联合取值与预测响应之间关系的定性理解。因此，神经网络这类「黑箱」方法在纯粹预测场景（如模式识别）很有用，但对数据挖掘用处小得多。
+
+\textbf{「现成（off-the-shelf）」方法}：可直接应用于数据、无需大量耗时的数据预处理或对学习程序的仔细调参。在所有著名学习方法中，\textbf{决策树最接近}满足数据挖掘「现成」程序的要求：构建相对快、产生可解释模型（若树小）；天然容纳数值与分类预测变量的混合及缺失值；对单个预测变量的（严格单调）变换不变，因而尺度化/变换不成问题、对预测变量离群点免疫；把\textbf{内部特征选择}作为过程的一部分，从而对大量无关预测变量的加入有抵抗力（甚至免疫）。这些性质使决策树成为数据挖掘最流行的方法。
+
+但树有一缺陷妨碍它成为理想工具：\textbf{不准确}——其预测精度很少能与数据能达到的最佳水平相比。如 §10.1 所见，boosting 树能显著（常是戏剧性地）提升其精度，同时保留其大部分数据挖掘所需性质；被牺牲的优点是\textbf{速度、可解释性}，以及（对 AdaBoost 而言）对重叠类分布、尤其对训练数据\textbf{错误标注}的稳健性。\textbf{梯度提升模型（GBM）}是树提升的推广，试图缓解这些问题，成为数据挖掘中准确有效的现成程序。
+
+% ============ §10.8 示例：Spam 数据 ============
+\section{示例：Spam 数据}
+
+在深入梯度提升细节前，先在二分类问题上展示其能力。Spam 数据见第 1 章，第 9 章多个方法都以它为示例（§9.1.2、§9.2.5、§9.3.1、§9.4.1）。
+
+对这批数据应用梯度提升得到测试误差率 \textbf{$4.5\%$}（与 §9.1.2 相同的测试集）。作为对比：加性 logistic 回归 $5.5\%$、完全生长并经交叉验证剪枝的 CART 树 $8.7\%$、MARS $5.5\%$。这些估计的标准误约 $0.6\%$；梯度提升显著优于所有其他方法（McNemar 检验，练习 10.6）。
+
+这里建模的量是 spam 对 email 的对数优势
+\begin{equation}\label{eq:10_24}
+    f(x) = \log\frac{\Pr(\text{spam} \mid x)}{\Pr(\text{email} \mid x)}
+\end{equation}
+（见 §10.13）。图 10.6 展示全部 57 个预测变量的\textbf{相对重要性}谱：字符 `!`、`\$`、`hp`、`remove` 的出现频率被估计为最相关的四个预测变量；`857`、`415`、`table`、`3d` 几乎无关。图 10.7 展示所选重要预测变量的\textbf{部分依赖}：两个与 spam 正相关（`!` 和 `remove`）、两个负相关（`edu` 和 `hp`），这些依赖基本单调，与加性 logistic 回归得到的对应函数大体一致（图 9.1，书内 p.303）。
+
+用 $J = 2$ 个终端节点的树运行梯度提升模型，对对数优势产生\textbf{纯加性（主效应）模型}，误差率 $4.7\%$，而完整梯度提升模型（$J = 5$）为 $4.5\%$。虽不显著，这略高的误差率提示某些重要预测变量间可能存在\textbf{交互}；可通过双变量部分依赖图诊断。图 10.8 即其一：当 `hp` 频率很低时 spam 对数优势大幅升高；`hp` 频率高时对数优势低得多且随 `!` 近似恒定；随 `hp` 频率下降，与 `!` 的函数关系增强。
+
+% ============ §10.9 Boosting 树 ============
+\section{Boosting 树}
+
+回归与分类树详见 §9.2。树把所有预测变量联合取值空间划分为\textbf{不相交区域} $R_j,\; j = 1, 2, \ldots, J$（树的终端节点），每个区域赋予常数 $\gamma_j$，预测规则为「$x \in R_j \Rightarrow f(x) = \gamma_j$」。树可形式化表示为
+\begin{equation}\label{eq:10_25}
+    T(x; \Theta) = \sum_{j=1}^{J} \gamma_j I(x \in R_j),
+\end{equation}
+参数 $\Theta = \{R_j, \gamma_j\}_1^J$，$J$ 通常视为元参数。参数通过最小化经验风险求得：
+\begin{equation}\label{eq:10_26}
+    \hat\Theta = \argmin_{\Theta} \sum_{j=1}^{J} \sum_{x_i \in R_j} L(y_i, \gamma_j).
+\end{equation}
+这是困难的组合优化问题，通常满足于近似次优解。把优化拆成两部分有用：
+\begin{itemize}
+    \item \textbf{给定 $R_j$ 求 $\gamma_j$}：通常平凡，常取 $\hat\gamma_j = \bar y_j$（落入 $R_j$ 的 $y_i$ 均值）；对误分类损失，$\hat\gamma_j$ 取落入 $R_j$ 观测的\textbf{众数类}。
+    \item \textbf{求 $R_j$}：困难部分，用近似解；且求 $R_j$ 也暗含估计 $\gamma_j$。典型策略是\textbf{贪心、自上而下的递归划分}算法。有时需用更光滑、更方便的准则 \eqref{eq:10_26} 的近似来优化 $R_j$：
+    \begin{equation}\label{eq:10_27}
+        \tilde\Theta = \argmin_{\Theta} \sum_{i=1}^{N} \tilde L\bigl(y_i, T(x_i, \Theta)\bigr),
+    \end{equation}
+    得到 $\hat R_j = \tilde R_j$ 后，再用原始准则更精确地估计 $\gamma_j$。
+\end{itemize}
+§9.2 对分类树描述了这样的策略：生长树（确定 $R_j$）时用 \textbf{Gini 指数}替代误分类损失。
+
+\textbf{提升树模型}是这种树的\textbf{和}：
+\begin{equation}\label{eq:10_28}
+    f_M(x) = \sum_{m=1}^{M} T(x; \Theta_m),
+\end{equation}
+以\textbf{前向分阶段}方式（Algorithm 10.2）诱导。前向分阶段每步需对下一棵树求解
+\begin{equation}\label{eq:10_29}
+    \hat\Theta_m = \argmin_{\Theta_m} \sum_{i=1}^{N} L\bigl(y_i, f_{m-1}(x_i) + T(x_i; \Theta_m)\bigr),
+\end{equation}
+给定当前模型 $f_{m-1}(x)$ 求区域集与常数 $\Theta_m = \{R_{jm}, \gamma_{jm}\}_1^{J_m}$。
+
+给定区域 $R_{jm}$，求每区域最优常数通常直截了当：
+\begin{equation}\label{eq:10_30}
+    \hat\gamma_{jm} = \argmin_{\gamma_{jm}} \sum_{x_i \in R_{jm}} L\bigl(y_i, f_{m-1}(x_i) + \gamma_{jm}\bigr).
+\end{equation}
+求区域是困难的（比单棵树更难）。少数特殊情形下问题简化：
+\begin{itemize}
+    \item \textbf{平方误差损失}：式 \eqref{eq:10_29} 的解不比单棵树难——只需当前残差 $y_i - f_{m-1}(x_i)$ 预测得最好的回归树，$\hat\gamma_{jm}$ 是各区域残差均值。
+    \item \textbf{二分类 + 指数损失}：分阶段方式产生 AdaBoost 提升分类树（Algorithm 10.1）。若树 $T(x;\Theta_m)$ 限制为\textbf{缩放分类树}（$\beta_m T(x;\Theta_m)$，$\gamma_{jm} \in \{-1, 1\}$），则 §10.4 已证式 \eqref{eq:10_29} 的解是使加权误差率 $\sum_{i=1}^{N} w_i^{(m)} I(y_i \neq T(x_i;\Theta_m))$ 最小的树，权重 $w_i^{(m)} = e^{-y_i f_{m-1}(x_i)}$。不加该限制时，指数损失下 \eqref{eq:10_29} 仍简化为新树的加权指数准则：
+    \begin{equation}\label{eq:10_31}
+        \hat\Theta_m = \argmin_{\Theta_m} \sum_{i=1}^{N} w_i^{(m)} \exp\bigl[-y_i T(x_i; \Theta_m)\bigr].
+    \end{equation}
+    可用加权指数损失作分裂准则实现贪心递归划分。给定 $R_{jm}$，可证（练习 10.7）式 \eqref{eq:10_30} 的解是各区域的\textbf{加权对数优势}：
+    \begin{equation}\label{eq:10_32}
+        \hat\gamma_{jm} = \frac{1}{2}\log\frac{\sum_{x_i \in R_{jm}} w_i^{(m)} I(y_i = 1)}{\sum_{x_i \in R_{jm}} w_i^{(m)} I(y_i = -1)}.
+    \end{equation}
+    这需要专门的树生长算法；实践中更偏好下面用加权最小二乘回归树的近似。
+\end{itemize}
+
+用绝对误差或 Huber 损失 \eqref{eq:10_23} 替代平方误差（回归）、用偏差 \eqref{eq:10_22} 替代指数损失（分类），可使提升树\textbf{稳健化}。但不同于其不稳健的对应物，这些稳健准则不产生简单快速的 boosting 算法。对更一般的损失，给定 $R_{jm}$ 后式 \eqref{eq:10_30} 的解通常是直截了当的（一个简单「位置」估计）：绝对损失下是各区域残差的中位数；其他准则有快速迭代算法，通常其更快「单步」近似已足够。问题在\textbf{树诱导}：对这些更一般损失不存在求解 \eqref{eq:10_29} 的简单快速算法，像 \eqref{eq:10_27} 这样的近似变得必不可少。
+
+% ============ §10.10 通过梯度提升的数值优化 ============
+\section{通过梯度提升的数值优化}
+
+对\textbf{任意可微损失准则}求解式 \eqref{eq:10_29} 的快速近似算法，可借助与数值优化的类比导出。用 $f(x)$ 预测训练数据上的 $y$ 的总损失为
+\begin{equation}\label{eq:10_33}
+    L(f) = \sum_{i=1}^{N} L\bigl(y_i, f(x_i)\bigr).
+\end{equation}
+目标是关于 $f$ 最小化 $L(f)$，此处 $f(x)$ 约束为树的和 \eqref{eq:10_28}。忽略此约束，最小化 \eqref{eq:10_33} 可视为数值优化
+\begin{equation}\label{eq:10_34}
+    \hat f = \argmin_{f} L(f),
+\end{equation}
+其中「参数」$f \in \R^N$ 是逼近函数在 $N$ 个数据点处的取值：
+\[
+    f = \{f(x_1), f(x_2), \ldots, f(x_N)\}^T.
+\]
+数值优化过程把 \eqref{eq:10_34} 的解表示为分量向量之和
+\[
+    f_M = \sum_{m=0}^{M} h_m, \qquad h_m \in \R^N,
+\]
+其中 $f_0 = h_0$ 是初始猜测，每个后继 $f_m$ 基于当前参数向量 $f_{m-1}$（已诱导更新的和）诱导。不同数值优化方法在如何计算每个增量向量 $h_m$（「步长」）上有所不同。
+
+\subsection{最速下降}
+
+\textbf{最速下降（steepest descent）}取 $h_m = -\rho_m g_m$，其中 $\rho_m$ 是标量、$g_m \in \R^N$ 是 $L(f)$ 在 $f = f_{m-1}$ 处求值的梯度。梯度 $g_m$ 的分量为
+\begin{equation}\label{eq:10_35}
+    g_{im} = \Bigl[\frac{\partial L(y_i, f(x_i))}{\partial f(x_i)}\Bigr]_{f(x_i) = f_{m-1}(x_i)}.
+\end{equation}
+
