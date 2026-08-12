@@ -1,0 +1,1116 @@
+\chapter{Support Vector Machines and Flexible Discriminants（支持向量机与灵活判别）}
+
+% ============ §12.1 Introduction ============
+\section{引言}
+
+本章介绍分类问题中\textbf{线性决策边界}的推广。第 4 章讨论了两类线性可分情形下的\textbf{最优分离超平面}（optimal separating hyperplane）；这里将其推广到类重叠（不可分）的情形。这些技术进一步推广为\textbf{支持向量机}（support vector machine, SVM）：通过在\textbf{放大后的特征空间}中构造线性边界来产生非线性边界。
+
+第二组方法推广 \textbf{Fisher 线性判别分析}（LDA），包括：
+
+\begin{itemize}
+\item \textbf{灵活判别分析}（flexible discriminant analysis, FDA）——以与 SVM 非常类似的方式构造非线性边界；
+\item \textbf{惩罚判别分析}（penalized discriminant analysis, PDA）——用于特征数众多且高度相关的信号/图像分类问题；
+\item \textbf{混合判别分析}（mixture discriminant analysis, MDA）——用于形状不规则的类别。
+\end{itemize}
+
+% ============ §12.2 The Support Vector Classifier ============
+\section{支持向量分类器}
+
+第 4 章讨论了在两个完全分离的类之间构造最优分离超平面的技术，这里回顾并推广到类可能无法被线性边界分离的情形。
+
+\begin{definition}[数据与超平面]
+训练数据为 $N$ 对 $(x_1,y_1),(x_2,y_2),\dots,(x_N,y_N)$，其中 $x_i\in\R^p$，$y_i\in\{-1,1\}$。超平面定义为
+\begin{equation}
+\{x : f(x) = x^T\beta + \beta_0 = 0\}, \label{eq:12_1}
+\end{equation}
+其中 $\beta$ 是单位向量：$\norm{\beta}=1$。由 $f(x)$ 导出的分类规则为
+\begin{equation}
+G(x) = \mathrm{sign}[x^T\beta + \beta_0]. \label{eq:12_2}
+\end{equation}
+\end{definition}
+
+超平面几何在 §4.5 中回顾：$f(x)$（式 \ref{eq:12_1}）给出点 $x$ 到超平面 $f(x)=0$ 的\textbf{带符号距离}。
+
+\begin{remark}[可分情形的最大间隔]
+若两类线性可分，可找到 $f(x)=x^T\beta+\beta_0$ 使 $y_i f(x_i)>0,\ \forall i$，从而构造在类 1 与类 $-1$ 的训练点之间产生\textbf{最大间隔}（margin）的超平面。优化问题
+\begin{equation}
+\max_{\beta,\beta_0,\ \norm{\beta}=1} M \quad \text{subject to}\quad y_i(x_i^T\beta + \beta_0)\ge M,\ i=1,\dots,N, \label{eq:12_3}
+\end{equation}
+即捕捉这一概念。图 \ref{fig:12_1_separable} 中，超平面两侧各 $M$ 个单位距离的带状区域宽 $2M$，称为\textbf{间隔}。
+\end{remark}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[>=stealth, font=\small, scale=0.92]
+  % 决策边界 x^Tβ+β0=0 与两侧间隔边缘
+  \coordinate (A) at (-4.6, 2.3);
+  \coordinate (B) at (4.6, -2.3);
+  \coordinate (P1) at ($(A)!1.35cm!90:(B)$);   % 上间隔边缘左端
+  \coordinate (P2) at ($(B)!1.35cm!-90:(A)$);  % 上间隔边缘右端
+  \coordinate (P3) at ($(B)!1.35cm!90:(A)$);   % 下间隔边缘右端
+  \coordinate (P4) at ($(A)!-1.35cm!90:(B)$);  % 下间隔边缘左端
+
+  % 间隔带阴影
+  \fill[blue!12] (P1) -- (P2) -- (P3) -- (P4) -- cycle;
+
+  % 间隔边缘（虚线）
+  \draw[gray!70, dashed] (P1) -- (P2);
+  \draw[gray!70, dashed] (P4) -- (P3);
+
+  % 决策边界（实线）
+  \draw[very thick] (A) -- (B);
+
+  % 类 +1（蓝色实心圆点）
+  \foreach \pt in {(-4.3,3.3), (-3.1,3.9), (-1.9,3.7), (-0.7,3.3), (0.9,2.8), (2.6,2.0)} {\fill[blue!70!black] \pt circle (0.09);}
+  % 类 -1（红色实心三角）
+  \foreach \pt in {(4.4,-2.8), (3.1,-3.7), (1.7,-3.6), (0.2,-3.1), (-1.6,-2.4)} {\node[red!70!black] at \pt {$\blacktriangle$};}
+
+  % 支持向量（恰好落在间隔边缘上）加圈标注
+  \draw[blue!70!black] (-2.61,2.81) circle (0.17);
+  \draw[blue!70!black] (1.53,0.74) circle (0.17);
+  \draw[red!70!black] (-0.61,-1.2) circle (0.17);
+  \draw[red!70!black] (2.61,-2.81) circle (0.17);
+
+  % 法向距离 M = 1/||β||（从决策边界到间隔边缘）
+  \draw[<->] (-4.0, 2.0) -- (-3.396, 3.2075);
+  \node[anchor=east] at (-4.6, 2.7) {$M = 1/\norm{\beta}$};
+
+  % 间隔宽度标注（左端 2M）
+  \draw[<->] (P4) -- (P1);
+  \node[anchor=east] at (-5.9, 2.35) {margin};
+  \node[anchor=east] at (-5.9, 1.15) {$2M = 2/\norm{\beta}$};
+
+  % 决策边界标签
+  \node[anchor=west] at (-0.8, 0.5) {$x^T\beta + \beta_0 = 0$};
+\end{tikzpicture}
+\caption{可分情形的最大间隔（示意，对应书图 12.1 左图）。实线为决策边界 $x^T\beta+\beta_0=0$，两侧虚线界定宽 $2M=2/\norm{\beta}$ 的最大间隔带（阴影）；加圈的观测为支持向量，恰好落在间隔边缘上。}
+\label{fig:12_1_separable}
+\end{figure}
+
+该问题可更方便地重写为
+\begin{equation}
+\min_{\beta,\beta_0} \norm{\beta} \quad \text{subject to}\quad y_i(x_i^T\beta + \beta_0)\ge 1,\ i=1,\dots,N, \label{eq:12_4}
+\end{equation}
+其中去掉了 $\beta$ 的范数约束，且 $M = 1/\norm{\beta}$。式 \ref{eq:12_4} 是分离数据下支持向量准则的通常写法。这是一个\textbf{凸优化问题}（二次准则 + 线性不等式约束），解在 §4.5.2 中刻画。
+
+\begin{remark}[不可分情形：松弛变量]
+现在假设类在特征空间\textbf{重叠}。处理重叠的方式之一是仍然最大化 $M$，但允许一些点位于间隔的错误一侧。定义松弛变量 $\xi = (\xi_1,\dots,\xi_N)$。修改式 \ref{eq:12_3} 的约束有两种自然方式：
+\begin{equation}
+y_i(x_i^T\beta + \beta_0) \ge M - \xi_i, \label{eq:12_5}
+\end{equation}
+或
+\begin{equation}
+y_i(x_i^T\beta + \beta_0) \ge M(1-\xi_i), \label{eq:12_6}
+\end{equation}
+对所有 $i$ 成立，$\xi_i\ge 0$，$\sum_{i=1}^N \xi_i \le \text{常数}$。两种选择导致不同解。
+\end{remark}
+
+\paragraph{为什么选 (12.6) 而不是 (12.5)？}
+
+第一种（式 \ref{eq:12_5}）看似更自然，因为它以\textbf{距间隔的实际距离}度量重叠；第二种（式 \ref{eq:12_6}）度量的是\textbf{相对距离}，随间隔宽度 $M$ 变化。但关键区别在凸性：\textbf{第一种选择导致非凸优化问题，而第二种是凸的}。因此式 \ref{eq:12_6} 导出「标准」支持向量分类器，本书沿用。
+
+\begin{remark}[$\xi_i$ 的含义]
+式 \ref{eq:12_6} 中，$\xi_i$ 表示预测 $f(x_i)=x_i^T\beta+\beta_0$ 落在其间隔错误一侧的\textbf{比例量}。通过约束 $\sum\xi_i$，我们限制了预测落在间隔错误一侧的总比例量。当 $\xi_i>1$ 时发生\textbf{误分类}，因此将 $\sum\xi_i$ 限制在某值 $K$，就限定了训练误分类总数不超过 $K$。
+\end{remark}
+
+与 §4.5.2 中式 (4.48) 一样，可去掉 $\beta$ 的范数约束、令 $M=1/\norm{\beta}$，把式 \ref{eq:12_4} 写成等价形式
+\begin{equation}
+\min \norm{\beta} \quad \text{subject to}\quad
+\begin{cases}
+y_i(x_i^T\beta+\beta_0) \ge 1 - \xi_i,\ \forall i,\\
+\xi_i \ge 0,\ \sum \xi_i \le \text{常数}.
+\end{cases} \label{eq:12_7}
+\end{equation}
+这是不可分情形下支持向量分类器的通常定义方式。书中提到式 \ref{eq:12_7} 中约束里固定的尺度「$1$」令人困惑，更愿意从式 \ref{eq:12_6} 出发推导。
+
+\begin{remark}[与 LDA 的本质区别]
+由准则 \ref{eq:12_7} 的性质可知，\textbf{位于类边界内部深处的点对边界的塑造不起重要作用}。这是一个吸引人的性质，也是它与线性判别分析（§4.3）的区别所在：在 LDA 中，决策边界由类分布的协方差和类质心的位置决定。我们将在 §12.3.3 看到，逻辑回归在这点上与支持向量分类器更为相似。
+\end{remark}
+
+% ============ §12.2.1 Computing the Support Vector Classifier ============
+\subsection{计算支持向量分类器}
+
+问题 \ref{eq:12_7} 是带线性不等式约束的二次问题，因此是凸优化问题。书中用 Lagrange 乘子给出二次规划解。计算上，把 \ref{eq:12_7} 重写为等价形式比较方便：
+\begin{equation}
+\min_{\beta,\beta_0} \frac12\norm{\beta}^2 + C\sum_{i=1}^{N}\xi_i \quad \text{subject to}\quad
+\xi_i \ge 0,\ y_i(x_i^T\beta+\beta_0)\ge 1-\xi_i,\ \forall i, \label{eq:12_8}
+\end{equation}
+其中「代价」参数 $C$ 取代 \ref{eq:12_7} 中的常数；可分情形对应 $C=\infty$。
+
+Lagrange（原始）函数为
+\begin{equation}
+L_P = \frac12\norm{\beta}^2 + C\sum_{i=1}^{N}\xi_i - \sum_{i=1}^{N}\alpha_i [y_i(x_i^T\beta+\beta_0) - (1-\xi_i)] - \sum_{i=1}^{N}\mu_i \xi_i, \label{eq:12_9}
+\end{equation}
+关于 $\beta,\beta_0,\xi_i$ 极小化。令各导数分别为零，得
+\begin{align}
+\beta &= \sum_{i=1}^{N}\alpha_i y_i x_i, \label{eq:12_10}\\
+0 &= \sum_{i=1}^{N}\alpha_i y_i, \label{eq:12_11}\\
+\alpha_i &= C - \mu_i,\ \forall i, \label{eq:12_12}
+\end{align}
+以及非负性约束 $\alpha_i,\mu_i,\xi_i\ge 0,\ \forall i$。
+
+将式 \ref{eq:12_10}--\ref{eq:12_12} 代入式 \ref{eq:12_9}，得到 Lagrange（Wolfe）\textbf{对偶目标函数}
+\begin{equation}
+L_D = \sum_{i=1}^{N}\alpha_i - \frac12 \sum_{i=1}^{N}\sum_{i'=1}^{N}\alpha_i \alpha_{i'} y_i y_{i'} x_i^T x_{i'}, \label{eq:12_13}
+\end{equation}
+它对任意可行点给出目标函数 \ref{eq:12_8} 的一个\textbf{下界}。我们在约束 $0\le \alpha_i\le C$、$\sum_{i=1}^{N}\alpha_i y_i = 0$ 下最大化 $L_D$。
+
+除式 \ref{eq:12_10}--\ref{eq:12_12} 外，\textbf{Karush--Kuhn--Tucker（KKT）条件}还包括约束
+\begin{align}
+\alpha_i [y_i(x_i^T\beta+\beta_0) - (1-\xi_i)] &= 0, \label{eq:12_14}\\
+\mu_i \xi_i &= 0, \label{eq:12_15}\\
+y_i(x_i^T\beta+\beta_0) - (1-\xi_i) &\ge 0, \label{eq:12_16}
+\end{align}
+对 $i=1,\dots,N$ 成立。这些方程 \ref{eq:12_10}--\ref{eq:12_16} 共同唯一刻画原始问题与对偶问题的解。
+
+\begin{remark}[支持向量]
+由式 \ref{eq:12_10} 可见，$\beta$ 的解具有形式
+\begin{equation}
+\hat\beta = \sum_{i=1}^{N}\hat\alpha_i y_i x_i, \label{eq:12_17}
+\end{equation}
+其中只有那些\textbf{约束 \ref{eq:12_16} 恰好取等号}的观测才有非零系数 $\hat\alpha_i$（由式 \ref{eq:12_14}）。这些观测称为\textbf{支持向量}，因为 $\hat\beta$ 仅由它们表示。
+
+在这些支持点中：有些位于间隔边缘上（$\hat\xi_i=0$），由式 \ref{eq:12_15} 与 \ref{eq:12_12} 知其特征为 $0<\hat\alpha_i<C$；其余点（$\hat\xi_i>0$）有 $\hat\alpha_i=C$。由式 \ref{eq:12_14}，这些间隔点（$0<\hat\alpha_i,\ \hat\xi_i=0$）中任意一个都可用于解出 $\beta_0$，为数值稳定起见通常取所有解的\textbf{平均}。
+\end{remark}
+
+最大化对偶 \ref{eq:12_13} 是比原始问题 \ref{eq:12_9} 更简单的凸二次规划问题，可用标准技术求解。给定解 $\hat\beta_0$ 与 $\hat\beta$，决策函数为
+\begin{equation}
+\hat G(x) = \mathrm{sign}[\hat f(x)] = \mathrm{sign}[x^T\hat\beta + \hat\beta_0]. \label{eq:12_18}
+\end{equation}
+该过程的\textbf{调参参数}是代价参数 $C$。
+
+% ============ §12.2.2 Mixture Example (Continued) ============
+\subsection{混合示例（续）}
+
+图 12.2 展示了图 2.5（第 21 页）混合示例中两个重叠类在 $C=0.01$ 与 $C=10{,}000$ 两种代价参数下的支持向量边界，两者的分类性能相当。
+
+\begin{remark}[$C$ 的作用]
+位于边界错误一侧的点是支持向量；此外，位于边界正确一侧但\textbf{靠近边界（在间隔内）}的点也是支持向量。$C=0.01$ 的间隔比 $C=10{,}000$ 更大。因此：
+\begin{itemize}
+\item 较大的 $C$ 把注意力更多地放在（正确分类的）靠近决策边界的点上；
+\item 较小的 $C$ 则让更远处的数据也参与。
+\end{itemize}
+无论哪种情况，误分类点都被赋权，无论它们离得多远。在此例中，由于线性边界的刚性，过程对 $C$ 的选择并不敏感。
+\end{remark}
+
+\begin{remark}[留一交叉验证误差的界]
+$C$ 的最优值可用交叉验证（第 7 章）估计。有趣的是，\textbf{留一交叉验证误差可由数据中支持点所占比例给出上界}：因为剔除一个非支持向量的观测不会改变解，这些观测被原边界正确分类，因而在交叉验证过程中也会被正确分类。然而这个界往往偏高，不足以用来选 $C$（在示例中分别达到 62\% 和 85\%）。
+\end{remark}
+
+% ============ §12.3 Support Vector Machines and Kernels ============
+\section{支持向量机与核}
+
+前面描述的支持向量分类器在输入特征空间中寻找线性边界。与其他线性方法一样，可通过\textbf{基展开}（如多项式或样条，第 5 章）放大特征空间来增加灵活性。一般而言，放大空间中线性边界在训练分离上表现更好，并转化为原空间中的\textbf{非线性边界}。一旦选定基函数 $h_m(x),\ m=1,\dots,M$，流程与之前相同：用输入特征 $h(x_i)=(h_1(x_i),\dots,h_M(x_i))$ 拟合支持向量分类器，得到（非线性）函数 $\hat f(x) = h(x)^T\hat\beta + \hat\beta_0$，分类器仍为 $\hat G(x)=\mathrm{sign}(\hat f(x))$。
+
+\begin{remark}[SVM 的动机与核心问题]
+支持向量机分类器是这一思想的推广，其中放大空间的维数允许\textbf{非常大，某些情形下是无穷维}。表面上计算会变得不可行，且基函数足够多时数据可分、会发生过拟合。SVM 技术首先解决这些问题；随后我们会看到，SVM 分类器实际上是在用\textbf{特定的准则和正则化形式}求解函数拟合问题，它属于一个包含第 5 章\textbf{光滑样条}在内的更大问题类。读者可参考 §5.8，那里提供了背景材料，与接下来的两小节内容有部分重叠。
+\end{remark}
+
+% ============ §12.3.1 Computing the SVM for Classification ============
+\subsection{计算用于分类的 SVM}
+
+优化问题 \ref{eq:12_9} 及其解可以一种\textbf{只通过内积涉及输入特征}的特殊方式表示。直接对变换后的特征向量 $h(x_i)$ 做：Lagrange 对偶函数 \ref{eq:12_13} 具有形式
+\begin{equation}
+L_D = \sum_{i=1}^{N}\alpha_i - \frac12 \sum_{i=1}^{N}\sum_{i'=1}^{N}\alpha_i \alpha_{i'} y_i y_{i'} \inner{h(x_i)}{h(x_{i'})}. \label{eq:12_19}
+\end{equation}
+由式 \ref{eq:12_10} 可知解函数 $f(x)$ 可写为
+\begin{equation}
+f(x) = h(x)^T\beta + \beta_0 = \sum_{i=1}^{N}\alpha_i y_i \inner{h(x)}{h(x_i)} + \beta_0. \label{eq:12_20}
+\end{equation}
+如前，给定 $\alpha_i$，$\beta_0$ 可由对任意（或全部）满足 $0<\alpha_i<C$ 的 $x_i$ 在式 \ref{eq:12_20} 中解 $y_i f(x_i)=1$ 得到。
+
+\begin{remark}[核技巧]
+式 \ref{eq:12_19} 与 \ref{eq:12_20} 都只通过内积涉及 $h(x)$。先明确各对象所在的空间：
+
+\begin{itemize}
+\item $h$ 是\textbf{基展开映射}（feature map），它把\textbf{输入空间}（原特征空间）$\R^p$ 中的点 $x$ 映到\textbf{特征空间}（变换空间）$\mathcal{H}$：
+\[
+h:\ \R^p \to \mathcal{H},\qquad x \mapsto h(x) = \bigl(h_1(x),\dots,h_M(x)\bigr)^T.
+\]
+$M$ 可以非常大，某些情形下为\textbf{无穷维}（此时 $\mathcal{H}$ 是无穷维 Hilbert 空间，$h$ 的「分量」来自核 $K$ 的本征展开，见 §12.3.3）。每个分量 $h_m(x)$ 就是一个基函数（多项式、样条、径向基等，见式 \ref{eq:12_22}）。
+
+\item $K$ 是\textbf{特征空间 $\mathcal{H}$ 上的内积}：把 $x,x'$ 先经 $h$ 映到 $\mathcal{H}$，再取该空间的内积，
+\begin{equation}
+K(x,x') = \inner{h(x)}{h(x')}_{\mathcal{H}}. \label{eq:12_21}
+\end{equation}
+$M$ 有限时它是普通的欧氏点积 $\sum_{m=1}^{M}h_m(x)h_m(x')$；$M$ 无穷时是 $\mathcal{H}$ 的 Hilbert 内积。注意 $K$ 的\textbf{自变量是原输入} $x,x'\in\R^p$，值却等于\textbf{特征空间}里的内积。
+\end{itemize}
+
+\textbf{要点}：SVM 只需知道 $K$——一个定义在 $\R^p\times\R^p$ 上、却等价于 $\mathcal{H}$ 中内积的二变量函数——\textbf{无需指明变换 $h$}，也不必显式构造特征空间。$K$ 应为对称的\textbf{正（半）定}函数；参见 §5.8.1。
+\end{remark}
+
+SVM 文献中三种常用的核：
+\begin{equation}
+\begin{aligned}
+\text{$d$ 阶多项式：}\quad & K(x,x') = (1 + \inner{x}{x'})^d,\\
+\text{径向基：}\quad & K(x,x') = \exp(-\gamma\norm{x-x'}^2),\\
+\text{神经网络：}\quad & K(x,x') = \tanh(\kappa_1 \inner{x}{x'} + \kappa_2).
+\end{aligned} \label{eq:12_22}
+\end{equation}
+
+\paragraph{多项式核到底对应什么样的基展开？以二次核为例}
+
+考虑有两个输入 $X_1,X_2$ 的特征空间与二次多项式核，则
+\begin{equation}
+\begin{aligned}
+K(X,X') &= (1 + \inner{X}{X'})^2 \\
+&= (1 + X_1 X_1' + X_2 X_2')^2 \\
+&= 1 + 2X_1 X_1' + 2X_2 X_2' + (X_1 X_1')^2 + (X_2 X_2')^2 + 2X_1 X_1' X_2 X_2'.
+\end{aligned} \label{eq:12_23}
+\end{equation}
+于是 $M=6$，若取 $h_1(X)=1,\ h_2(X)=\sqrt{2}X_1,\ h_3(X)=\sqrt{2}X_2,\ h_4(X)=X_1^2,\ h_5(X)=X_2^2,\ h_6(X)=\sqrt{2}X_1 X_2$，则 $K(X,X')=\inner{h(X)}{h(X')}$。由式 \ref{eq:12_20} 知解可写为
+\begin{equation}
+\hat f(x) = \sum_{i=1}^{N}\hat\alpha_i y_i K(x,x_i) + \hat\beta_0. \label{eq:12_24}
+\end{equation}
+
+\begin{remark}[放大空间中 $C$ 的作用]
+在放大特征空间中，由于完美分离常常可以实现，参数 $C$ 的角色更加清晰：\textbf{大的 $C$} 会抑制任何正的 $\xi_i$，导致原特征空间中过拟合的\textbf{wiggly（扭曲）边界}；\textbf{小的 $C$} 会促使 $\norm{\beta}$ 取较小值，进而使 $f(x)$ 与边界更光滑。图 12.3 将两个非线性支持向量机应用于第 2 章的混合示例：径向基核产生的边界与 Bayes 最优边界相当接近（对比图 2.5）。
+
+在支持向量的早期文献中，有人声称核性质是支持向量机独有的，并允许规避维数灾难——\textbf{这两种说法都不成立}，接下来的三个小节将讨论这两个问题。
+\end{remark}
+
+% ============ §12.3.2 The SVM as a Penalization Method ============
+\subsection{SVM 作为惩罚方法}
+
+令 $f(x) = h(x)^T\beta + \beta_0$，考虑优化问题
+\begin{equation}
+\min_{\beta_0,\beta} \sum_{i=1}^{N}[1 - y_i f(x_i)]_+ + \frac{\lambda}{2}\norm{\beta}^2, \label{eq:12_25}
+\end{equation}
+其中下标「$+$」表示正部。它具有\textbf{损失 + 惩罚}的形式，是函数估计中的常见范式。容易证明（习题 12.1）：\textbf{取 $\lambda = 1/C$ 时，式 \ref{eq:12_25} 的解与式 \ref{eq:12_8} 的解相同}。
+
+\begin{remark}[铰链损失]
+「铰链」（hinge）损失函数 $L(y,f) = [1-yf]_+$ 对二分类问题是合理的，这可通过与其他更传统的损失函数比较看出。图 12.4 将其与逻辑回归的（负）对数似然损失、平方误差损失及其变体比较：
+\begin{itemize}
+\item \textbf{逻辑回归的二项偏差}（binomial deviance）：与 SVM 损失有\textbf{相似的尾部}——对深居间隔内部的点给零惩罚，对位于错误一侧且远离的点给线性惩罚；
+\item \textbf{平方误差}：给\textbf{二次惩罚}，且深居自身间隔内部的点对模型也有很强影响；
+\item \textbf{平方铰链损失} $L(y,f) = [1-yf]_+^2$：像二次损失，但对间隔内的点为零；它在左尾仍二次上升，对误分类观测的\textbf{稳健性}不如铰链或偏差。
+\end{itemize}
+最近 Rosset \& Zhu (2007) 提出了「Huber 化」的平方铰链损失版本，在 $yf=-1$ 处平滑过渡为线性损失。
+\end{remark}
+
+这些损失函数可在\textbf{总体层面}用它们估计什么来刻画：考虑极小化 $\E L(Y,f(X))$，结果总结于表 12.1。
+
+\begin{table}[htbp]
+\centering
+\caption{图 12.4 中不同损失函数的总体极小元。逻辑回归用二项对数似然（偏差）；线性判别分析（习题 4.2）用平方误差损失；SVM 铰链损失估计的是后验类概率的\textbf{众数}，而其余损失估计的是这些概率的一个\textbf{线性变换}。}
+\label{tab:12_1}
+\begin{tabular}{lll}
+\toprule
+损失函数 $L[y,f(x)]$ & 极小化函数 \\
+\midrule
+二项偏差 & $\log[1+e^{-yf(x)}]$ & $f(x) = \log\dfrac{\Pr(Y=+1\mid x)}{\Pr(Y=-1\mid x)}$ \\
+SVM 铰链损失 & $[1-yf(x)]_+$ & $f(x) = \mathrm{sign}\!\big[\Pr(Y=+1\mid x) - \tfrac12\big]$ \\
+平方误差 & $[y-f(x)]^2 = [1-yf(x)]^2$ & $f(x) = 2\Pr(Y=+1\mid x) - 1$ \\
+Huber 化平方铰链 & $\begin{cases} -4yf(x), & yf(x)<-1\\ [1-yf(x)]^2_+, & \text{否则} \end{cases}$ & $f(x) = 2\Pr(Y=+1\mid x) - 1$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{remark}[铰链损失估计的是什么]
+铰链损失估计\textbf{分类器 $G(x)$ 本身}（后验概率的符号），而其余所有损失都估计类后验概率的一个\textbf{变换}（见表 \ref{tab:12_1}）：
+\begin{itemize}
+\item 二项偏差估计\textbf{对数几率} $\log\frac{\Pr(Y=+1\mid x)}{\Pr(Y=-1\mid x)}$；
+\item 平方误差与 Huber 化平方铰链估计 $2\Pr(Y=+1\mid x)-1$（$Y=\pm1$ 编码下 $f$ 的期望）；
+\item 铰链损失估计 $\mathrm{sign}[\Pr(Y=+1\mid x)-\tfrac12]$，即直接给出判别结果。
+\end{itemize}
+「Huber 化」平方铰链损失兼具逻辑回归的优点（损失光滑、估计概率）与 SVM 铰链损失的优点（支持点）。
+\end{remark}
+
+\begin{remark}[正则化函数估计的视角]
+式 \ref{eq:12_25} 将 SVM 刻画为\textbf{正则化的函数估计问题}：线性展开 $f(x)=\beta_0 + h(x)^T\beta$ 的系数被\textbf{向零收缩}（常数项除外）。若 $h(x)$ 表示具有某种有序结构的层次基（如按粗糙度排序），则该惩罚可推广为对粗糙度更一般的惩罚——这一视角将 SVM 与第 5 章的光滑样条统一起来，并引向下一小节对\textbf{再生核 Hilbert 空间}（RKHS，§12.3.3）的讨论。
+\end{remark}
+
+\begin{remark}[均匀收缩与边缘最大化损失]
+上一段关于有序层次基的收缩，当 $h$ 中较粗糙的元素 $h_j$ 具有较小范数时，\textbf{均匀收缩}更有意义。
+
+表 \ref{tab:12_1} 中除平方误差外的所有损失函数都是所谓的「\textbf{边缘最大化损失函数}」（margin maximizing loss functions, Rosset et al., 2004b）：若数据可分，则式 \ref{eq:12_25} 中 $\hat\beta_\lambda$ 在 $\lambda\to 0$ 时的极限定义\textbf{最优分离超平面}。（对逻辑回归，可分数据下 $\hat\beta_\lambda$ 发散，但比值 $\hat\beta_\lambda/\norm{\hat\beta_\lambda}$ 收敛到最优分离方向。）
+\end{remark}
+
+% ============ §12.3.3 Function Estimation and Reproducing Kernels ============
+\subsection{函数估计与再生核 (Function Estimation and Reproducing Kernels)}
+
+这里用\textbf{再生核 Hilbert 空间}（reproducing kernel Hilbert space, RKHS）中的函数估计语言描述 SVM，核性质在其中处处可见。此材料在 §5.8 中有较详细讨论；它提供了支持向量分类器的另一个视角，有助于弄清其工作原理。
+
+\begin{definition}[核的本征展开]
+设基 $h$ 来自一个正定核 $K$ 的（可能无穷）本征展开：
+\begin{equation}
+K(x,x') = \sum_{m=1}^{\infty}\phi_m(x)\phi_m(x')\,\delta_m, \label{eq:12_26}
+\end{equation}
+且 $h_m(x) = \sqrt{\delta_m}\,\phi_m(x)$。令 $\theta_m = \sqrt{\delta_m}\,\beta_m$，则式 \ref{eq:12_25} 可写为
+\begin{equation}
+\min_{\beta_0,\theta} \sum_{i=1}^{N}\Bigl[1 - y_i\Bigl(\beta_0 + \sum_{m=1}^{\infty}\theta_m \phi_m(x_i)\Bigr)\Bigr]_+ + \frac{\lambda}{2}\sum_{m=1}^{\infty}\frac{\theta_m^2}{\delta_m}. \label{eq:12_27}
+\end{equation}
+\end{definition}
+
+\begin{remark}[有限维表示]
+式 \ref{eq:12_27} 与 §5.8 中式 (5.49) 形式相同，那里的 RKHS 理论保证存在形如
+\begin{equation}
+f(x) = \beta_0 + \sum_{i=1}^{N}\alpha_i K(x,x_i) \label{eq:12_28}
+\end{equation}
+的\textbf{有限维解}。特别地，存在与准则 \ref{eq:12_19}（§5.8.2 中式 (5.67)，亦见 Wahba et al., 2000）等价的优化形式
+\begin{equation}
+\min_{\beta_0,\alpha} \sum_{i=1}^{N}(1 - y_i f(x_i))_+ + \frac{\lambda}{2}\alpha^T K \alpha, \label{eq:12_29}
+\end{equation}
+其中 $K$ 是训练特征两两核求值的 $N\times N$ 矩阵（习题 12.2）。
+\end{remark}
+
+这些模型非常一般，包含例如\textbf{光滑样条、加性与交互样条模型}的整个族（第 5、9 章；Wahba 1990；Hastie \& Tibshirani 1990）。可更一般地写为
+\begin{equation}
+\min_{f\in\mathcal{H}} \sum_{i=1}^{N}[1 - y_i f(x_i)]_+ + \lambda J(f), \label{eq:12_30}
+\end{equation}
+其中 $\mathcal{H}$ 是函数的结构化空间，$J(f)$ 是该空间上合适的正则化子。
+
+\begin{example}[加性三次样条]
+设 $\mathcal{H}$ 为加性函数空间 $f(x)=\sum_{j=1}^{p}f_j(x_j)$，且 $J(f)=\sum_{j=1}^{p}\int\{f_j''(x_j)\}^2 dx_j$。则式 \ref{eq:12_30} 的解是\textbf{加性三次样条}，具有核表示 \ref{eq:12_28}，其中 $K(x,x')=\sum_{j=1}^{p}K_j(x_j,x_j')$，每个 $K_j$ 是对应 $x_j$ 上单变量光滑样条的核（Wahba, 1990）。
+\end{example}
+
+\begin{remark}[核与损失的通用搭配]
+反过来，这个讨论也表明：式 \ref{eq:12_22} 中任意核都可用于任意\textbf{凸损失函数}，并仍导致形如 \ref{eq:12_28} 的有限维表示。图 12.5 使用与图 12.3 相同的核，但损失换成\textbf{二项对数似然}，此时拟合函数估计的是对数几率：
+\begin{equation}
+\hat f(x) = \log\frac{\hat\Pr(Y=+1\mid x)}{\hat\Pr(Y=-1\mid x)} = \hat\beta_0 + \sum_{i=1}^{N}\hat\alpha_i K(x,x_i), \label{eq:12_31}
+\end{equation}
+反过来可得类概率的估计
+\begin{equation}
+\hat\Pr(Y=+1\mid x) = \frac{1}{1 + e^{-\hat\beta_0 - \sum_{i=1}^{N}\hat\alpha_i K(x,x_i)}}. \label{eq:12_32}
+\end{equation}
+拟合模型在形状与性能上都相当接近。
+\end{remark}
+
+\begin{remark}[SVM 的稀疏性]
+对 SVM 而言，$N$ 个 $\alpha_i$ 中往往有相当一部分为零（非支持点）：图 12.3 两个例子中分别有 42\% 和 45\% 为零。这是准则 \ref{eq:12_25} 第一部分\textbf{分段线性}的后果。训练数据上的类重叠越低，这一比例越高；减小 $\lambda$ 通常会降低重叠（允许更灵活的 $f$）。支持点少意味着 $\hat f(x)$ 计算更快，这对查表（预测）阶段很重要。当然，把重叠降得太低会导致泛化变差。
+\end{remark}
+
+% ============ §12.3.4 SVMs and the Curse of Dimensionality ============
+\subsection{SVM 与维数灾难}
+
+本节讨论 SVM 是否在维数灾难上有什么优势。
+
+\begin{remark}[核不能自适应地集中于子空间]
+注意在式 \ref{eq:12_23} 中，我们\textbf{不允许在幂与乘积空间中用完全一般的内积}。例如所有形如 $2X_j X_j'$ 的项被赋予相同权重，核无法自适应地集中于某些子空间。若特征数 $p$ 很大，但类别分离只发生在由（比如）$X_1,X_2$ 张成的线性子空间中，该核就不容易发现这个结构，并因要在许多维度上搜索而受损。人们必须把关于子空间的知识\textbf{构建进核}（即让它忽略除前两个输入外的一切）；如果这种知识先验可得，很多统计学习问题会简单得多——自适应方法的一大目标正是发现这类结构。
+
+\paragraph{为什么「固定权重」是关键？}
+
+核 $K$ 一旦选定，就\textbf{在特征空间 $\mathcal{H}$ 中固定了一个度量（几何）}：$K(x,x')=\inner{h(x)}{h(x')}$ 意味着特征向量 $h(x)$ 各坐标的相对长度、夹角都已被隐含设定。以 $d=2$ 多项式核为例，特征映射是
+\[
+h(x) = \bigl(1,\ \sqrt{2}x_1,\dots,\sqrt{2}x_p,\ x_1^2,\dots,x_p^2,\ \sqrt{2}x_1x_2,\dots,\sqrt{2}x_{p-1}x_p\bigr)^T,
+\]
+特征空间维数
+\[
+M = 1 + 2p + \binom{p}{2} = 1 + 2p + \frac{p(p-1)}{2},
+\]
+对 $p=2$ 是 6，对 $p=10$ 是 66，对 $p=100$ 是 5151。式 \ref{eq:12_23} 中每个交叉项 $2X_j X_j'$ 的系数 2 对\textbf{所有} $(j,j')$ 都一样——核把注意力\textbf{平均分配}给所有输入的两两组合，无法自行放大「真正重要」的那几个方向。
+
+\paragraph{一个具体例子：圆柱形边界}
+
+设 $p=3$，类别分离完全发生在 $X_1$-$X_2$ 平面内的圆上：
+\[
+Y=+1 \iff X_1^2 + X_2^2 \le 1 \quad\text{（$X_3$ 是纯噪声，与类别无关）。}
+\]
+若不知道真相，用「盲」的完整二次核 $K(x,x')=(1+x_1x_1'+x_2x_2'+x_3x_3')^2$，其 $M=10$ 个特征中除 $X_1,X_2$ 相关项外还含 $X_3^2$、$X_1X_3$、$X_2X_3$ 这些\textbf{纯噪声项}——它们在训练集上只是随机拟合，却挤占间隔预算并让边界在 $X_3$ 方向来回扭曲，测试误差随之增大。若事先知道只需 $X_1,X_2$，改用「知情」核
+\[
+K_{\text{informed}}(x,x') = (1 + x_1x_1' + x_2x_2')^2,
+\]
+则 $h(x)=(1,\sqrt{2}x_1,\sqrt{2}x_2,x_1^2,x_2^2,\sqrt{2}x_1x_2)^T$ 只含真正相关的 6 个特征，可完美捕捉圆柱结构——但这要求把「只有前两个输入重要」的知识\textbf{先验地}写进核。$p$ 越大，盲核浪费在噪声维度上的特征占比越高：$p=10$ 时 66 个特征中只有与 $X_1,X_2$ 有关的约 5 个携带信号，$p=100$ 时更降到 5151 个中的 5 个——信号几乎被淹没。
+
+\paragraph{与表 \ref{tab:12_2} 的印证}
+
+这正是「橙子的皮」示例的现象：加上 6 个噪声特征后，多项式核 SVM 的测试误差显著恶化（SVM/poly 2 从 0.078 升至 0.152，SVM/poly 10 从 0.230 升至 0.434），而\textbf{能忽略冗余变量的自适应方法}几乎不受影响（BRUTO 0.084$\to$0.090、MARS 0.156$\to$0.173）。核是\textbf{预先固定}的，无法从数据中学会「哪些维度重要」；自适应方法的一大目标正是从数据中发现这类结构。
+\end{remark}
+
+书中用一个示例支撑上述论断：每类生成 100 个观测。第一类为 4 个标准正态独立特征 $X_1,\dots,X_4$；第二类同样是 4 个标准正态独立特征，但条件于 $9 \le \sum X_j^2 \le 16$——这是一个相对容易的问题。更难的版本再追加 6 个标准高斯\textbf{噪声特征}，于是第二类几乎完全包围第一类，像「橙子外面的皮」（skin of the orange）一样包裹在四维子空间中。该问题的 Bayes 误差率为 0.029（与维数无关）。生成 1000 个测试观测比较各方法，50 次模拟的测试误差均值（有/无噪声特征）见表 \ref{tab:12_2}。
+
+\begin{table}[htbp]
+\centering
+\caption{「橙子的皮」示例：50 次模拟的测试误差均值（标准误）。BRUTO 自适应拟合加性样条模型；MARS 自适应拟合低阶交互模型。}
+\label{tab:12_2}
+\begin{tabular}{lcc}
+\toprule
+方法 & 无噪声特征 & 六个噪声特征 \\
+\midrule
+SV 分类器 & 0.450 (0.003) & 0.472 (0.003) \\
+SVM/poly 2 & 0.078 (0.003) & 0.152 (0.004) \\
+SVM/poly 5 & 0.180 (0.004) & 0.370 (0.004) \\
+SVM/poly 10 & 0.230 (0.003) & 0.434 (0.002) \\
+BRUTO & 0.084 (0.003) & 0.090 (0.003) \\
+MARS & 0.156 (0.004) & 0.173 (0.005) \\
+Bayes & 0.029 & 0.029 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{remark}[结果解读]
+在原特征空间中超平面无法分离两类，SV 分类器（第 1 行）表现很差。多项式 SVM 大幅改善测试误差，但\textbf{受六个噪声特征的不利影响}；它对核的选择也高度敏感：\textbf{二次多项式核（第 2 行）最好}，因为真实决策边界正是二次多项式；但更高阶多项式核（第 3、4 行）反而差得多。BRUTO 表现良好，因为边界是\textbf{加性}的。BRUTO 与 MARS 自适应得好：在噪声存在下性能不显著恶化。
+
+\textbf{结论}：SVM（核技巧）\textbf{并不能规避维数灾难}——核是预先固定的，无法发现「只依赖少数特征/子空间」的结构；自适应方法（BRUTO、MARS、以及后文的 FDA 等）才能做到这一点。
+\end{remark}
+
+\paragraph{实际使用 SVM 时怎么筛选核？}
+
+\textbf{先想清楚：选核不是调参，而是「编码先验」。} §12.3.4 的核心观点是知识必须被\textbf{构建进核}——核一旦选定就固定了特征空间的度量，也就固定了假设类。所以第一步是问自己对问题结构有什么了解：
+
+\begin{itemize}
+\item \textbf{线性核}：边界近似线性、特征高维稀疏（如文本）、或需要可解释性时。
+\item \textbf{多项式核}：确信边界是低阶多项式/有交互时（表 \ref{tab:12_2} 中边界为二次时 poly 2 最好；阶数过高反而变差）。
+\item \textbf{高斯核（RBF）}：\textbf{没有先验时的通用默认}——$K(x,x')=\exp(-\gamma\norm{x-x'}^2)$ 只有 $\gamma$ 一个尺度参数，$\gamma$ 小近似线性、$\gamma$ 大接近插值/最近邻行为，能逼近各种形状的边界。
+\item \textbf{神经网络核（sigmoid）}：历史遗留，如今很少用。
+\end{itemize}
+
+\textbf{然后按「核 + $C$」一起做交叉验证网格搜索。} 核决定假设类（空间），$C$ 决定该空间内的正则化强度，二者必须\textbf{一起调}（分开调没有意义）：例如 RBF 核常用对数网格 $C\in\{2^{-5},\dots,2^{15}\}$、$\gamma\in\{2^{-15},\dots,2^{3}\}$，在训练集上做 $k$ 折交叉验证（第 7 章）选测试误差最小的组合；也可用 §12.3.5 的路径算法一次性拟合整条 $C$ 序列。常用经验规则：多数问题先用 RBF 核 + 交叉验证，就足够好；多个核性能接近时，选更简单、更可解释的那个（奥卡姆剃刀）。
+
+\textbf{两个实操要点：}
+\begin{itemize}
+\item \textbf{输入先标准化}：RBF 核的 $\norm{x-x'}$ 对每个维度的尺度都敏感，不缩放时大数值变量会主导距离。
+\item \textbf{警惕核选错的代价}：表 \ref{tab:12_2} 表明核选错（如过高阶多项式、噪声维度多）损失可能很大，且交叉验证对核的敏感度高于对 $C$ 的敏感度。
+\end{itemize}
+
+\textbf{何时该怀疑核这条路？} 若交叉验证误差对核的选择非常敏感、而你又没有可靠的先验，说明「固定核」这个假设本身可能不对——此时应转向能从数据中自适应发现结构的特征工程或方法（BRUTO、MARS、FDA 等），而不是继续在核的候选集里打转。
+
+% ============ §12.3.5 A Path Algorithm for the SVM Classifier ============
+\subsection{SVM 分类器的路径算法}
+
+SVM 分类器的正则化参数是代价参数 $C$，或其倒数 $\lambda$（式 \ref{eq:12_25}）。常见用法是把 $C$ 设得较高，往往导致有点过拟合的分类器。图 12.6 展示混合数据上测试误差随 $C$ 的变化，使用不同的径向核参数 $\gamma$：$\gamma=5$（窄而尖的核）时需要最重的正则化（小的 $C$）；$\gamma=1$（图 12.3 所用）时需要中间值的 $C$。显然需要好的方法选 $C$（例如交叉验证）。
+
+\begin{remark}[路径算法的思想]
+书中描述一个\textbf{路径算法}（path algorithm，秉承 §3.8 的精神），用于高效拟合 $C$ 变化得到的\textbf{整条 SVM 模型序列}。方便起见使用损失+惩罚形式 \ref{eq:12_25}（配合图 12.4）。给定 $\lambda$，$\beta$ 的解为
+\begin{equation}
+\beta_\lambda = \frac{1}{\lambda}\sum_{i=1}^{N}\alpha_i y_i x_i, \label{eq:12_33}
+\end{equation}
+其中 $\alpha_i$ 又是 Lagrange 乘子，但此处全部位于 $[0,1]$。
+\end{remark}
+
+KKT 最优性条件表明，标注点 $(x_i,y_i)$ 落入三类不同的群：
+
+\begin{itemize}
+\item \textbf{正确分类且在间隔之外}：$y_i f(x_i) > 1$，Lagrange 乘子 $\alpha_i = 0$。例如橙色点 8、9、11 与蓝色点 1、4。
+\item \textbf{恰好位于间隔边缘上}：$y_i f(x_i) = 1$，乘子 $\alpha_i\in[0,1]$。例如橙色 7 与蓝色 2、6。
+\item \textbf{位于间隔内部}：$y_i f(x_i) < 1$，$\alpha_i = 1$。例如蓝色 3、5 与橙色 10、12。
+\end{itemize}
+
+\begin{remark}[路径的演化]
+路径算法思想如下：初始 $\lambda$ 大，间隔 $1/\norm{\beta_\lambda}$ 宽，所有点都在间隔内部、$\alpha_i=1$。随着 $\lambda$ 减小，$1/\norm{\beta_\lambda}$ 减小、间隔变窄，一些点会从间隔内部移出，其 $\alpha_i$ 从 1 变为 0。由 $\alpha_i(\lambda)$ 的连续性，这些点在转变期间会\textbf{逗留在间隔边缘上}。由式 \ref{eq:12_33}，$\alpha_i=1$ 的点对 $\beta(\lambda)$ 贡献固定，$\alpha_i=0$ 的点无贡献；所以随 $\lambda$ 变化而改变的只是那少数\textbf{间隔边缘点}的 $\alpha_i\in[0,1]$。由于这些点都满足 $y_i f(x_i)=1$，这导致一组小规模的线性方程描述 $\alpha_i(\lambda)$（进而 $\beta_\lambda$）在这些转变期间如何变化，最终得到每个 $\alpha_i(\lambda)$ 的\textbf{分段线性路径}；断点发生在点穿过间隔时。图 12.7 右图展示了小例子的 $\alpha_i(\lambda)$ 剖面。
+
+虽然以上对线性 SVM 描述，同一思想也适用于非线性模型，此时式 \ref{eq:12_33} 换成
+\begin{equation}
+f_\lambda(x) = \frac{1}{\lambda}\sum_{i=1}^{N}\alpha_i y_i K(x,x_i). \label{eq:12_34}
+\end{equation}
+细节见 Hastie et al. (2004)；R 包 \texttt{svmpath}（CRAN）可用于拟合这些模型。
+\end{remark}
+
+% ============ §12.3.6 Support Vector Machines for Regression ============
+\subsection{支持向量机用于回归}
+
+本节说明如何把 SVM 改造为\textbf{定量响应}的回归问题，并继承 SVM 分类器的一些性质。先讨论线性回归模型
+\begin{equation}
+f(x) = x^T\beta + \beta_0, \label{eq:12_35}
+\end{equation}
+再处理非线性推广。为估计 $\beta$，考虑极小化
+\begin{equation}
+H(\beta,\beta_0) = \sum_{i=1}^{N}V(y_i - f(x_i)) + \frac{\lambda}{2}\norm{\beta}^2, \label{eq:12_36}
+\end{equation}
+其中
+\begin{equation}
+V_\varepsilon(r) = \begin{cases} 0, & |r| < \varepsilon, \\ |r| - \varepsilon, & \text{否则}. \end{cases} \label{eq:12_37}
+\end{equation}
+这是「$\varepsilon$-\textbf{不敏感}」误差度量：忽略小于 $\varepsilon$ 的误差（图 12.8 左图）。
+
+\begin{remark}[与分类情形的类比]
+这与支持向量分类有粗略类比：在分类中，位于决策边界正确一侧且远离边界的点在优化中被忽略；在回归中，这些「低误差」的点正是\textbf{残差很小}的点。
+
+与统计学中稳健回归所用的误差度量对照也很有趣。最流行的是 Huber (1964) 损失：
+\begin{equation}
+V_H(r) = \begin{cases} r^2/2, & |r|\le c, \\ c|r| - c^2/2, & |r| > c, \end{cases} \label{eq:12_38}
+\end{equation}
+（图 12.8 右图）。它把绝对残差超过预设常数 $c$ 的观测贡献从二次降为线性，使拟合对离群点\textbf{不敏感}。支持向量误差度量 \ref{eq:12_37} 也有线性尾部（超过 $\varepsilon$），但\textbf{额外把残差小的个案贡献压平}。
+\end{remark}
+
+若 $\hat\beta,\hat\beta_0$ 是 $H$ 的极小元，可证解函数具有形式
+\begin{align}
+\hat\beta &= \sum_{i=1}^{N}(\hat\alpha_i^* - \hat\alpha_i)x_i, \label{eq:12_39}\\
+\hat f(x) &= \sum_{i=1}^{N}(\hat\alpha_i^* - \hat\alpha_i)\inner{x}{x_i} + \beta_0, \label{eq:12_40}
+\end{align}
+其中 $\hat\alpha_i,\hat\alpha_i^*$ 为正且求解如下二次规划问题：
+\begin{equation}
+\min_{\alpha_i,\alpha_i^*} \varepsilon\sum_{i=1}^{N}(\alpha_i^* + \alpha_i) - \sum_{i=1}^{N}y_i(\alpha_i^* - \alpha_i) + \frac12\sum_{i,i'=1}^{N}(\alpha_i^* - \alpha_i)(\alpha_{i'}^* - \alpha_{i'})\inner{x_i}{x_{i'}}, \label{eq:12_41}
+\end{equation}
+约束为 $0\le \alpha_i,\alpha_i^*\le 1/\lambda$，$\sum_{i=1}^{N}(\alpha_i^* - \alpha_i)=0$，$\alpha_i\alpha_i^*=0$。
+
+\begin{remark}[支持向量与内积]
+由于这些约束的性质，通常只有一部分解值 $(\hat\alpha_i^*-\hat\alpha_i)$ 非零，对应的数据点称为\textbf{支持向量}。与分类情形一样，解只通过内积 $\inner{x_i}{x_{i'}}$ 依赖输入值，因此可用适当的内积（如式 \ref{eq:12_22} 中的核）推广到更丰富的空间。
+
+注意准则 \ref{eq:12_36} 有两个参数 $\varepsilon$ 与 $\lambda$，作用不同：$\varepsilon$ 是损失函数 $V_\varepsilon$ 的参数，正如 $c$ 之于 $V_H$。$V_\varepsilon$ 与 $V_H$ 都依赖 $y$（从而 $r$）的尺度；若对响应做缩放（改用 $V_H(r/\sigma)$、$V_\varepsilon(r/\sigma)$），则可预设 $c$ 与 $\varepsilon$ 的值（$c=1.345$ 对高斯达到 95\% 效率）。$\lambda$ 则是更传统的正则化参数，可用交叉验证估计。
+\end{remark}
+
+% ============ §12.3.7 Regression and Kernels ============
+\subsection{回归与核}
+
+如 §12.3.3 所述，核性质并非支持向量机独有。设用一组基函数 $\{h_m(x)\},\ m=1,\dots,M$ 逼近回归函数：
+\begin{equation}
+f(x) = \sum_{m=1}^{M}\beta_m h_m(x) + \beta_0. \label{eq:12_42}
+\end{equation}
+对某个一般误差度量 $V(r)$，极小化
+\begin{equation}
+H(\beta,\beta_0) = \sum_{i=1}^{N}V(y_i - f(x_i)) + \frac{\lambda}{2}\sum_{m=1}^{M}\beta_m^2, \label{eq:12_43}
+\end{equation}
+对任意 $V(r)$，解 $\hat f(x)=\sum\hat\beta_m h_m(x)+\hat\beta_0$ 都具有形式
+\begin{equation}
+\hat f(x) = \sum_{i=1}^{N}\hat a_i K(x,x_i), \label{eq:12_44}
+\end{equation}
+其中 $K(x,y)=\sum_{m=1}^{M}h_m(x)h_m(y)$。注意这与径向基函数展开和正则化估计形式相同（第 5、6 章）。
+
+\begin{example}[平方损失的具体推导]
+设 $V(r)=r^2$。令 $H$ 为 $N\times M$ 基矩阵（第 $im$ 元为 $h_m(x_i)$），设 $M>N$ 很大，并假设 $\beta_0=0$（或常数被吸收进 $h$）。极小化惩罚最小二乘准则
+\begin{equation}
+H(\beta) = (y - H\beta)^T(y - H\beta) + \lambda\norm{\beta}^2. \label{eq:12_45}
+\end{equation}
+解为
+\begin{equation}
+\hat y = H\hat\beta, \label{eq:12_46}
+\end{equation}
+其中 $\hat\beta$ 由
+\begin{equation}
+-H^T(y - H\hat\beta) + \lambda\hat\beta = 0 \label{eq:12_47}
+\end{equation}
+确定。表面上看需计算变换空间中 $M\times M$ 内积矩阵；但左乘 $H$ 得
+\begin{equation}
+H\hat\beta = (HH^T + \lambda I)^{-1} HH^T y. \label{eq:12_48}
+\end{equation}
+$N\times N$ 矩阵 $HH^T$ 由观测两两之间的内积组成，即内积核的求值 $\{HH^T\}_{i,i'} = K(x_i,x_{i'})$。可直接验证此情形下 \ref{eq:12_44}：任意 $x$ 处的预测满足
+\begin{equation}
+\hat f(x) = h(x)^T\hat\beta = \sum_{i=1}^{N}\hat\alpha_i K(x,x_i), \label{eq:12_49}
+\end{equation}
+其中 $\hat\alpha = (HH^T + \lambda I)^{-1}y$。
+\end{example}
+
+\begin{remark}[核技巧的本质与代价]
+与支持向量机一样，我们\textbf{无需指定或求值那一大组函数} $h_1(x),\dots,h_M(x)$——只需对 $N$ 个训练点两两及预测点求值内积核 $K(x_i,x_{i'})$。精心选择 $h_m$（例如特定易求值核 $K$ 的本征函数）可使 $HH^T$ 以 $N^2/2$ 次 $K$ 求值计算，而非直接成本 $N^2M$。
+
+但注意：该性质依赖于惩罚中的\textbf{平方范数} $\norm{\beta}^2$。它对 $L_1$ 范数 $\abs{\beta}$ \textbf{不成立}——而 $L_1$ 惩罚可能得到更优的模型。
+\end{remark}
+
+% ============ §12.3.8 Discussion ============
+\subsection{讨论}
+
+支持向量机可推广到\textbf{多分类}问题，本质上通过求解许多二分类问题：为每对类构造分类器，最终分类器取「获胜最多」者（Kressel, 1999；Friedman, 1996；Hastie \& Tibshirani, 1998）。或者如 §12.3.3 那样，用多项损失配合合适的核。SVM 在监督与非监督学习的许多其他问题中也有应用；截至写作时，经验证据表明它在许多真实学习问题上表现良好。
+
+\begin{remark}[与结构风险最小化的联系]
+最后提一下支持向量机与\textbf{结构风险最小化}（structural risk minimization, SRM，式 7.9）的联系。设训练点（或其基展开）包含在半径 $R$ 的球内，$G(x)=\mathrm{sign}[f(x)]=\mathrm{sign}[\beta^T x+\beta_0]$（式 \ref{eq:12_2}）。可证函数类 $\{G(x),\ \norm{\beta}\le A\}$ 的 VC 维 $h$ 满足
+\begin{equation}
+h \le R^2 A^2. \label{eq:12_50}
+\end{equation}
+若 $f(x)$ 在 $\norm{\beta}\le A$ 下最优地分离训练数据，则以至少 $1-\eta$ 的概率（Vapnik, 1996, p.139）：
+\begin{equation}
+\mathrm{Error}_{\mathrm{Test}} \le \frac{4h[\log(2N/h) + 1] - \log(\eta/4)}{N}. \label{eq:12_51}
+\end{equation}
+\end{remark}
+
+\begin{remark}[对 SRM 界的一点谨慎]
+支持向量分类器是首批能得到 VC 维\textbf{有用界}、从而能执行 SRM 程序的实用学习算法之一。但推导中在数据点周围放了球——这一过程依赖于\textbf{观测到的特征值}，因此严格地说，该函数类的 VC 复杂度并非在看到特征之前就固定。
+
+正则化参数 $C$ 控制分类器 VC 维的一个上界。按 SRM 范式，可用 \ref{eq:12_51} 给出的测试误差上界最小化来选 $C$；但尚不清楚这比用交叉验证选 $C$ 有任何优势。
+\end{remark}
+
+% ============ §12.4 Generalizing Linear Discriminant Analysis ============
+\section{推广线性判别分析 (Generalizing Linear Discriminant Analysis)}
+
+§4.3 讨论了线性判别分析（LDA）这一分类的基本工具。本章剩余部分讨论一类通过\textbf{直接推广 LDA} 而产生比 LDA 更好分类器的技术。
+
+LDA 的一些优点如下：
+
+\begin{itemize}
+\item 它是简单的\textbf{原型分类器}（prototype classifier）：新观测被分到质心最近的类；稍微特别的是距离用\textbf{马氏度量}（Mahalanobis metric）衡量，使用\textbf{合并协方差}估计。
+\item 若每类内观测为多元高斯且协方差矩阵公共，则 LDA 是\textbf{估计的 Bayes 分类器}。由于该假设通常不成立，这看起来不像是多大优点。
+\item LDA 的决策边界是\textbf{线性}的，规则简单、易于描述与实现。
+\item LDA 提供自然的\textbf{低维视图}：例如图 12.12 是 256 维、10 类数据的富有信息的二维视图。
+\item 因其简单与低方差，LDA 常常产生\textbf{最好的分类结果}：在 STATLOG 项目（Michie et al., 1994）研究的 22 个数据集中，LDA 在 7 个里进入前三。
+\end{itemize}
+
+\begin{remark}[LDA 的不足]
+遗憾的是，LDA 的简单性也导致它在多种情况下失效：
+
+\begin{itemize}
+\item \textbf{线性边界往往不足以分离各类}。$N$ 大时可估计更复杂的边界；此时 \textbf{QDA}（二次判别分析）通常有用，允许二次决策边界。更一般地，我们希望建模\textbf{不规则}的决策边界。
+\item 上述不足可概括为「\textbf{每类一个原型不够}」：LDA 用单个原型（类质心）加公共协方差描述每类数据的散布；许多情形下多个原型更合适。
+\item 另一个极端：预测变量\textbf{太多且相关}（如数字化模拟信号、图像）。此时 LDA 参数太多、估计方差高、性能受损，需要进一步\textbf{限制或正则化} LDA。
+\end{itemize}
+\end{remark}
+
+本章剩余部分通过\textbf{推广 LDA 模型}处理上述所有问题，主要通过三个不同的思路：
+
+\begin{enumerate}
+\item \textbf{把 LDA 重述为线性回归问题}。存在大量把线性回归推广到更灵活的非参数回归形式的技术，由此得到更灵活的判别分析，即 \textbf{FDA}。多数感兴趣情形中，回归过程可看作通过基展开识别出一组\textbf{放大的预测变量}；FDA 就是放大空间中的 LDA——与 SVM 相同的范式。
+
+\item \textbf{预测变量过多时（如数字化图像的像素）我们不想再放大变量集}——它已经太大。第二个思路是拟合 LDA 模型但\textbf{惩罚其系数在空间域上光滑}（即把系数当作图像看待），称为\textbf{惩罚判别分析}（PDA）。FDA 本身展开的基集通常也很大，同样需要正则化（如同 SVM）。二者都可通过在 FDA 模型语境下做合适的\textbf{正则化回归}实现。
+
+\item \textbf{把每个类建模为两个或多个高斯的混合}：各成分质心不同，但每个成分高斯（类内与类间）共享\textbf{同一个协方差矩阵}。这允许更复杂的决策边界，并允许像 LDA 那样的子空间降维。称为\textbf{混合判别分析}（MDA）。
+\end{enumerate}
+
+三者都利用与 LDA 的联系，使用一个公共框架。
+
+% ============ §12.5 Flexible Discriminant Analysis ============
+\section{灵活判别分析 (Flexible Discriminant Analysis, FDA)}
+
+本节描述一种用\textbf{派生响应的线性回归}实现 LDA 的方法，由此得到 LDA 的非参数、灵活替代。
+
+\begin{definition}[最优评分 (Optimal Scoring)]
+与第 4 章一样，设观测有落入 $K$ 类 $\mathcal{G}=\{1,\dots,K\}$ 之一的定量响应 $G$，各有特征 $X$。设 $\theta:\mathcal{G}\to\R^1$ 是给各类赋分的函数，使得变换后的类标签能被 $X$ 上的线性回归最优预测：对训练样本 $(g_i,x_i),\ i=1,\dots,N$，求解
+\begin{equation}
+\min_{\beta,\theta} \sum_{i=1}^{N}\bigl(\theta(g_i) - x_i^T\beta\bigr)^2, \label{eq:12_52}
+\end{equation}
+并对 $\theta$ 施加限制（在训练数据上均值零、方差单位）以避免平凡解。这产生类之间的一维分离。
+\end{definition}
+
+更一般地，可找出至多 $L\le K-1$ 组独立的类标签评分 $\theta_1,\dots,\theta_L$ 及对应的线性映射 $\eta_\ell(X)=X^T\beta_\ell,\ \ell=1,\dots,L$，选作 $\R^p$ 中多元回归的最优。评分 $\theta_\ell(g)$ 与映射 $\beta_\ell$ 极小化\textbf{平均平方残差}（Average Squared Residual, ASR）
+\begin{equation}
+\mathrm{ASR} = \frac{1}{N}\sum_{\ell=1}^{L}\Bigl[\sum_{i=1}^{N}\bigl(\theta_\ell(g_i) - x_i^T\beta_\ell\bigr)^2\Bigr]. \label{eq:12_53}
+\end{equation}
+评分集关于适当内积\textbf{相互正交且归一化}，以防止平凡零解。
+
+\begin{remark}[为什么走这条路？]
+可证 §4.3.3 导出的判别（正则）向量序列 $\nu_\ell$ 与序列 $\beta_\ell$ \textbf{只差一个常数}（Mardia et al., 1979; Hastie et al., 1995）。而且，测试点 $x$ 到第 $k$ 类质心 $\hat\mu_k$ 的马氏距离为
+\begin{equation}
+\delta_J(x,\hat\mu_k) = \sum_{\ell=1}^{K-1} w_\ell\bigl(\hat\eta_\ell(x) - \bar\eta_\ell^k\bigr)^2 + D(x), \label{eq:12_54}
+\end{equation}
+其中 $\bar\eta_\ell^k$ 是第 $k$ 类中 $\hat\eta_\ell(x_i)$ 的均值，$D(x)$ 与 $k$ 无关。权重 $w_\ell$ 由第 $\ell$ 个最优评分拟合的均方残差 $r_\ell^2$ 定义：
+\begin{equation}
+w_\ell = \frac{1}{r_\ell^2(1-r_\ell^2)}. \label{eq:12_55}
+\end{equation}
+§4.3.2 已见：在高斯设置、各类协方差相等时，这些正则距离正是分类所需的全部。
+\end{remark}
+
+\textbf{总结}：LDA 可由\textbf{一串线性回归}、随后在\textbf{拟合值空间}中把观测分到最近的类质心来完成。该类比既适用于降秩版本，也适用于 $L=K-1$ 的全秩情形。
+
+\begin{remark}[推广的威力]
+这个结果的真正威力在于它带来的推广：可把线性回归拟合 $\eta_\ell(x)=x^T\beta_\ell$ 换成\textbf{远更灵活的非参数拟合}，从而类比地得到比 LDA 更灵活的分类器——如广义加性拟合、样条函数、MARS 模型等。更一般形式下，回归问题由准则
+\begin{equation}
+\mathrm{ASR}(\{\theta_\ell,\eta_\ell\}_{\ell=1}^{L}) = \frac{1}{N}\sum_{\ell=1}^{L}\Bigl[\sum_{i=1}^{N}\bigl(\theta_\ell(g_i) - \eta_\ell(x_i)\bigr)^2 + \lambda J(\eta_\ell)\Bigr], \label{eq:12_56}
+\end{equation}
+定义，其中 $J$ 是适合某些非参数回归形式的正则化子，如光滑样条、加性样条与低阶 ANOVA 样条模型；也包括 §12.3.3 中核生成的函数类与相关惩罚。
+\end{remark}
+
+\paragraph{完整的 FDA 计算步骤（最优评分算法）}
+
+当回归过程可表示为线性算子 $S_\lambda$（固定光滑参数的加性样条、选定基后的 MARS 等）时，最优评分等价于典型相关问题，可由\textbf{单次本征分解}求解。给定类指示响应矩阵 $Y\in\R^{N\times K}$（$y_{ik}=1$ 若 $g_i=k$，否则 0），步骤如下：
+
+\begin{enumerate}
+\item \textbf{多元非参数回归}：对指示矩阵 $Y$ 的每一列 $y_k\in\R^N$ 关于 $X$ 做非参数回归，得拟合值
+\[
+\hat y_k = S_\lambda y_k\ \ (k=1,\dots,K) \quad\Longrightarrow\quad \hat Y = S_\lambda Y,
+\]
+以及拟合回归函数向量 $\eta^*(x)=\bigl(\eta_1^*(x),\dots,\eta_K^*(x)\bigr)^T$，其中 $\eta_k^*(x_i)=\hat y_{ik}$（训练点上的取值即拟合值）。$S_\lambda$ 为拟合最终所选模型的线性算子；当 $S_\lambda=H_X$（线性回归投影）时 $\eta^*(x)=\hat\beta_0+\hat\beta^T x$。
+
+\item \textbf{最优评分}：求 $Y^T\hat Y = Y^T S_\lambda Y$ 关于 $D_\pi$ 的\textbf{广义本征分解}
+\[
+Y^T S_\lambda Y\,\Theta = D_\pi\,\Theta\,\Lambda,
+\]
+其中 $\Lambda$ 为特征值对角阵，$\Theta\in\R^{K\times K}$ 为评分矩阵，归一化为
+\[
+\Theta^T D_\pi \Theta = I, \qquad D_\pi = \frac{1}{N}Y^T Y = \operatorname{diag}\!\Bigl(\frac{N_1}{N},\dots,\frac{N_K}{N}\Bigr),
+\]
+$D_\pi$ 是估计的类先验概率对角矩阵（$N_k$ 为第 $k$ 类样本数）。
+
+\item \textbf{更新模型}：用最优评分对原始拟合做线性组合，得到最终判别函数
+\[
+\eta(x) = \Theta^T \eta^*(x), \qquad \eta_\ell(x) = \sum_{k=1}^{K}\Theta_{k\ell}\,\eta_k^*(x)\quad(\ell=1,\dots,K).
+\]
+$K$ 个函数中的第一个是常数函数（平凡解），其余 $K-1$ 个即判别函数；常数函数连同归一化 $\Theta^T D_\pi\Theta=I$ 使其余函数都居中、正交。
+\end{enumerate}
+
+\begin{remark}[$\eta_\ell$ 的角色：判别函数，但严格说是「拟合的回归函数」]
+式 \ref{eq:12_56} 中的 $\eta_\ell(x)$ 是 FDA 中\textbf{扮演判别函数角色的回归函数}——分类就发生在这些拟合值的空间里：由式 \ref{eq:12_54}，测试点被分到「拟合值 $\hat\eta_\ell(x)$ 到各类均值 $\bar\eta_\ell^k$ 的加权距离」最小的类。在线性情形 $\eta_\ell(x)=x^T\beta_\ell$ 下，它们与 §4.3.3 的典型判别向量 $\nu_\ell$ 只差常数，故正是 LDA 的判别（正则）坐标；换成非参数拟合后，$\hat\eta_\ell(x)$ 就成了 FDA 的\textbf{灵活判别函数}。
+
+但严格区分「原始拟合」与「最终判别函数」：在 §12.5.1 的算法里，步骤 1 先对指示矩阵做多响应回归得到原始拟合 $\eta^*(x)$（即式 \ref{eq:12_56} 中极小化的对象），步骤 2 求最优评分 $\Theta$，步骤 3 才得到\textbf{最终判别函数} $\eta(x)=\Theta^T\eta^*(x)$——它是原始拟合的\textbf{正交线性组合}（居中、消除平凡常数方向）。一句话：$\eta_\ell$ 是 FDA 判别坐标的载体（回归拟合），最优评分步骤只是对这些拟合做一次正交旋转/重组。
+\end{remark}
+
+\begin{example}[二次多项式 FDA 的决策边界]
+设对每个 $\eta_\ell$ 用二次多项式回归。由 \ref{eq:12_54}，每个拟合函数都是二次的，决策边界将是\textbf{二次曲面}（在 LDA 中比较距离时平方项相互抵消）。更传统的方式也能达到同样的二次边界：把原始预测变量\textbf{加上它们的平方与交叉乘积}，再在放大空间做一次 LDA，放大空间中的线性边界映射回原空间即二次边界。经典例子：两个以原点为中心的高斯，协方差分别为 $I$ 与 $cI\ (c>1)$（图 12.9）。Bayes 决策边界是球面 $\norm{x}^2 = \dfrac{pc\log c}{c-1}$，即放大空间中的线性边界。
+\end{example}
+
+许多非参数回归过程都通过生成派生变量的基展开、再在放大空间做线性回归。\textbf{MARS}（第 9 章）正是这种形式；光滑样条与加性样条生成极大的基集（加性样条有 $N\times p$ 个基函数），但随后在放大空间做\textbf{惩罚回归}；SVM 也是如此（见 §12.3.7 的基于核的回归例）。此时可证 FDA 在放大空间做的是\textbf{惩罚线性判别分析}（§12.6 详述）。放大空间中的线性边界映射回低维空间即非线性边界——与支持向量机（§12.3）完全相同的范式。
+
+\begin{remark}[语音识别示例]
+书用第 4 章语音识别示例说明 FDA：$K=11$ 类、$p=10$ 个预测变量。11 个元音，各含于 11 个不同单词：i:（heed）、I（hid）、E（head）、A（had）、a:（hard）、Y（hud）、3:（heard）、O（hod）、C:（hoard）、U（hood）、u:（who'd）。训练集中 8 位说话者每人把每个词说 6 遍，测试集 7 位说话者；10 个预测变量以相当复杂的方式由数字化语音导出（语音识别界的标准）。共 528 个训练观测、462 个测试观测。图 12.10 展示 LDA 与 FDA 的二维投影（FDA 用自适应加性样条拟合 $\eta_\ell(x)$），可见灵活建模帮助分离了各类。表 \ref{tab:12_3} 列出多种分类技术的训练/测试误差。
+\end{remark}
+
+\begin{remark}[BRUTO 是什么？]
+\textbf{BRUTO} 是拟合\textbf{加性模型}的算法（S-PLUS 里的例程），出自 Hastie \& Tibshirani (1990)《Generalized Additive Models》：
+
+\begin{itemize}
+\item \textbf{模型}：$f(x)=\alpha+\sum_{j=1}^{p}f_j(x_j)$（加性模型）；
+\item \textbf{算法}：\textbf{后退拟合}（backfitting），反复对每个变量做部分残差的光滑、轮流更新 $f_j$ 直到收敛；
+\item \textbf{自动选参}：对每个 $f_j$ 的光滑量用 \textbf{GCV} 自动选择——某变量不相关时，GCV 会把它的 $f_j$ 估成接近常数，等价于\textbf{自动忽略该变量}。
+\end{itemize}
+
+因此 BRUTO 能自适应地忽略冗余/噪声变量：表 \ref{tab:12_2} 中加上 6 个噪声特征后它的性能几乎不变（0.084$\to$0.090）；表 \ref{tab:12_3} 中 FDA/BRUTO 测试误差 0.44，明显优于 LDA 的 0.56。在 FDA 里，BRUTO 被当作步骤 1 的「回归方法」（\texttt{method=}），即 FDA/BRUTO。
+\end{remark}
+
+\begin{table}[htbp]
+\centering
+\caption{元音识别数据性能（书表 12.3）。神经网络结果是取自神经网络档案的更大集合中最好的；FDA/BRUTO 记号指 FDA 所用的回归方法。}
+\label{tab:12_3}
+\begin{tabular}{llcc}
+\toprule
+技术 & 训练误差 & 测试误差 \\
+\midrule
+(1) LDA & 0.32 & 0.56 \\
+\hspace{1em}Softmax & 0.48 & 0.67 \\
+(2) QDA & 0.01 & 0.53 \\
+(3) CART & 0.05 & 0.56 \\
+(4) CART（线性组合分裂） & 0.05 & 0.54 \\
+(5) 单层感知机 & & 0.67 \\
+(6) 多层感知机（88 隐藏单元） & & 0.49 \\
+(7) 高斯节点网络（528 隐藏单元） & & 0.45 \\
+(8) 最近邻 & & 0.44 \\
+(9) FDA/BRUTO & 0.06 & 0.44 \\
+\hspace{1em}Softmax & 0.11 & 0.50 \\
+(10) FDA/MARS（degree=1） & 0.09 & 0.45 \\
+\hspace{1em}最佳降秩维数（=2） & 0.18 & 0.42 \\
+\hspace{1em}Softmax & 0.14 & 0.48 \\
+(11) FDA/MARS（degree=2） & 0.02 & 0.42 \\
+\hspace{1em}最佳降秩维数（=6） & 0.13 & 0.39 \\
+\hspace{1em}Softmax & 0.10 & 0.50 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{remark}[表 12.3 的解读]
+FDA/MARS 指 Friedman 的多元自适应回归样条；degree=2 表示允许两两乘积。注意对 FDA/MARS，最好结果出现在\textbf{降秩子空间}中。整体看：LDA 测试误差 0.56，FDA/BRUTO 降到 0.44，FDA/MARS（degree=2, 降秩 6）达 0.39——灵活模型显著优于 LDA。
+\end{remark}
+
+% ============ §12.5.1 Computing the FDA Estimates ============
+\subsection{计算 FDA 估计}
+
+许多重要情形下 FDA 坐标的计算可简化，尤其是当非参数回归过程可表示为\textbf{线性算子}时。记该算子为 $S_\lambda$：$\hat y = S_\lambda y$，其中 $y$ 为响应向量、$\hat y$ 为拟合向量。固定光滑参数后，加性样条有此性质；选定基函数后的 MARS 也是。下标 $\lambda$ 表示整组光滑参数。此时最优评分等价于\textbf{典型相关问题}，解可由\textbf{单次本征分解}算出（习题 12.6 推导），算法如下。
+
+由响应 $g_i$ 构造 $N\times K$ 指示响应矩阵 $Y$：$y_{ik}=1$ 若 $g_i=k$，否则 0。例如五类问题：
+\begin{equation}
+Y = \begin{pmatrix}
+0 & 1 & 0 & 0 & 0\\
+1 & 0 & 0 & 0 & 0\\
+1 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 1\\
+0 & 0 & 0 & 1 & 0\\
+\vdots & \vdots & \vdots & \vdots & \vdots\\
+0 & 0 & 1 & 0 & 0
+\end{pmatrix} \quad
+\begin{array}{l}
+g_1=2\\ g_2=1\\ g_3=1\\ g_4=5\\ g_5=4\\ \vdots\\ g_N=3
+\end{array}
+\end{equation}
+
+\textbf{计算步骤（FDA 算法）：}
+
+\begin{enumerate}
+\item \textbf{多元非参数回归}：对 $Y$ 关于 $X$ 做多响应、自适应的非参数回归，得拟合值 $\hat Y$。设 $S_\lambda$ 为拟合最终所选模型的线性算子，$\eta^*(x)$ 为拟合回归函数向量。
+\item \textbf{最优评分}：计算 $Y^T\hat Y = Y^T S_\lambda Y$ 的本征分解，其中本征向量 $\Theta$ 归一化为 $\Theta^T D_\pi \Theta = I$。这里 $D_\pi = Y^T Y/N$ 是估计的类先验概率的对角矩阵。
+\item \textbf{用最优评分更新模型}：$\eta(x) = \Theta^T \eta^*(x)$。
+\end{enumerate}
+
+$\eta(x)$ 中 $K$ 个函数的第一个是\textbf{常数函数}（平凡解）；其余 $K-1$ 个是判别函数。常数函数连同归一化使其余函数都\textbf{居中}。
+
+\begin{remark}[模块化：任何回归方法皆可]
+$S_\lambda$ 可对应任意回归方法。当 $S_\lambda = H_X$（线性回归投影算子）时，FDA 就是线性判别分析。书中引用的软件利用了这一模块性：\texttt{fda} 函数有 \texttt{method=} 参数，可传入任意回归函数（只要遵循一些自然约定）。提供的回归函数支持多项式回归、自适应加性模型与 MARS；它们都高效处理多响应，故步骤 (1) 只是对回归例程的一次调用，步骤 (2) 的本征分解同时算出全部最优评分函数。
+
+§4.2 讨论了用指示响应矩阵做线性回归用于分类的陷阱——尤其是三类及以上时的严重 \textbf{masking}。FDA 在步骤 (1) 使用这种回归的拟合值，但进一步变换产生\textbf{没有这些陷阱}的有用判别函数（习题 12.9 提供另一视角）。
+\end{remark}
+
+% ============ §12.6 Penalized Discriminant Analysis ============
+\section{惩罚判别分析 (Penalized Discriminant Analysis, PDA)}
+
+虽然 FDA 的动机是推广最优评分，它也可直接看作一种\textbf{正则化判别分析}。设 FDA 所用的回归过程归结为对基展开 $h(X)$ 的线性回归、并对系数加二次惩罚：
+\begin{equation}
+\mathrm{ASR}(\{\theta_\ell,\beta_\ell\}_{\ell=1}^{L}) = \frac{1}{N}\sum_{\ell=1}^{L}\Bigl[\sum_{i=1}^{N}\bigl(\theta_\ell(g_i) - h^T(x_i)\beta_\ell\bigr)^2 + \lambda \beta_\ell^T \Omega \beta_\ell\Bigr]. \label{eq:12_57}
+\end{equation}
+
+\begin{remark}[$\Omega$ 的选择]
+$\Omega$ 的选择取决于问题。若 $\eta_\ell(x)=h(x)\beta_\ell$ 是样条基函数上的展开，$\Omega$ 可约束 $\eta_\ell$ 在 $\R^p$ 上光滑。加性样条情形下每个坐标有 $N$ 个样条基函数，$h(x)$ 共 $Np$ 个基函数；此时 $\Omega$ 是 $Np\times Np$ 的\textbf{分块对角}矩阵。
+\end{remark}
+
+于是 FDA 的步骤可看作 LDA 的一种广义形式，即\textbf{惩罚判别分析}（PDA）：
+
+\begin{enumerate}
+\item 通过基展开 $h(X)$ \textbf{放大预测变量集}。
+\item 在放大空间用（惩罚）LDA，其中\textbf{惩罚马氏距离}为
+\begin{equation}
+D(x,\mu) = \bigl(h(x) - h(\mu)\bigr)^T (\Sigma_W + \lambda\Omega)^{-1} \bigl(h(x) - h(\mu)\bigr), \label{eq:12_58}
+\end{equation}
+其中 $\Sigma_W$ 是派生变量 $h(x_i)$ 的\textbf{类内协方差矩阵}。
+\item 用惩罚度量分解分类子空间：
+\[
+\max u^T \Sigma_{\mathrm{Bet}} u \quad \text{subject to}\quad u^T(\Sigma_W + \lambda\Omega)u = 1.
+\]
+\end{enumerate}
+
+\begin{remark}[如何理解「基展开 $h(X)$ 放大预测变量集」？]
+「放大」指的是\textbf{换一个更高维的特征空间}：基展开把原始 $p$ 维输入 $x=(x_1,\dots,x_p)$ 通过一组基函数 $h_m(x)$ 映到 $M$ 维派生空间
+\[
+h(x) = \bigl(h_1(x),\dots,h_M(x)\bigr)^T,\qquad M \text{ 通常远大于 } p.
+\]
+于是判别分析的「预测变量」从 $p$ 个原始输入变成 $M$ 个派生特征。关键洞察：\textbf{放大空间中的线性判别边界，映射回原空间就是非线性边界}——这与 SVM 的核技巧（§12.3）、FDA 的放大空间范式（§12.5）完全相同。
+
+举例：只有两个输入 $x_1,x_2$ 时，取二次多项式展开 $h(x)=(x_1,x_2,x_1^2,x_2^2,x_1x_2)^T$，放大空间中「线性」的 $u^T h(x)=0$ 在原空间就是 $x_1,x_2$ 的\textbf{二次曲线}（椭圆、双曲线等）。基展开还可取样条（加性样条每个坐标 $N$ 个基、共 $Np$ 个）、MARS 生成的基、或核方法生成的函数类（RKHS）。
+
+两点提醒：
+\begin{itemize}
+\item \textbf{PDA 的关键不在放大，而在惩罚}。展开后的基集往往极大（同 SVM 一样需要正则化），$\lambda\Omega$ 正是那个在放大空间起作用的惩罚。
+\item \textbf{并非总要做这一步}：当预测变量已经太多且相关（如图像、256 频率对数周期图）时，第一步应\textbf{跳过}——此时直接在原始空间惩罚系数使其在空间域光滑，这正是下文「何时不需要基展开」注记的内容。
+\end{itemize}
+\end{remark}
+
+\begin{remark}[惩罚马氏距离的含义]
+粗略地说，惩罚马氏距离倾向于给「粗糙」坐标较少的权重、给「光滑」坐标较多权重；由于惩罚非对角，对粗糙或光滑的\textbf{线性组合}同样如此。
+\end{remark}
+
+\begin{remark}[何时不需要基展开]
+对某类问题，第一步（基展开）不需要——我们已经拥有太多（相关的）预测变量。典型例子是待分类对象是\textbf{数字化模拟信号}：
+
+\begin{itemize}
+\item 一段口语语音片段的\textbf{对数周期图}（log-periodogram），在 256 个频率上采样（见图 5.5）；
+\item 手写数字的数字化图像的\textbf{灰度像素值}。
+\end{itemize}
+\end{remark}
+
+\begin{remark}[为什么需要正则化：以数字图像为例]
+直观上很清楚为什么需要正则化。以数字化图像为例：相邻像素值往往相关，常常几乎相同。这意味着这些像素对应的\textbf{一对 LDA 系数可以差异极大且符号相反}，从而在作用于相似像素值时相互抵消。正相关的预测变量导致噪声大、负相关的系数估计，这种噪声造成多余的抽样方差。合理的策略是正则化系数使其在\textbf{空间域}（即当作图像）上光滑——这正是 PDA 所做的。
+
+PDA 的计算与 FDA 一样，只是改用合适的\textbf{惩罚回归}。这里 $h^T(X)\beta_\ell = X\beta_\ell$，$\Omega$ 的选择使 $\beta_\ell^T \Omega \beta_\ell$ 把 $\beta_\ell$ 当作图像惩罚其粗糙度。图 12.11 展示 LDA 与 PDA 的判别变量：LDA 的像「盐和胡椒」（salt-and-pepper），PDA 的则光滑。第一幅光滑图像可看作一个线性对比泛函的系数：把「中央有暗竖条」的图像（1、可能 7）与「中间空心」的图像（0、某些 4）分开。图 12.12 支持这一解读。这些例子在 Hastie et al. (1995) 中有更详细讨论；他们还证明，在其尝试的案例中，正则化使 LDA 在独立测试数据上的分类性能提升了约 25\%。
+\end{remark}
+
+% ============ §12.7 Mixture Discriminant Analysis ============
+\section{混合判别分析 (Mixture Discriminant Analysis, MDA)}
+
+线性判别分析可看作原型分类器：每类用其质心表示，用适当度量把观测分到最近的质心。许多情形下\textbf{单个原型不足以表示不均质（inhomogeneous）的类}，此时混合模型更合适。本节回顾高斯混合模型，并说明如何通过前面讨论的 FDA 与 PDA 方法推广它们。
+
+\paragraph{「原型」（prototype）指什么？「不均质（inhomogeneous）」怎么定义？}
+
+\textbf{原型} = 每类的「代表点」/模板，分类就按「离哪个原型最近」来判：
+
+\begin{itemize}
+\item 在 LDA 里，原型就是\textbf{类质心（均值）} $\mu_k$——用「一个点」代表整类；
+\item 分类规则：新观测 $x$ 被分到「在某种度量下离它最近」的原型所属的类；LDA 用的度量是\textbf{马氏距离}（带合并协方差 $\Sigma$）；
+\item 因此 LDA 属于\textbf{原型分类器}（prototype classifier）家族——这类方法以「与原型（们）的距离/相似度」为判别依据（第 13 章还会见到 LVQ、$k$ 最近邻等）；
+\item 每个原型只是类的「中心位置」，整个类被描述成「一个原型 + 一个散布（协方差）」；
+\item 一个类可以有\textbf{多个原型}：MDA 里每类有 $R_k$ 个子类，就有 $R_k$ 个子质心 $\mu_{kr}$——这就是「多原型」的体现。
+\end{itemize}
+
+\textbf{不均质}不是严格数学定义，而是描述「类内部不是单一、紧凑、单峰结构」的性质——一个类的数据由几个明显分离的「子群/子簇」组成，即\textbf{类内密度多峰}（multimodal）。它与 LDA 的\textbf{均质}（homogeneous）假设相对：均质 = 类内单峰、紧凑，一个质心 + 协方差就足以描述。
+
+特点：
+
+\begin{enumerate}
+\item \textbf{单峰假设失效}：类内数据形成多个分离的簇，整体密度多峰；
+\item \textbf{单个质心是坏代表}：质心常落在子群之间的「空洞」里，甚至那里一个样本都没有，不能代表任何子群；
+\item \textbf{分类会出问题}：用单原型分类会把子群之间的空白区也划归该类，边界不自然；
+\item \textbf{典型来源}：同一类由不同机制/子过程产生——如手写「7」有带/不带横杠两种写法、同一元音由不同说话人发出、图像中同一目标的不同姿态等；
+\item \textbf{需要多原型才能刻画}：这正是 MDA 的动机——每类用 $R_k$ 个高斯成分（子类，各带自己的质心 $\mu_{kr}$、共享同一 $\Sigma$）来「多原型」表示一个不均质类。
+\end{enumerate}
+
+一句话：\textbf{均质类 = 一个团、一个中心就够；不均质类 = 内部有几个子团，一个质心代表不了}——LDA 在这类问题上失效，MDA 用「每类多个子高斯」来补救。
+
+\paragraph{怎么知道在度量空间中是不是多簇的（类是否不均质）？}
+
+没有单一公式，可从几个互补角度判断：
+
+\begin{enumerate}
+\item \textbf{可视化 + 降维投影}：对\textbf{每个类内部}做 PCA / LDA 典型变量 / t-SNE / UMAP 投影，看该类是否分成几个明显分离的「团」——注意要按类分开看，否则会把类间分离误判为类内多簇；再画\textbf{类内成对距离的直方图}，双峰提示有子簇。
+\item \textbf{聚类 / 模型比较}：单独对一个类的数据做 $k$-means / 层次聚类，用总 SSE 的肘部、gap statistic、silhouette 判断最优簇数是否 $>1$；或用 GMM 以 BIC/AIC 比较单高斯 vs 多成分，多成分显著胜出即密度多峰——这正对应 MDA「每类 $R_k$ 个子类」的假设；层次聚类树状图中该类在很高处才合并也提示子分支。
+\item \textbf{统计检验}：Hartigan 的\textbf{单峰性 dip 检验}（$p$ 值小 $\Rightarrow$ 拒绝单峰，即多模态）；辅助用正态性检验（Shapiro--Wilk、JB），但「非正态」$\neq$「多簇」，只能当线索。
+\item \textbf{从分类性能反推}：在验证集/交叉验证上比较 LDA（单原型）vs MDA（每类多子类），若 MDA 明显更好就是类不均质/多簇的证据；看 LDA 的\textbf{类内残差}，若系统性偏大且集中在某些区域，说明质心代表不了整类。
+\end{enumerate}
+
+\textbf{两个提醒}：① 要在\textbf{与问题一致的度量}里查（LDA 用马氏距离、SVM 用核距离等），否则结论可能失真；② 区分\textbf{类内多簇}（几个分离的峰）与\textbf{类间重叠/类内拖尾}（单峰但被拉长/偏斜），并注意类内样本量太小会让随机波动伪装成「几簇」。
+
+\begin{definition}[高斯混合模型]
+第 $k$ 类的密度为
+\begin{equation}
+P(X\mid G=k) = \sum_{r=1}^{R_k}\pi_{kr}\,\varphi(X;\mu_{kr},\Sigma), \label{eq:12_59}
+\end{equation}
+其中混合比例 $\pi_{kr}$ 之和为 1。这为第 $k$ 类给出 $R_k$ 个原型；在我们的设定中，全程用\textbf{同一个协方差矩阵} $\Sigma$ 作为度量。
+\end{definition}
+
+给定每类的模型后，类后验概率为
+\begin{equation}
+P(G=k\mid X=x) = \frac{\sum_{r=1}^{R_k}\pi_{kr}\,\varphi(X;\mu_{kr},\Sigma)\,\Pi_k}{\sum_{\ell=1}^{K}\sum_{r=1}^{R_\ell}\pi_{\ell r}\,\varphi(X;\mu_{\ell r},\Sigma)\,\Pi_\ell}, \label{eq:12_60}
+\end{equation}
+其中 $\Pi_k$ 表示类先验概率。
+
+与 LDA 一样用最大似然估计参数，基于 $P(G,X)$ 的联合对数似然：
+\begin{equation}
+\sum_{k=1}^{K}\sum_{g_i=k}\log\Bigl[\sum_{r=1}^{R_k}\pi_{kr}\,\varphi(x_i;\mu_{kr},\Sigma)\,\Pi_k\Bigr]. \label{eq:12_61}
+\end{equation}
+log 内的求和使直接求解成为相当棘手的优化问题。计算混合分布 MLE 的经典且自然的方法是 \textbf{EM 算法}（Dempster et al., 1977），已知具有良好的收敛性质。EM 在两个步骤间交替：
+
+\begin{enumerate}
+\item \textbf{E 步}：给定当前参数，计算子类 $c_{kr}$（类 $k$ 内第 $r$ 个子类）对每个类 $k$ 观测（$g_i=k$）的\textbf{责任}（responsibility）：
+\begin{equation}
+W(c_{kr}\mid x_i,g_i) = \frac{\pi_{kr}\,\varphi(x_i;\mu_{kr},\Sigma)}{\sum_{\ell=1}^{R_k}\pi_{k\ell}\,\varphi(x_i;\mu_{k\ell},\Sigma)}. \label{eq:12_62}
+\end{equation}
+\item \textbf{M 步}：用 E 步的权重，计算每个类内各成分高斯的\textbf{加权 MLE}。
+\end{enumerate}
+
+\begin{remark}[EM 的解释与初始化]
+E 步把类 $k$ 中一个观测的单位权重按比例分配给该类下辖的各子类：若它靠近某子类质心而远离其他，则对该子类得到接近 1 的质量；若恰在两子类之间，则对两者得到近似相等的权重。M 步中，类 $k$ 的一个观测被使用 $R_k$ 次，分别以不同权重估计 $R_k$ 个成分密度的参数。EM 在第 8 章有详细研究。
+
+算法需要初始化，且由于混合似然通常是\textbf{多峰}的，初始化会有影响。默认策略：用户提供每类子类数 $R_k$；对类 $k$ 内数据用\textbf{多次随机起始的 $k$-means} 聚类，把观测分成 $R_k$ 个不相交组，据此构造由 0 和 1 组成的初始权重矩阵。
+\end{remark}
+
+\begin{remark}[降秩与加权 LDA]
+假设全程等成分协方差 $\Sigma$ 带来额外的简洁性：可在混合公式中像 LDA 一样加入\textbf{秩约束}。为此回顾一个 LDA 的少为人知事实：秩 $L$ 的 LDA 拟合（§4.3.3）等价于「各类均值向量被约束在 $\R^p$ 的秩 $L$ 子空间内」的高斯模型的最大似然拟合（习题 4.8）。混合模型可继承这一性质：在所有 $\sum_k R_k$ 个质心上加秩约束 $\rank\{\mu_{k\ell}\}=L$ 来最大化对数似然 \ref{eq:12_61}。
+
+此时 EM 仍然可用，且 \textbf{M 步变成带权重的 LDA}，有 $R=\sum_{k=1}^{K}R_k$ 个「类」。此外可用最优评分如前求解加权 LDA 问题，从而在该阶段使用带权重的 FDA 或 PDA。
+\end{remark}
+
+\begin{remark}[模糊响应矩阵 $Z$]
+可以预期：除了「类」数增加，「观测」数也应相应增加（第 $k$ 类放大 $R_k$ 倍）。但若最优评分回归用线性算子，则事实并非如此：放大的指示矩阵 $Y$ 此时坍缩为一个\textbf{模糊响应矩阵} $Z$，这在直观上是令人满意的。例如 $K=3$ 类、每类 $R_k=3$ 个子类，$Z$ 可能形如（行对应 $g_1,\dots,g_N$，列对应各子类 $c_{11},\dots,c_{33}$）：
+\begin{equation}
+Z = \begin{pmatrix}
+0 & 0 & 0 & 0.3 & 0.5 & 0.2 & 0 & 0 & 0\\
+0.9 & 0.1 & 0.0 & 0 & 0 & 0 & 0 & 0 & 0\\
+0.1 & 0.8 & 0.1 & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & 0.5 & 0.4 & 0.1\\
+0 & 0 & 0 & 0.7 & 0.1 & 0.2 & 0 & 0 & 0\\
+\vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots\\
+0 & 0 & 0 & 0 & 0 & 0 & 0.1 & 0.1 & 0.8
+\end{pmatrix} \quad
+\begin{array}{l}
+g_1=2\\ g_2=1\\ g_3=1\\ g_4=3\\ g_5=2\\ \vdots\\ g_N=3
+\end{array} \label{eq:12_63}
+\end{equation}
+其中类 $k$ 某行的元素正是 $W(c_{kr}\mid x_i,g_i)$。余下的步骤与前面相同，构成 MDA 的 M 步：
+\[
+\hat Z = SZ, \qquad Z^T\hat Z = \Theta D \Theta^T, \qquad \text{更新 } \pi \text{ 与 } \Pi.
+\]
+\end{remark}
+
+\begin{remark}[MDA 带来的灵活性]
+这些简单修改给混合模型带来相当大的灵活性：
+\begin{itemize}
+\item LDA、FDA 或 PDA 中的\textbf{降维}受类数限制；特别是 $K=2$ 类时无法降维。MDA 用\textbf{子类代替类}，从而允许查看这些子类质心张成的子空间的低维视图——该子空间对判别往往很重要。
+\item 在 M 步中使用 FDA 或 PDA，可更适应特定情形：例如可对数字化模拟信号与图像拟合 MDA，并内置光滑性约束。
+\end{itemize}
+图 12.13 比较了混合示例上的 FDA 与 MDA。
+\end{remark}
+
+% ============ §12.7.1 Example: Waveform Data ============
+\subsection{示例：波形数据 (Waveform Data)}
+
+\begin{example}[波形数据生成]
+该流行模拟示例取自 Breiman et al. (1984, pp.~49--55)，也用于 Hastie \& Tibshirani (1996b) 等处。它是一个三分类、21 个变量的问题，被认为是困难的模式识别问题。预测变量定义为
+\begin{equation}
+\begin{aligned}
+X_j &= U h_1(j) + (1-U)h_2(j) + \varepsilon_j \quad &&\text{类 1},\\
+X_j &= U h_1(j) + (1-U)h_3(j) + \varepsilon_j \quad &&\text{类 2},\\
+X_j &= U h_2(j) + (1-U)h_3(j) + \varepsilon_j \quad &&\text{类 3},
+\end{aligned} \label{eq:12_64}
+\end{equation}
+其中 $j=1,\dots,21$，$U$ 在 $(0,1)$ 上均匀分布，$\varepsilon_j$ 为标准正态变量，$h_\ell$ 是平移的三角波形：$h_1(j)=\max(6-\abs{j-11},0)$，$h_2(j)=h_1(j-4)$，$h_3(j)=h_1(j+4)$。图 12.14 展示各类的示例波形。
+\end{example}
+
+\begin{remark}[波形数据的分析与结果]
+表 \ref{tab:12_4} 展示 MDA 及本章和其他章若干方法在波形数据上的结果。每个训练样本 300 个观测，用等先验（每类约 100 个）；测试样本 500 个。
+
+图 12.15 展示惩罚 MDA 模型在测试数据上评估的前两个典型变量：各类看起来位于\textbf{三角形的边上}——因为 $h_j(i)$ 由 21 空间中的三个点表示、构成三角形顶点，而每类是两个顶点的一个凸组合，故位于一条边上。显然所有信息都在前两维：前两个坐标解释的方差百分比为 99.8\%，在此截断不会损失任何东西。该问题的 Bayes 风险估计约 0.14（Breiman et al., 1984）；MDA 接近最优率——这不奇怪，因为 MDA 模型的结构与生成模型相似。
+\end{remark}
+
+\begin{table}[htbp]
+\centering
+\caption{波形数据结果（书表 12.4）。数值是十次模拟的平均，括号内为平均的标准误。线上五项取自 Hastie et al. (1994)；线下第一行是每类三个子类的 MDA；第二行相同但判别系数经粗糙度惩罚等效为 4df；第三行是对应的惩罚 LDA（PDA）。}
+\label{tab:12_4}
+\begin{tabular}{llcc}
+\toprule
+技术 & 训练误差 & 测试误差 \\
+\midrule
+LDA & 0.121 (0.006) & 0.191 (0.006) \\
+QDA & 0.039 (0.004) & 0.205 (0.006) \\
+CART & 0.072 (0.003) & 0.289 (0.004) \\
+FDA/MARS（degree=1） & 0.100 (0.006) & 0.191 (0.006) \\
+FDA/MARS（degree=2） & 0.068 (0.004) & 0.215 (0.002) \\
+\midrule
+MDA（3 子类） & 0.087 (0.005) & 0.169 (0.006) \\
+MDA（3 子类，惩罚 4 df） & 0.137 (0.006) & 0.157 (0.005) \\
+PDA（惩罚 4 df） & 0.150 (0.005) & 0.171 (0.005) \\
+\midrule
+Bayes & & 0.140 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============ Computational Considerations ============
+\section{计算考虑}
+
+\begin{itemize}
+\item \textbf{SVM}：$N$ 个训练样本、$p$ 个预测变量、$m$ 个支持向量时需约 $m^3 + mN + mpN$ 次运算（假设 $m\approx N$），随 $N$ 扩展性不好，但已有计算捷径（Platt, 1999）。
+\item \textbf{LDA / PDA}：需 $Np^2 + p^3$ 次运算。
+\item \textbf{FDA}：复杂度取决于所用回归方法；许多技术对 $N$ 是线性的（如加性模型与 MARS），一般样条与基于核的回归方法通常需 $N^3$ 次运算。
+\end{itemize}
+
+拟合 FDA、PDA、MDA 模型的软件在 R 包 \texttt{mda} 中可用（S-PLUS 也有）。本章书目注记（Bibliographic Notes）与习题从略。
+
+% ============ 本章总结 ============
+\section{本章总结}
+
+本章沿「把线性分类边界推广到非线性」这一主线展开，包含两大块内容。
+
+\begin{remark}[两条主线]
+\textbf{① 支持向量机（SVM）}：从线性最大间隔分类器出发，用\textbf{核技巧}与\textbf{正则化}把线性边界推广到非线性，并扩展到回归（SVR）。核心要素：最大间隔 / 松弛变量 / 对偶与 KKT / 支持向量 / 代价 $C$ / 核函数 / 铰链损失。
+
+\textbf{② 推广线性判别分析（LDA）}：从原型分类器（LDA）出发，用三个思路分别解决三类问题——FDA（边界不灵活）、PDA（变量太多且相关）、MDA（类不均质）。
+\end{remark}
+
+\begin{remark}[共同范式：放大空间]
+SVM、FDA、PDA 共享同一范式：\textbf{在放大空间（基展开 / 核）里做线性模型，映射回原空间即非线性边界}。区别在于：
+\begin{itemize}
+\item \textbf{SVM}：核 $K=\inner{h(x)}{h(x')}$ + 铰链损失 $[1-yf]_+$；
+\item \textbf{FDA}：最优评分 + 非参数回归（样条 / MARS / GAM）；
+\item \textbf{PDA}：惩罚马氏距离 $(\Sigma_W+\lambda\Omega)^{-1}$，使系数在空间域光滑。
+\end{itemize}
+\end{remark}
+
+\begin{remark}[关键要点]
+\leavevmode \par
+\begin{itemize}
+\item \textbf{支持向量}是决定边界的少数观测；$C$（或 $\lambda$）控制间隔宽度与正则化强度，通常用交叉验证选择。
+\item \textbf{核技巧}：只需知道 $K(x,x')$，无需显式构造 $h$；但核一旦固定就无法自适应发现子空间结构，\textbf{不规避维数灾难}。
+\item \textbf{损失函数}（表 \ref{tab:12_1}）：铰链损失估计后验概率的\textbf{众数}（直接给出分类器），偏差 / 平方误差估计其\textbf{线性变换}。
+\item \textbf{FDA}：LDA 可看作「一串回归 + 在拟合值空间按最近质心分类」；最优评分由单次本征分解完成（$\Theta^T D_\pi\Theta=I$）。
+\item \textbf{PDA}：用 $\Omega$ 惩罚「粗糙」方向，使正相关的相邻像素不再产生符号相反、相互抵消的噪声系数。
+\item \textbf{MDA}：每类用 $R_k$ 个子高斯 + EM 拟合，子类代替类可实现降维与非线性边界，适用于不均质类。
+\end{itemize}
+\end{remark}
+
+一句话总结：\textbf{SVM 用「核 + 铰链损失」把线性边界推向非线性；FDA / PDA / MDA 分别用「最优评分 + 非参回归」「系数惩罚」「高斯混合多原型」推广 LDA}——两条路线殊途同归，都落在「放大空间中的线性模型」这一共同范式上。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[>=stealth, font=\small,
+  root/.style={draw, rounded corners, fill=blue!12, thick, align=center, inner sep=6pt},
+  col/.style={draw, rounded corners, fill=green!8, align=center, inner sep=5pt},
+  leaf/.style={draw, rounded corners, fill=gray!6, align=center, inner sep=4pt},
+  ins/.style={draw, rounded corners, fill=orange!10, align=center, inner sep=5pt},
+  arr/.style={->, >=stealth, thick}]
+
+  \node[root] (root) {\textbf{第 12 章：支持向量机与灵活判别}\\[2pt] 放大空间中的线性边界 $\Leftrightarrow$ 原空间中的非线性边界};
+
+  \node[col, below=1.1cm of root, xshift=-4.0cm, minimum width=5.6cm] (svm) {\textbf{① 支持向量机 (SVM)}};
+  \node[col, below=1.1cm of root, xshift=4.0cm, minimum width=5.6cm] (lda) {\textbf{② 推广线性判别分析 (LDA)}};
+  \draw[arr] (root.south) -- (svm.north);
+  \draw[arr] (root.south) -- (lda.north);
+
+  \node[leaf, below=0.75cm of svm, minimum width=5.6cm] (s1) {\textbf{支持向量分类器（线性）}\\[1pt] 最大间隔 \ref{eq:12_4} + 松弛变量 \ref{eq:12_7}\\[1pt] 对偶/KKT + 支持向量 + 代价 $C$};
+  \node[leaf, below=0.55cm of s1, minimum width=5.6cm] (s2) {\textbf{核技巧}\\[1pt] 基展开 $h:\R^p\to\mathcal{H}$，$K=\inner{h(x)}{h(x')}$ \ref{eq:12_21}\\[1pt] 线性 $\to$ 非线性};
+  \node[leaf, below=0.55cm of s2, minimum width=5.6cm] (s3) {\textbf{惩罚视角 / RKHS}\\[1pt] 铰链损失 $[1-yf]_+ + \frac{\lambda}{2}\norm{\beta}^2$ \ref{eq:12_25}\\[1pt] 表 \ref{tab:12_1} 损失对比};
+  \node[leaf, below=0.55cm of s3, minimum width=5.6cm] (s4) {\textbf{扩展与局限}\\[1pt] SVR（$\varepsilon$-不敏感）、路径算法、VC 维\\ 核\textbf{不规避}维数灾难（表 \ref{tab:12_2}）};
+
+  \node[leaf, below=0.75cm of lda, minimum width=5.6cm] (l1) {\textbf{LDA：原型分类器}\\[1pt] 单原型（质心）+ 马氏距离\\ 局限：线性边界 / 单原型 / 参数过多};
+  \node[leaf, below=0.55cm of l1, minimum width=5.6cm] (l2) {\textbf{FDA 灵活判别分析}\\[1pt] 最优评分 \ref{eq:12_52} $\to$ 非参数回归 \ref{eq:12_56}\\[1pt] 非线性边界};
+  \node[leaf, below=0.55cm of l2, minimum width=5.6cm] (l3) {\textbf{PDA 惩罚判别分析}\\[1pt] 惩罚马氏距离 \ref{eq:12_58}\\[1pt] 空间域光滑（图像/信号）};
+  \node[leaf, below=0.55cm of l3, minimum width=5.6cm] (l4) {\textbf{MDA 混合判别分析}\\[1pt] 每类 $R_k$ 个子高斯 \ref{eq:12_59} + EM\\ 多原型 $\Rightarrow$ 不均质类};
+
+  \coordinate (mid) at ($(s4.south)!0.5!(l4.south)$);
+  \node[ins, below=1.0cm of mid, minimum width=11.8cm] (ins) {\textbf{共同范式}：放大空间（基展开 / 核）中做\textbf{线性模型}，映射回原空间即非线性\\[2pt] SVM：核 + 铰链损失 ｜ FDA：最优评分 + 非参回归 ｜ PDA：系数惩罚 ｜ MDA：高斯混合多原型};
+  \draw[arr] (s4.south) -- (ins.north west);
+  \draw[arr] (l4.south) -- (ins.north east);
+\end{tikzpicture}
+\caption{第 12 章结构总结。两大主线：① 支持向量机（核技巧 + 正则化）；② 推广 LDA（FDA / PDA / MDA）。底部为贯穿全章的共同范式——放大空间中的线性模型。}
+\label{fig:12_summary}
+\end{figure}
+

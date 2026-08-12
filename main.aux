@@ -1482,4 +1482,113 @@
 \@writefile{lof}{\contentsline {figure}{\numberline {19.5}{\ignorespaces 第 11 章核心框架：神经网络是\textbf  {脊函数的叠加}（输入线性组合 + 非线性激活 → 派生特征 → 输出函数），用\textbf  {反向传播}拟合、\textbf  {正则化}防过拟合；进一步可用\textbf  {贝叶斯}方式把权重视为后验分布，用 \textbf  {HMC} 采样并做\textbf  {后验平均}预测。}}{507}{figure.caption.52}\protected@file@percent }
 \newlabel{fig:11_summary}{{19.5}{507}{第 11 章核心框架：神经网络是\textbf {脊函数的叠加}（输入线性组合 + 非线性激活 → 派生特征 → 输出函数），用\textbf {反向传播}拟合、\textbf {正则化}防过拟合；进一步可用\textbf {贝叶斯}方式把权重视为后验分布，用 \textbf {HMC} 采样并做\textbf {后验平均}预测。}{figure.caption.52}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {19.11.2}要点回顾}{507}{subsection.19.11.2}\protected@file@percent }
-\gdef \@abspage@last{508}
+\@writefile{toc}{\contentsline {chapter}{\numberline {第二十章\hspace  {.3em}}Support Vector Machines and Flexible Discriminants（支持向量机与灵活判别）}{509}{chapter.20}\protected@file@percent }
+\@writefile{lof}{\addvspace {10.0pt}}
+\@writefile{lot}{\addvspace {10.0pt}}
+\@writefile{toc}{\contentsline {section}{\numberline {20.1}引言}{509}{section.20.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {20.2}支持向量分类器}{509}{section.20.2}\protected@file@percent }
+\newlabel{eq:12_1}{{20.1}{509}{数据与超平面}{equation.20.2.1}{}}
+\newlabel{eq:12_2}{{20.2}{509}{数据与超平面}{equation.20.2.2}{}}
+\newlabel{eq:12_3}{{20.3}{510}{可分情形的最大间隔}{equation.20.2.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {20.1}{\ignorespaces 可分情形的最大间隔（示意，对应书图 12.1 左图）。实线为决策边界 $x^T\beta +\beta _0=0$，两侧虚线界定宽 $2M=2/\left \lVert \beta \right \rVert $ 的最大间隔带（阴影）；加圈的观测为支持向量，恰好落在间隔边缘上。}}{510}{figure.caption.53}\protected@file@percent }
+\newlabel{fig:12_1_separable}{{20.1}{510}{可分情形的最大间隔（示意，对应书图 12.1 左图）。实线为决策边界 $x^T\beta +\beta _0=0$，两侧虚线界定宽 $2M=2/\norm {\beta }$ 的最大间隔带（阴影）；加圈的观测为支持向量，恰好落在间隔边缘上。}{figure.caption.53}{}}
+\newlabel{eq:12_4}{{20.4}{510}{支持向量分类器}{equation.20.2.4}{}}
+\newlabel{eq:12_5}{{20.5}{510}{不可分情形：松弛变量}{equation.20.2.5}{}}
+\newlabel{eq:12_6}{{20.6}{510}{不可分情形：松弛变量}{equation.20.2.6}{}}
+\@writefile{toc}{\contentsline {paragraph}{为什么选 (12.6) 而不是 (12.5)？}{511}{equation.20.2.6}\protected@file@percent }
+\newlabel{eq:12_7}{{20.7}{511}{为什么选 (12.6) 而不是 (12.5)？}{equation.20.2.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {20.2.1}计算支持向量分类器}{511}{subsection.20.2.1}\protected@file@percent }
+\newlabel{eq:12_8}{{20.8}{511}{计算支持向量分类器}{equation.20.2.8}{}}
+\newlabel{eq:12_9}{{20.9}{511}{计算支持向量分类器}{equation.20.2.9}{}}
+\newlabel{eq:12_10}{{20.10}{511}{计算支持向量分类器}{equation.20.2.10}{}}
+\newlabel{eq:12_11}{{20.11}{511}{计算支持向量分类器}{equation.20.2.11}{}}
+\newlabel{eq:12_12}{{20.12}{511}{计算支持向量分类器}{equation.20.2.12}{}}
+\newlabel{eq:12_13}{{20.13}{512}{计算支持向量分类器}{equation.20.2.13}{}}
+\newlabel{eq:12_14}{{20.14}{512}{计算支持向量分类器}{equation.20.2.14}{}}
+\newlabel{eq:12_15}{{20.15}{512}{计算支持向量分类器}{equation.20.2.15}{}}
+\newlabel{eq:12_16}{{20.16}{512}{计算支持向量分类器}{equation.20.2.16}{}}
+\newlabel{eq:12_17}{{20.17}{512}{支持向量}{equation.20.2.17}{}}
+\newlabel{eq:12_18}{{20.18}{512}{计算支持向量分类器}{equation.20.2.18}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {20.2.2}混合示例（续）}{512}{subsection.20.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {20.3}支持向量机与核}{513}{section.20.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {20.3.1}计算用于分类的 SVM}{513}{subsection.20.3.1}\protected@file@percent }
+\newlabel{eq:12_19}{{20.19}{513}{计算用于分类的 SVM}{equation.20.3.19}{}}
+\newlabel{eq:12_20}{{20.20}{513}{计算用于分类的 SVM}{equation.20.3.20}{}}
+\newlabel{eq:12_21}{{20.21}{514}{核技巧}{equation.20.3.21}{}}
+\newlabel{eq:12_22}{{20.22}{514}{计算用于分类的 SVM}{equation.20.3.22}{}}
+\@writefile{toc}{\contentsline {paragraph}{多项式核到底对应什么样的基展开？以二次核为例}{514}{equation.20.3.22}\protected@file@percent }
+\newlabel{eq:12_23}{{20.23}{514}{多项式核到底对应什么样的基展开？以二次核为例}{equation.20.3.23}{}}
+\newlabel{eq:12_24}{{20.24}{514}{多项式核到底对应什么样的基展开？以二次核为例}{equation.20.3.24}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {20.3.2}SVM 作为惩罚方法}{515}{subsection.20.3.2}\protected@file@percent }
+\newlabel{eq:12_25}{{20.25}{515}{SVM 作为惩罚方法}{equation.20.3.25}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {20.1}{\ignorespaces 图 12.4 中不同损失函数的总体极小元。逻辑回归用二项对数似然（偏差）；线性判别分析（习题 4.2）用平方误差损失；SVM 铰链损失估计的是后验类概率的\textbf  {众数}，而其余损失估计的是这些概率的一个\textbf  {线性变换}。}}{515}{table.caption.54}\protected@file@percent }
+\newlabel{tab:12_1}{{20.1}{515}{图 12.4 中不同损失函数的总体极小元。逻辑回归用二项对数似然（偏差）；线性判别分析（习题 4.2）用平方误差损失；SVM 铰链损失估计的是后验类概率的\textbf {众数}，而其余损失估计的是这些概率的一个\textbf {线性变换}。}{table.caption.54}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {20.3.3}函数估计与再生核 (Function Estimation and Reproducing Kernels)}{516}{subsection.20.3.3}\protected@file@percent }
+\newlabel{eq:12_26}{{20.26}{516}{核的本征展开}{equation.20.3.26}{}}
+\newlabel{eq:12_27}{{20.27}{516}{核的本征展开}{equation.20.3.27}{}}
+\newlabel{eq:12_28}{{20.28}{516}{有限维表示}{equation.20.3.28}{}}
+\newlabel{eq:12_29}{{20.29}{517}{有限维表示}{equation.20.3.29}{}}
+\newlabel{eq:12_30}{{20.30}{517}{函数估计与再生核 (Function Estimation and Reproducing Kernels)}{equation.20.3.30}{}}
+\newlabel{eq:12_31}{{20.31}{517}{核与损失的通用搭配}{equation.20.3.31}{}}
+\newlabel{eq:12_32}{{20.32}{517}{核与损失的通用搭配}{equation.20.3.32}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {20.3.4}SVM 与维数灾难}{517}{subsection.20.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{为什么「固定权重」是关键？}{518}{remark.20.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{一个具体例子：圆柱形边界}{518}{remark.20.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{与表 \ref {tab:12_2} 的印证}{518}{remark.20.18}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {20.2}{\ignorespaces 「橙子的皮」示例：50 次模拟的测试误差均值（标准误）。BRUTO 自适应拟合加性样条模型；MARS 自适应拟合低阶交互模型。}}{519}{table.caption.55}\protected@file@percent }
+\newlabel{tab:12_2}{{20.2}{519}{「橙子的皮」示例：50 次模拟的测试误差均值（标准误）。BRUTO 自适应拟合加性样条模型；MARS 自适应拟合低阶交互模型。}{table.caption.55}{}}
+\@writefile{toc}{\contentsline {paragraph}{实际使用 SVM 时怎么筛选核？}{519}{remark.20.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {20.3.5}SVM 分类器的路径算法}{520}{subsection.20.3.5}\protected@file@percent }
+\newlabel{eq:12_33}{{20.33}{520}{路径算法的思想}{equation.20.3.33}{}}
+\newlabel{eq:12_34}{{20.34}{521}{路径的演化}{equation.20.3.34}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {20.3.6}支持向量机用于回归}{521}{subsection.20.3.6}\protected@file@percent }
+\newlabel{eq:12_35}{{20.35}{521}{支持向量机用于回归}{equation.20.3.35}{}}
+\newlabel{eq:12_36}{{20.36}{521}{支持向量机用于回归}{equation.20.3.36}{}}
+\newlabel{eq:12_37}{{20.37}{521}{支持向量机用于回归}{equation.20.3.37}{}}
+\newlabel{eq:12_38}{{20.38}{521}{与分类情形的类比}{equation.20.3.38}{}}
+\newlabel{eq:12_39}{{20.39}{522}{支持向量机用于回归}{equation.20.3.39}{}}
+\newlabel{eq:12_40}{{20.40}{522}{支持向量机用于回归}{equation.20.3.40}{}}
+\newlabel{eq:12_41}{{20.41}{522}{支持向量机用于回归}{equation.20.3.41}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {20.3.7}回归与核}{522}{subsection.20.3.7}\protected@file@percent }
+\newlabel{eq:12_42}{{20.42}{522}{回归与核}{equation.20.3.42}{}}
+\newlabel{eq:12_43}{{20.43}{522}{回归与核}{equation.20.3.43}{}}
+\newlabel{eq:12_44}{{20.44}{522}{回归与核}{equation.20.3.44}{}}
+\newlabel{eq:12_45}{{20.45}{523}{平方损失的具体推导}{equation.20.3.45}{}}
+\newlabel{eq:12_46}{{20.46}{523}{平方损失的具体推导}{equation.20.3.46}{}}
+\newlabel{eq:12_47}{{20.47}{523}{平方损失的具体推导}{equation.20.3.47}{}}
+\newlabel{eq:12_48}{{20.48}{523}{平方损失的具体推导}{equation.20.3.48}{}}
+\newlabel{eq:12_49}{{20.49}{523}{平方损失的具体推导}{equation.20.3.49}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {20.3.8}讨论}{523}{subsection.20.3.8}\protected@file@percent }
+\newlabel{eq:12_50}{{20.50}{523}{与结构风险最小化的联系}{equation.20.3.50}{}}
+\newlabel{eq:12_51}{{20.51}{524}{与结构风险最小化的联系}{equation.20.3.51}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {20.4}推广线性判别分析 (Generalizing Linear Discriminant Analysis)}{524}{section.20.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {20.5}灵活判别分析 (Flexible Discriminant Analysis, FDA)}{525}{section.20.5}\protected@file@percent }
+\newlabel{eq:12_52}{{20.52}{525}{最优评分 (Optimal Scoring)}{equation.20.5.52}{}}
+\newlabel{eq:12_53}{{20.53}{525}{灵活判别分析 (Flexible Discriminant Analysis, FDA)}{equation.20.5.53}{}}
+\newlabel{eq:12_54}{{20.54}{526}{为什么走这条路？}{equation.20.5.54}{}}
+\newlabel{eq:12_55}{{20.55}{526}{为什么走这条路？}{equation.20.5.55}{}}
+\newlabel{eq:12_56}{{20.56}{526}{推广的威力}{equation.20.5.56}{}}
+\@writefile{toc}{\contentsline {paragraph}{完整的 FDA 计算步骤（最优评分算法）}{526}{equation.20.5.56}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {20.5.1}计算 FDA 估计}{528}{subsection.20.5.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {20.3}{\ignorespaces 元音识别数据性能（书表 12.3）。神经网络结果是取自神经网络档案的更大集合中最好的；FDA/BRUTO 记号指 FDA 所用的回归方法。}}{529}{table.caption.56}\protected@file@percent }
+\newlabel{tab:12_3}{{20.3}{529}{元音识别数据性能（书表 12.3）。神经网络结果是取自神经网络档案的更大集合中最好的；FDA/BRUTO 记号指 FDA 所用的回归方法。}{table.caption.56}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {20.6}惩罚判别分析 (Penalized Discriminant Analysis, PDA)}{530}{section.20.6}\protected@file@percent }
+\newlabel{eq:12_57}{{20.58}{530}{惩罚判别分析 (Penalized Discriminant Analysis, PDA)}{equation.20.6.58}{}}
+\newlabel{eq:12_58}{{20.59}{530}{惩罚判别分析 (Penalized Discriminant Analysis, PDA)}{equation.20.6.59}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {20.7}混合判别分析 (Mixture Discriminant Analysis, MDA)}{532}{section.20.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{「原型」（prototype）指什么？「不均质（inhomogeneous）」怎么定义？}{532}{section.20.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{怎么知道在度量空间中是不是多簇的（类是否不均质）？}{533}{Item.516}\protected@file@percent }
+\newlabel{eq:12_59}{{20.60}{533}{高斯混合模型}{equation.20.7.60}{}}
+\newlabel{eq:12_60}{{20.61}{534}{怎么知道在度量空间中是不是多簇的（类是否不均质）？}{equation.20.7.61}{}}
+\newlabel{eq:12_61}{{20.62}{534}{怎么知道在度量空间中是不是多簇的（类是否不均质）？}{equation.20.7.62}{}}
+\newlabel{eq:12_62}{{20.63}{534}{怎么知道在度量空间中是不是多簇的（类是否不均质）？}{equation.20.7.63}{}}
+\newlabel{eq:12_63}{{20.64}{535}{模糊响应矩阵 $Z$}{equation.20.7.64}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {20.7.1}示例：波形数据 (Waveform Data)}{535}{subsection.20.7.1}\protected@file@percent }
+\newlabel{eq:12_64}{{20.65}{535}{波形数据生成}{equation.20.7.65}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {20.4}{\ignorespaces 波形数据结果（书表 12.4）。数值是十次模拟的平均，括号内为平均的标准误。线上五项取自 Hastie et al. (1994)；线下第一行是每类三个子类的 MDA；第二行相同但判别系数经粗糙度惩罚等效为 4df；第三行是对应的惩罚 LDA（PDA）。}}{536}{table.caption.57}\protected@file@percent }
+\newlabel{tab:12_4}{{20.4}{536}{波形数据结果（书表 12.4）。数值是十次模拟的平均，括号内为平均的标准误。线上五项取自 Hastie et al. (1994)；线下第一行是每类三个子类的 MDA；第二行相同但判别系数经粗糙度惩罚等效为 4df；第三行是对应的惩罚 LDA（PDA）。}{table.caption.57}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {20.8}计算考虑}{536}{section.20.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {20.9}本章总结}{536}{section.20.9}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {20.2}{\ignorespaces 第 12 章结构总结。两大主线：① 支持向量机（核技巧 + 正则化）；② 推广 LDA（FDA / PDA / MDA）。底部为贯穿全章的共同范式——放大空间中的线性模型。}}{538}{figure.caption.58}\protected@file@percent }
+\newlabel{fig:12_summary}{{20.2}{538}{第 12 章结构总结。两大主线：① 支持向量机（核技巧 + 正则化）；② 推广 LDA（FDA / PDA / MDA）。底部为贯穿全章的共同范式——放大空间中的线性模型。}{figure.caption.58}{}}
+\gdef \@abspage@last{538}

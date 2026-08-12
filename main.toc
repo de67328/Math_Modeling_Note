@@ -880,3 +880,34 @@
 \contentsline {section}{\numberline {19.11}本章小结}{507}{section.19.11}%
 \contentsline {subsection}{\numberline {19.11.1}核心框架}{507}{subsection.19.11.1}%
 \contentsline {subsection}{\numberline {19.11.2}要点回顾}{507}{subsection.19.11.2}%
+\contentsline {chapter}{\numberline {第二十章\hspace {.3em}}Support Vector Machines and Flexible Discriminants（支持向量机与灵活判别）}{509}{chapter.20}%
+\contentsline {section}{\numberline {20.1}引言}{509}{section.20.1}%
+\contentsline {section}{\numberline {20.2}支持向量分类器}{509}{section.20.2}%
+\contentsline {paragraph}{为什么选 (12.6) 而不是 (12.5)？}{511}{equation.20.2.6}%
+\contentsline {subsection}{\numberline {20.2.1}计算支持向量分类器}{511}{subsection.20.2.1}%
+\contentsline {subsection}{\numberline {20.2.2}混合示例（续）}{512}{subsection.20.2.2}%
+\contentsline {section}{\numberline {20.3}支持向量机与核}{513}{section.20.3}%
+\contentsline {subsection}{\numberline {20.3.1}计算用于分类的 SVM}{513}{subsection.20.3.1}%
+\contentsline {paragraph}{多项式核到底对应什么样的基展开？以二次核为例}{514}{equation.20.3.22}%
+\contentsline {subsection}{\numberline {20.3.2}SVM 作为惩罚方法}{515}{subsection.20.3.2}%
+\contentsline {subsection}{\numberline {20.3.3}函数估计与再生核 (Function Estimation and Reproducing Kernels)}{516}{subsection.20.3.3}%
+\contentsline {subsection}{\numberline {20.3.4}SVM 与维数灾难}{517}{subsection.20.3.4}%
+\contentsline {paragraph}{为什么「固定权重」是关键？}{518}{remark.20.18}%
+\contentsline {paragraph}{一个具体例子：圆柱形边界}{518}{remark.20.18}%
+\contentsline {paragraph}{与表 \ref {tab:12_2} 的印证}{518}{remark.20.18}%
+\contentsline {paragraph}{实际使用 SVM 时怎么筛选核？}{519}{remark.20.19}%
+\contentsline {subsection}{\numberline {20.3.5}SVM 分类器的路径算法}{520}{subsection.20.3.5}%
+\contentsline {subsection}{\numberline {20.3.6}支持向量机用于回归}{521}{subsection.20.3.6}%
+\contentsline {subsection}{\numberline {20.3.7}回归与核}{522}{subsection.20.3.7}%
+\contentsline {subsection}{\numberline {20.3.8}讨论}{523}{subsection.20.3.8}%
+\contentsline {section}{\numberline {20.4}推广线性判别分析 (Generalizing Linear Discriminant Analysis)}{524}{section.20.4}%
+\contentsline {section}{\numberline {20.5}灵活判别分析 (Flexible Discriminant Analysis, FDA)}{525}{section.20.5}%
+\contentsline {paragraph}{完整的 FDA 计算步骤（最优评分算法）}{526}{equation.20.5.56}%
+\contentsline {subsection}{\numberline {20.5.1}计算 FDA 估计}{528}{subsection.20.5.1}%
+\contentsline {section}{\numberline {20.6}惩罚判别分析 (Penalized Discriminant Analysis, PDA)}{530}{section.20.6}%
+\contentsline {section}{\numberline {20.7}混合判别分析 (Mixture Discriminant Analysis, MDA)}{532}{section.20.7}%
+\contentsline {paragraph}{「原型」（prototype）指什么？「不均质（inhomogeneous）」怎么定义？}{532}{section.20.7}%
+\contentsline {paragraph}{怎么知道在度量空间中是不是多簇的（类是否不均质）？}{533}{Item.516}%
+\contentsline {subsection}{\numberline {20.7.1}示例：波形数据 (Waveform Data)}{535}{subsection.20.7.1}%
+\contentsline {section}{\numberline {20.8}计算考虑}{536}{section.20.8}%
+\contentsline {section}{\numberline {20.9}本章总结}{536}{section.20.9}%
