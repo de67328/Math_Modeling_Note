@@ -1,913 +1,962 @@
-\contentsline {part}{第一部分\hspace {1em}统计学基础}{21}{part.1}%
-\contentsline {chapter}{\numberline {第一章\hspace {.3em}}概率论回顾}{23}{chapter.1}%
-\contentsline {section}{\numberline {1.1}随机变量与分布}{23}{section.1.1}%
-\contentsline {subsection}{\numberline {1.1.1}离散随机变量}{23}{subsection.1.1.1}%
-\contentsline {subsection}{\numberline {1.1.2}连续随机变量}{23}{subsection.1.1.2}%
-\contentsline {subsection}{\numberline {1.1.3}常见分布}{23}{subsection.1.1.3}%
-\contentsline {section}{\numberline {1.2}条件概率与独立性}{24}{section.1.2}%
-\contentsline {section}{\numberline {1.3}矩与特征}{24}{section.1.3}%
-\contentsline {subsection}{\numberline {1.3.1}Pearson 与 Spearman 相关系数}{24}{subsection.1.3.1}%
-\contentsline {chapter}{\numberline {第二章\hspace {.3em}}样本及抽样分布}{27}{chapter.2}%
-\contentsline {section}{\numberline {2.1}随机样本}{27}{section.2.1}%
-\contentsline {subsection}{\numberline {2.1.1}总体与样本}{27}{subsection.2.1.1}%
-\contentsline {subsubsection}{从总体到统计量：四步概念梳理}{28}{Item.8}%
-\contentsline {subsection}{\numberline {2.1.2}常用统计量}{30}{subsection.2.1.2}%
-\contentsline {subsubsection}{推导目标}{30}{equation.2.1.7}%
-\contentsline {subsubsection}{前提假设}{30}{equation.2.1.7}%
-\contentsline {subsubsection}{关键恒等式}{30}{equation.2.1.7}%
-\contentsline {subsubsection}{逐项求期望}{30}{equation.2.1.8}%
-\contentsline {subsubsection}{合并得到最终结果}{31}{equation.2.1.14}%
-\contentsline {subsubsection}{结论}{31}{equation.2.1.15}%
-\contentsline {subsubsection}{直观解释：自由度的损失}{32}{equation.2.1.18}%
-\contentsline {section}{\numberline {2.2}直方图和箱线图}{32}{section.2.2}%
-\contentsline {subsection}{\numberline {2.2.1}直方图}{32}{subsection.2.2.1}%
-\contentsline {subsection}{\numberline {2.2.2}箱线图}{33}{subsection.2.2.2}%
-\contentsline {subsubsection}{箱线图结构示意}{33}{equation.2.2.22}%
-\contentsline {subsubsection}{异常值判定规则}{33}{figure.caption.2}%
-\contentsline {subsection}{\numberline {2.2.3}经验分布函数}{34}{subsection.2.2.3}%
-\contentsline {section}{\numberline {2.3}抽样分布}{34}{section.2.3}%
-\contentsline {subsection}{\numberline {2.3.1}$\chi ^2$ 分布（卡方分布）}{34}{subsection.2.3.1}%
-\contentsline {subsubsection}{历史背景}{34}{subsection.2.3.1}%
-\contentsline {subsubsection}{直观理解}{34}{subsection.2.3.1}%
-\contentsline {subsubsection}{核心问题：总体不是 $\mathcal {N}(0,1)$ 时怎么用卡方？}{34}{subsection.2.3.1}%
-\contentsline {subsubsection}{典型应用场景}{36}{equation.2.3.28}%
-\contentsline {subsubsection}{拟合优度检验——完整流程与实例}{36}{Item.22}%
-\contentsline {subsubsection}{概念澄清：常见用词误区}{38}{equation.2.3.31}%
-\contentsline {subsubsection}{核心原理：为什么 $\DOTSB \sum@ \slimits@ (O_i-E_i)^2/E_i$ 服从 $\chi ^2$ 分布？}{38}{Item.27}%
-\contentsline {subsubsection}{定义与性质}{41}{equation.2.3.41}%
-\contentsline {subsection}{\numberline {2.3.2}$t$ 分布（学生氏分布）}{41}{subsection.2.3.2}%
-\contentsline {subsubsection}{历史背景——"Student" 的真实身份}{41}{subsection.2.3.2}%
-\contentsline {subsubsection}{直观理解}{42}{subsection.2.3.2}%
-\contentsline {subsubsection}{核心桥梁：$S$ 怎样与 $\chi ^2$ 挂钩——从 $t$ 定义到 $t$ 检验}{42}{equation.2.3.45}%
-\contentsline {subsubsection}{典型应用场景}{43}{Item.32}%
-\contentsline {subsubsection}{单样本 $t$ 检验——完整流程与实例}{44}{Item.37}%
-\contentsline {subsubsection}{关键前提：为什么假定 $X_i$ 服从正态分布？违背了怎么办？}{45}{equation.2.3.51}%
-\contentsline {subsubsection}{Q-Q 图详解：为什么能检查正态性？}{46}{Item.41}%
-\contentsline {subsubsection}{定义与性质}{48}{remark.2.4}%
-\contentsline {subsection}{\numberline {2.3.3}$F$ 分布}{49}{subsection.2.3.3}%
-\contentsline {subsubsection}{历史背景}{49}{subsection.2.3.3}%
-\contentsline {subsubsection}{直观理解}{49}{subsection.2.3.3}%
-\contentsline {subsubsection}{典型应用场景}{49}{equation.2.3.54}%
-\contentsline {subsubsection}{单因素 ANOVA——完整流程与实例}{50}{Item.46}%
-\contentsline {subsubsection}{定义与性质}{53}{Item.49}%
-\contentsline {subsubsection}{三大抽样分布对比总结}{53}{equation.2.3.64}%
-\contentsline {subsubsection}{常见理解误区：各分布的适用范围被窄化了}{53}{equation.2.3.64}%
-\contentsline {subsection}{\numberline {2.3.4}正态总体的抽样分布定理（核心定理）}{54}{subsection.2.3.4}%
-\contentsline {chapter}{\numberline {第三章\hspace {.3em}}参数估计}{57}{chapter.3}%
-\contentsline {section}{\numberline {3.1}点估计}{57}{section.3.1}%
-\contentsline {subsection}{\numberline {3.1.1}矩估计法}{57}{subsection.3.1.1}%
-\contentsline {subsection}{\numberline {3.1.2}极大似然估计 (MLE)}{57}{subsection.3.1.2}%
-\contentsline {subsubsection}{完整示例：正态分布 $N(\mu , \sigma ^2)$ 的 MLE}{59}{remark.3.2}%
-\contentsline {subsubsection}{概念纠正：似然函数 $L(\theta )$ 究竟是谁的"概率"？}{60}{equation.3.1.16}%
-\contentsline {subsubsection}{频率学派 vs. 贝叶斯学派：根本分歧}{61}{equation.3.1.18}%
-\contentsline {subsubsection}{深层追问：把 $\theta $ 当常数 vs. 当变量，实际差别在哪？}{63}{equation.3.1.19}%
-\contentsline {subsection}{\numberline {3.1.3}最大后验估计 (MAP)}{65}{subsection.3.1.3}%
-\contentsline {section}{\numberline {3.2}基于截尾样本的最大似然估计}{66}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}定时截尾}{66}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}定数截尾}{66}{subsection.3.2.2}%
-\contentsline {subsection}{\numberline {3.2.3}指数分布截尾样本的 MLE}{66}{subsection.3.2.3}%
-\contentsline {section}{\numberline {3.3}估计量的评选标准}{66}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}无偏性}{66}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}有效性}{67}{subsection.3.3.2}%
-\contentsline {subsection}{\numberline {3.3.3}相合性（一致性）}{67}{subsection.3.3.3}%
-\contentsline {subsection}{\numberline {3.3.4}均方误差（综合评价）}{67}{subsection.3.3.4}%
-\contentsline {section}{\numberline {3.4}区间估计}{67}{section.3.4}%
-\contentsline {subsection}{\numberline {3.4.1}基本概念}{67}{subsection.3.4.1}%
-\contentsline {subsection}{\numberline {3.4.2}枢轴量法（构造置信区间的通用方法）}{68}{subsection.3.4.2}%
-\contentsline {section}{\numberline {3.5}正态总体均值与方差的区间估计}{68}{section.3.5}%
-\contentsline {subsection}{\numberline {3.5.1}单个正态总体均值的置信区间}{68}{subsection.3.5.1}%
-\contentsline {subsubsection}{$\sigma ^2$ 已知时}{68}{subsection.3.5.1}%
-\contentsline {subsubsection}{$\sigma ^2$ 未知时}{68}{equation.3.5.30}%
-\contentsline {subsection}{\numberline {3.5.2}单个正态总体方差的置信区间}{68}{subsection.3.5.2}%
-\contentsline {subsection}{\numberline {3.5.3}两个正态总体均值差的置信区间}{69}{subsection.3.5.3}%
-\contentsline {subsubsection}{$\sigma _1^2, \sigma _2^2$ 已知}{69}{subsection.3.5.3}%
-\contentsline {subsubsection}{$\sigma _1^2 = \sigma _2^2 = \sigma ^2$ 但 $\sigma ^2$ 未知}{69}{equation.3.5.33}%
-\contentsline {subsection}{\numberline {3.5.4}两个正态总体方差比的置信区间}{69}{subsection.3.5.4}%
-\contentsline {section}{\numberline {3.6}(0-1) 分布参数的区间估计}{69}{section.3.6}%
-\contentsline {section}{\numberline {3.7}单侧置信区间}{70}{section.3.7}%
-\contentsline {chapter}{\numberline {第四章\hspace {.3em}}假设检验}{71}{chapter.4}%
-\contentsline {section}{\numberline {4.1}假设检验的基本概念}{71}{section.4.1}%
-\contentsline {subsection}{\numberline {4.1.1}假设检验问题}{71}{subsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.1.2}两类错误}{71}{subsection.4.1.2}%
-\contentsline {subsection}{\numberline {4.1.3}拒绝域与检验统计量}{72}{subsection.4.1.3}%
-\contentsline {section}{\numberline {4.2}正态总体均值的假设检验}{72}{section.4.2}%
-\contentsline {subsection}{\numberline {4.2.1}单个正态总体均值的检验}{72}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}两个正态总体均值差的检验}{73}{subsection.4.2.2}%
-\contentsline {subsection}{\numberline {4.2.3}配对数据的 $t$ 检验}{73}{subsection.4.2.3}%
-\contentsline {section}{\numberline {4.3}正态总体方差的假设检验}{74}{section.4.3}%
-\contentsline {subsection}{\numberline {4.3.1}单个正态总体方差的检验 — $\chi ^2$ 检验}{74}{subsection.4.3.1}%
-\contentsline {subsection}{\numberline {4.3.2}两个正态总体方差比的检验 — $F$ 检验}{74}{subsection.4.3.2}%
-\contentsline {section}{\numberline {4.4}置信区间与假设检验之间的关系}{74}{section.4.4}%
-\contentsline {section}{\numberline {4.5}样本容量的选取}{75}{section.4.5}%
-\contentsline {subsection}{\numberline {4.5.1}$Z$ 检验的样本容量}{75}{subsection.4.5.1}%
-\contentsline {subsection}{\numberline {4.5.2}$t$ 检验的样本容量}{75}{subsection.4.5.2}%
-\contentsline {subsection}{\numberline {4.5.3}影响样本容量的因素}{76}{subsection.4.5.3}%
-\contentsline {section}{\numberline {4.6}分布拟合检验}{76}{section.4.6}%
-\contentsline {subsection}{\numberline {4.6.1}$\chi ^2$ 拟合优度检验}{76}{subsection.4.6.1}%
-\contentsline {subsection}{\numberline {4.6.2}正态性检验概述}{77}{subsection.4.6.2}%
-\contentsline {section}{\numberline {4.7}秩和检验}{77}{section.4.7}%
-\contentsline {subsection}{\numberline {4.7.1}Wilcoxon 秩和检验（两独立样本）}{77}{subsection.4.7.1}%
-\contentsline {subsection}{\numberline {4.7.2}Wilcoxon 符号秩检验（配对样本）}{79}{subsection.4.7.2}%
-\contentsline {section}{\numberline {4.8}假设检验问题的 $p$ 值检验法}{82}{section.4.8}%
-\contentsline {subsection}{\numberline {4.8.1}$p$ 值的定义}{82}{subsection.4.8.1}%
-\contentsline {subsection}{\numberline {4.8.2}$p$ 值的解释}{82}{subsection.4.8.2}%
-\contentsline {subsection}{\numberline {4.8.3}$p$ 值与置信区间的关系}{83}{subsection.4.8.3}%
-\contentsline {chapter}{\numberline {第五章\hspace {.3em}}方差分析及回归分析}{87}{chapter.5}%
-\contentsline {section}{\numberline {5.1}单因素试验的方差分析}{87}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}问题的提出}{87}{subsection.5.1.1}%
-\contentsline {subsection}{\numberline {5.1.2}平方和分解}{88}{subsection.5.1.2}%
-\contentsline {subsection}{\numberline {5.1.3}$F$ 检验}{88}{subsection.5.1.3}%
-\contentsline {subsection}{\numberline {5.1.4}多重比较}{89}{subsection.5.1.4}%
-\contentsline {section}{\numberline {5.2}双因素试验的方差分析}{90}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}无交互作用的双因素 ANOVA}{90}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5.2.2}有交互作用的双因素 ANOVA}{92}{subsection.5.2.2}%
-\contentsline {section}{\numberline {5.3}一元线性回归}{95}{section.5.3}%
-\contentsline {subsection}{\numberline {5.3.1}模型与假设}{95}{subsection.5.3.1}%
-\contentsline {subsection}{\numberline {5.3.2}最小二乘估计 (OLS)}{95}{subsection.5.3.2}%
-\contentsline {subsection}{\numberline {5.3.3}拟合优度：$R^2$}{95}{subsection.5.3.3}%
-\contentsline {subsection}{\numberline {5.3.4}回归系数的假设检验}{96}{subsection.5.3.4}%
-\contentsline {subsection}{\numberline {5.3.5}置信区间与预测区间}{96}{subsection.5.3.5}%
-\contentsline {section}{\numberline {5.4}多元线性回归}{97}{section.5.4}%
-\contentsline {subsection}{\numberline {5.4.1}模型与矩阵形式}{97}{subsection.5.4.1}%
-\contentsline {subsection}{\numberline {5.4.2}最小二乘估计}{97}{subsection.5.4.2}%
-\contentsline {subsection}{\numberline {5.4.3}显著性检验}{98}{subsection.5.4.3}%
-\contentsline {subsection}{\numberline {5.4.4}多重共线性}{98}{subsection.5.4.4}%
-\contentsline {subsection}{\numberline {5.4.5}回归诊断：假设验证}{99}{subsection.5.4.5}%
-\contentsline {subsubsection}{正态性检验：Shapiro-Wilk 检验与 Q-Q 图}{99}{subsection.5.4.5}%
-\contentsline {subsubsection}{方差齐性（Homoscedasticity）}{99}{definition.5.5}%
-\contentsline {subsubsection}{异常值与影响力点}{100}{definition.5.5}%
-\contentsline {subsection}{\numberline {5.4.6}混合效应模型简介}{100}{subsection.5.4.6}%
-\contentsline {subsection}{\numberline {5.4.7}分位数回归（Quantile Regression）}{101}{subsection.5.4.7}%
-\contentsline {subsubsection}{基本概念}{101}{subsection.5.4.7}%
-\contentsline {subsubsection}{损失函数：检查函数（Check Function）}{101}{subsection.5.4.7}%
-\contentsline {subsubsection}{模型形式}{102}{equation.5.4.68}%
-\contentsline {subsubsection}{NIPT 中的应用}{102}{equation.5.4.69}%
-\contentsline {subsection}{\numberline {5.4.8}模型选择}{102}{subsection.5.4.8}%
-\contentsline {chapter}{\numberline {第六章\hspace {.3em}}Bootstrap 方法}{105}{chapter.6}%
-\contentsline {section}{\numberline {6.1}非参数 Bootstrap 方法}{105}{section.6.1}%
-\contentsline {subsection}{\numberline {6.1.1}基本思想}{105}{subsection.6.1.1}%
-\contentsline {subsection}{\numberline {6.1.2}Bootstrap 标准误}{105}{subsection.6.1.2}%
-\contentsline {subsection}{\numberline {6.1.3}Bootstrap 置信区间}{106}{subsection.6.1.3}%
-\contentsline {subsection}{\numberline {6.1.4}为什么有放回抽样？}{106}{subsection.6.1.4}%
-\contentsline {section}{\numberline {6.2}参数 Bootstrap 方法}{107}{section.6.2}%
-\contentsline {subsection}{\numberline {6.2.1}与非参数 Bootstrap 的区别}{107}{subsection.6.2.1}%
-\contentsline {subsection}{\numberline {6.2.2}算法}{107}{subsection.6.2.2}%
-\contentsline {subsection}{\numberline {6.2.3}何时用哪种 Bootstrap？}{108}{subsection.6.2.3}%
-\contentsline {subsection}{\numberline {6.2.4}Cluster Bootstrap（聚类自助法）}{109}{subsection.6.2.4}%
-\contentsline {chapter}{\numberline {第七章\hspace {.3em}}统计实践：从建模到报告}{111}{chapter.7}%
-\contentsline {section}{\numberline {7.1}$R^2$ 与 $p$ 值的区别与联系}{111}{section.7.1}%
-\contentsline {subsection}{\numberline {7.1.1}框架对比}{111}{subsection.7.1.1}%
-\contentsline {subsection}{\numberline {7.1.2}为什么 $R^2$ 很低但 $p$ 值可以显著？}{112}{subsection.7.1.2}%
-\contentsline {subsection}{\numberline {7.1.3}用“射击靶子”理解二者}{112}{subsection.7.1.3}%
-\contentsline {subsection}{\numberline {7.1.4}四种组合判断表}{112}{subsection.7.1.4}%
-\contentsline {subsection}{\numberline {7.1.5}常见误区纠正}{113}{subsection.7.1.5}%
-\contentsline {section}{\numberline {7.2}因素分析的标准流程}{113}{section.7.2}%
-\contentsline {subsection}{\numberline {7.2.1}第 1 步：相关性扫描 —— 看方向和显著性}{113}{subsection.7.2.1}%
-\contentsline {subsection}{\numberline {7.2.2}第 2 步：建立回归模型 —— 量化效应大小}{113}{subsection.7.2.2}%
-\contentsline {subsection}{\numberline {7.2.3}第 3 步：模型诊断 —— 验证假设}{114}{subsection.7.2.3}%
-\contentsline {subsection}{\numberline {7.2.4}第 4 步：模型改进 —— 从简单到复杂}{114}{subsection.7.2.4}%
-\contentsline {subsection}{\numberline {7.2.5}第 5 步：报告与解释 —— 讲好故事}{114}{subsection.7.2.5}%
-\contentsline {subsection}{\numberline {7.2.6}完整流程图}{115}{subsection.7.2.6}%
-\contentsline {section}{\numberline {7.3}APA 学术报告规范}{115}{section.7.3}%
-\contentsline {subsection}{\numberline {7.3.1}核心原则}{115}{subsection.7.3.1}%
-\contentsline {subsection}{\numberline {7.3.2}常见统计量的 APA 报告格式}{116}{subsection.7.3.2}%
-\contentsline {subsection}{\numberline {7.3.3}$p$ 值的写法}{116}{subsection.7.3.3}%
-\contentsline {subsection}{\numberline {7.3.4}完整报告示例}{116}{subsection.7.3.4}%
-\contentsline {subsection}{\numberline {7.3.5}建模竞赛论文的 APA 使用要点}{117}{subsection.7.3.5}%
-\contentsline {section}{\numberline {7.4}方法选择速查表}{117}{section.7.4}%
-\contentsline {chapter}{\numberline {第八章\hspace {.3em}}信息论基础}{119}{chapter.8}%
-\contentsline {section}{\numberline {8.1}基本概念}{119}{section.8.1}%
-\contentsline {part}{第二部分\hspace {1em}机器学习}{121}{part.2}%
-\contentsline {chapter}{\numberline {第九章\hspace {.3em}}矩阵运算与张量记号}{123}{chapter.9}%
-\contentsline {section}{\numberline {9.1}迹运算}{123}{section.9.1}%
-\contentsline {section}{\numberline {9.2}正定与半正定矩阵}{123}{section.9.2}%
-\contentsline {section}{\numberline {9.3}矩阵求导}{124}{section.9.3}%
-\contentsline {subsection}{\numberline {9.3.1}标量对向量的导数}{124}{subsection.9.3.1}%
-\contentsline {subsection}{\numberline {9.3.2}标量对矩阵的导数}{125}{subsection.9.3.2}%
-\contentsline {subsection}{\numberline {9.3.3}向量对向量的导数（雅可比矩阵）}{125}{subsection.9.3.3}%
-\contentsline {section}{\numberline {9.4}张量分析的指标记号}{125}{section.9.4}%
-\contentsline {subsection}{\numberline {9.4.1}Einstein 求和约定}{125}{subsection.9.4.1}%
-\contentsline {subsection}{\numberline {9.4.2}Kronecker $\delta $ 符号}{126}{subsection.9.4.2}%
-\contentsline {subsection}{\numberline {9.4.3}偏导数的指标写法}{126}{subsection.9.4.3}%
-\contentsline {subsection}{\numberline {9.4.4}矩阵对标量的导数}{127}{subsection.9.4.4}%
-\contentsline {subsection}{\numberline {9.4.5}何时用矩阵记号，何时用指标记号}{127}{subsection.9.4.5}%
-\contentsline {section}{\numberline {9.5}谱分解与奇异值分解 (SVD)}{128}{section.9.5}%
-\contentsline {subsection}{\numberline {9.5.1}对称矩阵的谱分解}{128}{subsection.9.5.1}%
-\contentsline {subsection}{\numberline {9.5.2}奇异值分解（SVD）}{128}{subsection.9.5.2}%
-\contentsline {section}{\numberline {9.6}矩阵范数}{129}{section.9.6}%
-\contentsline {section}{\numberline {9.7}关键恒等式}{129}{section.9.7}%
-\contentsline {subsection}{\numberline {9.7.1}Woodbury 矩阵求逆公式}{129}{subsection.9.7.1}%
-\contentsline {subsection}{\numberline {9.7.2}矩阵求逆引理（Woodbury 的特例）}{129}{subsection.9.7.2}%
-\contentsline {subsection}{\numberline {9.7.3}期望的二次型}{130}{subsection.9.7.3}%
-\contentsline {chapter}{\numberline {第十章\hspace {.3em}}统计学习导论}{131}{chapter.10}%
-\contentsline {section}{\numberline {10.1}监督学习的数学框架}{131}{section.10.1}%
-\contentsline {subsection}{\numberline {10.1.1}基本设定}{131}{subsection.10.1.1}%
-\contentsline {subsection}{\numberline {10.1.2}损失函数}{131}{subsection.10.1.2}%
-\contentsline {subsection}{\numberline {10.1.3}期望风险与经验风险}{132}{subsection.10.1.3}%
-\contentsline {subsection}{\numberline {10.1.4}EPE 与 ERM：理想与现实的桥梁}{132}{subsection.10.1.4}%
-\contentsline {subsubsection}{EPE 是真正的目标}{133}{subsection.10.1.4}%
-\contentsline {subsubsection}{ERM 是唯一能做的}{133}{subsection.10.1.4}%
-\contentsline {subsubsection}{EPE 与 ERM 的对比}{133}{subsection.10.1.4}%
-\contentsline {subsubsection}{核心张力：泛化差距}{133}{subsection.10.1.4}%
-\contentsline {subsection}{\numberline {10.1.5}最优预测器：回归函数}{134}{subsection.10.1.5}%
-\contentsline {subsubsection}{平方损失下的推导（回归）}{134}{subsection.10.1.5}%
-\contentsline {subsubsection}{EPE 的一般形式：损失矩阵}{135}{equation.10.1.14}%
-\contentsline {subsubsection}{0--1 损失下的详细推导（0--1 作为特例验证）}{136}{equation.10.1.17}%
-\contentsline {subsubsection}{三种损失形式的统一视角}{136}{equation.10.1.21}%
-\contentsline {subsection}{\numberline {10.1.6}两种建模策略}{137}{subsection.10.1.6}%
-\contentsline {subsection}{\numberline {10.1.7}完整示例：从数据到预测}{137}{subsection.10.1.7}%
-\contentsline {subsubsection}{例 1：一元线性回归（参数方法）}{137}{subsection.10.1.7}%
-\contentsline {subsubsection}{例 2：二分类——线性回归用作分类器（ESL \S 2.4 经典示例）}{138}{equation.10.1.22}%
-\contentsline {subsubsection}{例 3：k-近邻 (k-NN) 分类——非参数方法的代表}{140}{equation.10.1.28}%
-\contentsline {subsection}{\numberline {10.1.8}理论回看：从最优预测器到实际估计器}{142}{subsection.10.1.8}%
-\contentsline {subsubsection}{线性回归的估计器（例 1 \& 例 2）}{142}{subsection.10.1.8}%
-\contentsline {subsubsection}{k-NN 的估计器（例 3）}{142}{equation.10.1.32}%
-\contentsline {subsubsection}{两种估计器的渐近行为：谁逼近了 $f^*$？}{142}{equation.10.1.33}%
-\contentsline {subsubsection}{两种策略对比}{144}{equation.10.1.33}%
-\contentsline {subsection}{\numberline {10.1.9}统计学习 vs 经典统计：两种推理框架}{144}{subsection.10.1.9}%
-\contentsline {subsubsection}{经典统计框架（推断范式）}{144}{subsection.10.1.9}%
-\contentsline {subsubsection}{统计学习框架（预测范式）}{144}{subsection.10.1.9}%
-\contentsline {subsubsection}{核心对比}{145}{subsection.10.1.9}%
-\contentsline {subsubsection}{两者并非对立}{145}{subsection.10.1.9}%
-\contentsline {section}{\numberline {10.2}无监督学习的数学框架}{145}{section.10.2}%
-\contentsline {subsection}{\numberline {10.2.1}基本设定}{145}{subsection.10.2.1}%
-\contentsline {subsection}{\numberline {10.2.2}聚类}{146}{subsection.10.2.2}%
-\contentsline {subsection}{\numberline {10.2.3}密度估计}{146}{subsection.10.2.3}%
-\contentsline {subsection}{\numberline {10.2.4}降维}{146}{subsection.10.2.4}%
-\contentsline {section}{\numberline {10.3}监督学习与无监督学习的对比}{147}{section.10.3}%
-\contentsline {section}{\numberline {10.4}维数灾难与高维空间中的局部方法}{147}{section.10.4}%
-\contentsline {subsection}{\numberline {10.4.1}单位超立方体中的邻域}{147}{subsection.10.4.1}%
-\contentsline {subsection}{\numberline {10.4.2}期望邻域边长}{148}{subsection.10.4.2}%
-\contentsline {subsection}{\numberline {10.4.3}1-NN 的偏差-方差分解（高维示例）}{148}{subsection.10.4.3}%
-\contentsline {subsection}{\numberline {10.4.4}线性模型 vs 1-NN：高维下的 EPE 对比}{149}{subsection.10.4.4}%
-\contentsline {subsection}{\numberline {10.4.5}维数灾难的形式化定义与启示}{150}{subsection.10.4.5}%
-\contentsline {section}{\numberline {10.5}统计学习的基本框架：从模型到估计}{150}{section.10.5}%
-\contentsline {subsection}{\numberline {10.5.1}加性误差模型与条件期望}{150}{subsection.10.5.1}%
-\contentsline {subsection}{\numberline {10.5.2}条件方差：为什么可以不是常数}{152}{subsection.10.5.2}%
-\contentsline {subsection}{\numberline {10.5.3}期望预测误差与最优预测器}{152}{subsection.10.5.3}%
-\contentsline {subsection}{\numberline {10.5.4}监督学习的数学表述}{153}{subsection.10.5.4}%
-\contentsline {subsection}{\numberline {10.5.5}函数逼近视角}{153}{subsection.10.5.5}%
-\contentsline {subsubsection}{线性模型}{153}{subsection.10.5.5}%
-\contentsline {subsubsection}{线性基展开}{154}{equation.10.5.52}%
-\contentsline {subsection}{\numberline {10.5.6}参数估计 I：最小二乘法}{154}{subsection.10.5.6}%
-\contentsline {subsection}{\numberline {10.5.7}参数估计 II：极大似然估计}{155}{subsection.10.5.7}%
-\contentsline {subsubsection}{条件似然}{155}{subsection.10.5.7}%
-\contentsline {subsubsection}{正态误差下的 MLE $\Leftrightarrow $ 最小二乘}{155}{equation.10.5.58}%
-\contentsline {subsubsection}{分类问题：多项似然 $\Leftrightarrow $ 交叉熵}{155}{equation.10.5.60}%
-\contentsline {subsection}{\numberline {10.5.8}参数估计 III：从 EPE 到 ERM}{156}{subsection.10.5.8}%
-\contentsline {subsubsection}{EPE vs.\ ERM}{156}{subsection.10.5.8}%
-\contentsline {subsection}{\numberline {10.5.9}无约束最小化的根本困境}{157}{subsection.10.5.9}%
-\contentsline {subsubsection}{无穷多完美解}{157}{subsection.10.5.9}%
-\contentsline {subsubsection}{出路：对解空间施加限制}{158}{subsection.10.5.9}%
-\contentsline {subsection}{\numberline {10.5.10}受限制的估计量：几类经典方法}{158}{subsection.10.5.10}%
-\contentsline {subsubsection}{粗糙惩罚与平滑样条}{158}{subsection.10.5.10}%
-\contentsline {subsubsection}{核方法与局部回归}{159}{equation.10.5.68}%
-\contentsline {subsubsection}{基函数与字典方法}{161}{equation.10.5.72}%
-\contentsline {subsection}{\numberline {10.5.11}模型选择与偏差-方差权衡}{163}{subsection.10.5.11}%
-\contentsline {subsubsection}{偏差-方差分解}{163}{subsection.10.5.11}%
-\contentsline {subsubsection}{$k$-NN 的偏差-方差分析}{166}{equation.10.5.89}%
-\contentsline {subsubsection}{训练误差 vs.\ 测试误差}{167}{equation.10.5.90}%
-\contentsline {subsubsection}{模型选择的实践方法}{168}{figure.caption.5}%
-\contentsline {subsection}{\numberline {10.5.12}总结：从模型到估计的统一框架}{168}{subsection.10.5.12}%
-\contentsline {chapter}{\numberline {第十一章\hspace {.3em}}线性回归模型与最小二乘法}{171}{chapter.11}%
-\contentsline {section}{\numberline {11.1}引言：为什么从线性模型开始}{171}{section.11.1}%
-\contentsline {section}{\numberline {11.2}线性回归模型}{171}{section.11.2}%
-\contentsline {subsection}{\numberline {11.2.1}模型形式}{171}{subsection.11.2.1}%
-\contentsline {subsection}{\numberline {11.2.2}输入的来源}{172}{subsection.11.2.2}%
-\contentsline {subsection}{\numberline {11.2.3}矩阵记号}{172}{subsection.11.2.3}%
-\contentsline {section}{\numberline {11.3}最小二乘估计}{173}{section.11.3}%
-\contentsline {subsection}{\numberline {11.3.1}残差平方和}{173}{subsection.11.3.1}%
-\contentsline {subsection}{\numberline {11.3.2}矩阵形式的解}{173}{subsection.11.3.2}%
-\contentsline {subsubsection}{方式一：矩阵微积分求导}{173}{equation.11.3.6}%
-\contentsline {subsubsection}{方式二：Einstein 求和约定 (Einstein Summation)}{175}{equation.11.3.12}%
-\contentsline {subsubsection}{两种方式的对比}{176}{equation.11.3.17}%
-\contentsline {subsection}{\numberline {11.3.3}拟合值与 Hat Matrix}{176}{subsection.11.3.3}%
-\contentsline {subsection}{\numberline {11.3.4}几何解释}{177}{subsection.11.3.4}%
-\contentsline {section}{\numberline {11.4}估计量的抽样性质}{177}{section.11.4}%
-\contentsline {subsection}{\numberline {11.4.1}一阶矩与二阶矩的假设}{177}{subsection.11.4.1}%
-\contentsline {subsubsection}{用 $\mathbf {y} = \mathbf {X}\bm {\beta } + \bm {\varepsilon }$ 理解三个假设}{178}{equation.11.4.23}%
-\contentsline {subsection}{\numberline {11.4.2}三层限制：从模型选择到无偏性的逻辑链}{180}{subsection.11.4.2}%
-\contentsline {subsubsection}{第一层：我们对 $f$ 施加了什么限制？}{180}{subsection.11.4.2}%
-\contentsline {subsubsection}{第二层：在这个限制下，$\hat {\bm {\beta }}$ 是不是``好''的？}{181}{subsection.11.4.2}%
-\contentsline {subsubsection}{第三层：$\mathbf {X}$ 固定时，期望到底是对什么取的？}{181}{subsection.11.4.2}%
-\contentsline {subsection}{\numberline {11.4.3}深入理解：固定设计与随机设计}{182}{subsection.11.4.3}%
-\contentsline {subsubsection}{固定设计 (Fixed Design)}{183}{subsection.11.4.3}%
-\contentsline {subsubsection}{随机设计 (Random Design)}{183}{subsection.11.4.3}%
-\contentsline {subsubsection}{两者关系：条件推断作为桥梁}{184}{subsection.11.4.3}%
-\contentsline {subsubsection}{三种视角的对比}{184}{subsection.11.4.3}%
-\contentsline {subsubsection}{ESL 的选择：为什么偏好固定设计视角？}{184}{subsection.11.4.3}%
-\contentsline {subsection}{\numberline {11.4.4}条件推断：实践中你真正在做的事}{185}{subsection.11.4.4}%
-\contentsline {subsubsection}{什么是条件推断？}{185}{subsection.11.4.4}%
-\contentsline {subsubsection}{为什么条件推断是默认选择？}{185}{definition.11.7}%
-\contentsline {subsubsection}{条件推断下，置信区间的正确解读}{186}{Item.188}%
-\contentsline {subsubsection}{条件推断 vs 无条件推断：什么时候有区别？}{186}{Item.188}%
-\contentsline {subsubsection}{你需要记住的三个要点}{187}{Item.192}%
-\contentsline {subsubsection}{总结图：从数据生成到推断的完整逻辑链}{187}{Item.195}%
-\contentsline {subsection}{\numberline {11.4.5}$\sigma ^2$ 的无偏估计}{189}{subsection.11.4.5}%
-\contentsline {subsection}{\numberline {11.4.6}单个系数的方差}{189}{subsection.11.4.6}%
-\contentsline {section}{\numberline {11.5}正态假设下的推断}{189}{section.11.5}%
-\contentsline {subsection}{\numberline {11.5.1}正态误差假设}{190}{subsection.11.5.1}%
-\contentsline {subsection}{\numberline {11.5.2}$\hat {\bm {\beta }}$ 的抽样分布}{190}{subsection.11.5.2}%
-\contentsline {subsection}{\numberline {11.5.3}单个系数的检验：$t$ 检验到底在检验什么？}{190}{subsection.11.5.3}%
-\contentsline {subsubsection}{原假设与备择假设}{190}{subsection.11.5.3}%
-\contentsline {subsubsection}{检验的逻辑结构}{191}{remark.11.4}%
-\contentsline {subsubsection}{等价形式：用 $t$ 值与临界值比较}{192}{Item.199}%
-\contentsline {subsubsection}{$t$ 检验与置信区间的关系}{192}{Item.199}%
-\contentsline {subsubsection}{常见误区}{192}{equation.11.5.36}%
-\contentsline {subsubsection}{追问：$t$ 检验不显著，可以直接去掉这个变量吗？}{193}{Item.204}%
-\contentsline {subsection}{\numberline {11.5.4}置信区间与显著性检验}{194}{subsection.11.5.4}%
-\contentsline {subsection}{\numberline {11.5.5}进一步可检验的假设}{195}{subsection.11.5.5}%
-\contentsline {subsection}{\numberline {11.5.6}$F$ 检验与嵌套模型比较}{195}{subsection.11.5.6}%
-\contentsline {subsubsection}{嵌套模型与 $F$ 统计量}{195}{subsection.11.5.6}%
-\contentsline {subsubsection}{特例：检验所有非截距系数}{196}{equation.11.5.38}%
-\contentsline {subsection}{\numberline {11.5.7}联合置信域}{196}{subsection.11.5.7}%
-\contentsline {section}{\numberline {11.6}高斯-马尔可夫定理}{196}{section.11.6}%
-\contentsline {subsection}{\numberline {11.6.1}定理陈述与意义}{196}{subsection.11.6.1}%
-\contentsline {subsection}{\numberline {11.6.2}MSE 分解：偏差-方差视角}{197}{subsection.11.6.2}%
-\contentsline {section}{\numberline {11.7}预测误差的分解}{197}{section.11.7}%
-\contentsline {subsection}{\numberline {11.7.1}新观测的预测}{198}{subsection.11.7.1}%
-\contentsline {subsection}{\numberline {11.7.2}期望预测误差 (Expected Prediction Error)}{198}{subsection.11.7.2}%
-\contentsline {subsection}{\numberline {11.7.3}训练误差 vs 预测误差}{198}{subsection.11.7.3}%
-\contentsline {section}{\numberline {11.8}多元回归作为单变量回归的叠加}{199}{section.11.8}%
-\contentsline {subsection}{\numberline {11.8.1}单变量回归的最小二乘}{199}{subsection.11.8.1}%
-\contentsline {subsection}{\numberline {11.8.2}有截距时的处理}{199}{subsection.11.8.2}%
-\contentsline {subsection}{\numberline {11.8.3}推广到多元：正交化 (Gram-Schmidt)}{199}{subsection.11.8.3}%
-\contentsline {subsection}{\numberline {11.8.4}直观理解}{200}{subsection.11.8.4}%
-\contentsline {subsection}{\numberline {11.8.5}QR 分解：从 Gram-Schmidt 到数值计算}{200}{subsection.11.8.5}%
-\contentsline {subsubsection}{从 Gram-Schmidt 到矩阵分解}{200}{subsection.11.8.5}%
-\contentsline {subsubsection}{标准化得到 QR 分解}{201}{equation.11.8.46}%
-\contentsline {subsubsection}{用 QR 分解求解最小二乘}{201}{equation.11.8.47}%
-\contentsline {subsubsection}{单个系数的方差}{201}{equation.11.8.48}%
-\contentsline {subsubsection}{QR vs 正规方程：数值稳定性}{202}{equation.11.8.49}%
-\contentsline {section}{\numberline {11.9}多输出回归 (Multiple Outputs)}{202}{section.11.9}%
-\contentsline {subsection}{\numberline {11.9.1}模型形式}{202}{subsection.11.9.1}%
-\contentsline {subsection}{\numberline {11.9.2}矩阵形式}{203}{subsection.11.9.2}%
-\contentsline {subsection}{\numberline {11.9.3}最小二乘估计}{203}{subsection.11.9.3}%
-\contentsline {subsection}{\numberline {11.9.4}当误差跨输出相关时}{203}{subsection.11.9.4}%
-\contentsline {section}{\numberline {11.10}实例：前列腺癌数据}{204}{section.11.10}%
-\contentsline {subsection}{\numberline {11.10.1}变量说明}{204}{subsection.11.10.1}%
-\contentsline {subsection}{\numberline {11.10.2}预测变量的相关矩阵}{205}{subsection.11.10.2}%
-\contentsline {subsection}{\numberline {11.10.3}全模型回归结果}{205}{subsection.11.10.3}%
-\contentsline {subsection}{\numberline {11.10.4}$F$ 检验：小模型 vs 大模型}{206}{subsection.11.10.4}%
-\contentsline {section}{\numberline {11.11}完整示例：手算一个线性回归}{206}{section.11.11}%
-\contentsline {subsection}{\numberline {11.11.1}数据与模型}{206}{subsection.11.11.1}%
-\contentsline {subsection}{\numberline {11.11.2}Step 1：估计 $\hat {\bm {\beta }}$}{207}{subsection.11.11.2}%
-\contentsline {subsection}{\numberline {11.11.3}Step 2：拟合值与残差}{207}{subsection.11.11.3}%
-\contentsline {subsection}{\numberline {11.11.4}Step 3：$\sigma ^2$ 的无偏估计}{208}{subsection.11.11.4}%
-\contentsline {subsection}{\numberline {11.11.5}Step 4：系数的标准误与 $t$ 检验}{208}{subsection.11.11.5}%
-\contentsline {subsection}{\numberline {11.11.6}Step 5：$F$ 检验——小模型 vs 大模型}{208}{subsection.11.11.6}%
-\contentsline {subsection}{\numberline {11.11.7}Step 6：$R^2$ 与模型解释力}{209}{subsection.11.11.7}%
-\contentsline {subsection}{\numberline {11.11.8}Step 7：95\% 置信区间}{209}{subsection.11.11.8}%
-\contentsline {subsection}{\numberline {11.11.9}Step 8：预测新观测}{210}{subsection.11.11.9}%
-\contentsline {subsection}{\numberline {11.11.10}总结：从这个例子学到了什么}{210}{subsection.11.11.10}%
-\contentsline {section}{\numberline {11.12}子集选择与系数收缩}{210}{section.11.12}%
-\contentsline {subsection}{\numberline {11.12.1}为什么要超越最小二乘？}{211}{subsection.11.12.1}%
-\contentsline {subsection}{\numberline {11.12.2}最优子集选择 (Best-Subset Selection)}{211}{subsection.11.12.2}%
-\contentsline {subsection}{\numberline {11.12.3}逐步选择 (Stepwise Selection)}{212}{subsection.11.12.3}%
-\contentsline {subsubsection}{前向逐步选择 (Forward-Stepwise)}{212}{subsection.11.12.3}%
-\contentsline {subsubsection}{后向逐步选择 (Backward-Stepwise)}{212}{Item.226}%
-\contentsline {subsubsection}{三种方法的比较}{212}{Item.229}%
-\contentsline {subsubsection}{关于基于 $F$ 检验的逐步选择}{213}{Item.229}%
-\contentsline {paragraph}{多重检验问题 (Multiple Testing)}{213}{Item.229}%
-\contentsline {paragraph}{选择后偏倚 (Post-Selection Bias)}{213}{Item.229}%
-\contentsline {paragraph}{现代实践：收缩方法优于逐步选择}{214}{Item.229}%
-\contentsline {subsubsection}{其他实践注意事项}{214}{Item.229}%
-\contentsline {subsection}{\numberline {11.12.4}前向分段回归 (Forward-Stagewise Regression)}{214}{subsection.11.12.4}%
-\contentsline {subsection}{\numberline {11.12.5}小结：子集选择的统一视角}{215}{subsection.11.12.5}%
-\contentsline {section}{\numberline {11.13}收缩方法 (Shrinkage Methods)}{216}{section.11.13}%
-\contentsline {subsection}{\numberline {11.13.1}前列腺癌实例回顾}{216}{subsection.11.13.1}%
-\contentsline {subsection}{\numberline {11.13.2}岭回归 (Ridge Regression)}{217}{subsection.11.13.2}%
-\contentsline {subsubsection}{定义与两种等价形式}{217}{subsection.11.13.2}%
-\contentsline {subsubsection}{矩阵形式与闭式解}{217}{equation.11.13.56}%
-\contentsline {subsubsection}{贝叶斯解释}{218}{equation.11.13.58}%
-\contentsline {subsection}{\numberline {11.13.3}岭回归的 SVD 视角}{218}{subsection.11.13.3}%
-\contentsline {subsubsection}{LS 的 SVD 表示}{218}{equation.11.13.59}%
-\contentsline {subsubsection}{岭回归的 SVD 表示}{218}{equation.11.13.60}%
-\contentsline {subsection}{\numberline {11.13.4}主成分与方差方向}{220}{subsection.11.13.4}%
-\contentsline {subsection}{\numberline {11.13.5}有效自由度}{220}{subsection.11.13.5}%
-\contentsline {subsection}{\numberline {11.13.6}Lasso}{220}{subsection.11.13.6}%
-\contentsline {subsubsection}{定义}{220}{subsection.11.13.6}%
-\contentsline {subsubsection}{Lasso 与岭回归的本质区别}{221}{equation.11.13.65}%
-\contentsline {subsection}{\numberline {11.13.7}正交输入情形下的统一视角}{221}{subsection.11.13.7}%
-\contentsline {subsection}{\numberline {11.13.8}几何直观：$p=2$ 时的图形比较}{223}{subsection.11.13.8}%
-\contentsline {subsubsection}{图中三种元素的含义（逐层解读）}{223}{subsection.11.13.8}%
-\contentsline {subsubsection}{为什么 Lasso 产生零系数而 Ridge 不能？}{224}{Item.238}%
-\contentsline {subsection}{\numberline {11.13.9}一般 $L_q$ 惩罚与贝叶斯统一视角}{224}{subsection.11.13.9}%
-\contentsline {subsubsection}{推导：从最大后验 (MAP) 到正则化}{225}{equation.11.13.66}%
-\contentsline {subsubsection}{为什么 $q=2$ 对应高斯，$q=1$ 对应拉普拉斯？}{225}{equation.11.13.66}%
-\contentsline {subsection}{\numberline {11.13.10}弹性网 (Elastic Net)}{226}{subsection.11.13.10}%
-\contentsline {subsection}{\numberline {11.13.11}最小角回归 (LAR)——Lasso 的高效算法}{227}{subsection.11.13.11}%
-\contentsline {subsubsection}{与前向逐步的对比}{227}{subsection.11.13.11}%
-\contentsline {subsubsection}{算法直觉}{227}{subsection.11.13.11}%
-\contentsline {subsection}{\numberline {11.13.12}小结：收缩方法谱系}{228}{subsection.11.13.12}%
-\contentsline {section}{\numberline {11.14}使用导出输入方向的方法 (Derived Input Directions)}{228}{section.11.14}%
-\contentsline {subsection}{\numberline {11.14.1}主成分回归 (PCR)}{228}{subsection.11.14.1}%
-\contentsline {subsection}{\numberline {11.14.2}偏最小二乘 (PLS)}{229}{subsection.11.14.2}%
-\contentsline {subsection}{\numberline {11.14.3}PCR 与 PLS 的优化问题}{229}{subsection.11.14.3}%
-\contentsline {subsection}{\numberline {11.14.4}深入理解 PLS：正交投影、实例与动机}{230}{subsection.11.14.4}%
-\contentsline {subsubsection}{从正交投影看 PLS}{230}{subsection.11.14.4}%
-\contentsline {subsubsection}{完整数值例子}{231}{Item.253}%
-\contentsline {subsubsection}{为什么同时考虑方差和相关性？}{233}{Item.258}%
-\contentsline {section}{\numberline {11.15}选择与收缩方法的比较 (Discussion)}{235}{section.11.15}%
-\contentsline {section}{\numberline {11.16}多输出收缩与选择}{236}{section.11.16}%
-\contentsline {subsubsection}{前文方法（子集选择、岭回归、Lasso）在多输出场景下有什么局限？}{236}{section.11.16}%
-\contentsline {subsubsection}{CCA / 降秩回归 / C+W 的前提条件是什么？}{237}{Item.265}%
-\contentsline {subsection}{\numberline {11.16.1}典型相关分析 (CCA)}{237}{subsection.11.16.1}%
-\contentsline {subsubsection}{第一步：CCA 的优化问题}{240}{Item.270}%
-\contentsline {subsubsection}{第二步：白化——消去分母}{241}{Item.270}%
-\contentsline {subsubsection}{第三步：Rayleigh 商与 SVD}{241}{Item.270}%
-\contentsline {subsubsection}{第四步：回到原始坐标}{242}{theorem.11.6}%
-\contentsline {subsubsection}{用一句话记住}{242}{theorem.11.6}%
-\contentsline {subsection}{\numberline {11.16.2}降秩回归 (Reduced-Rank Regression)}{243}{subsection.11.16.2}%
-\contentsline {subsubsection}{$\bm {\Sigma }^{-1}$ 是什么？}{243}{equation.11.16.70}%
-\contentsline {subsubsection}{「降秩」是让输入变量变少吗？}{243}{equation.11.16.70}%
-\contentsline {subsection}{\numberline {11.16.3}Curds \& Whey 收缩}{244}{subsection.11.16.3}%
-\contentsline {section}{\numberline {11.17}Lasso 深入与路径算法}{246}{section.11.17}%
-\contentsline {subsection}{\numberline {11.17.1}增量前向分段回归 (Incremental Forward Stagewise, FS)}{246}{subsection.11.17.1}%
-\contentsline {subsection}{\numberline {11.17.2}分段线性路径算法}{247}{subsection.11.17.2}%
-\contentsline {subsection}{\numberline {11.17.3}Dantzig 选择器}{247}{subsection.11.17.3}%
-\contentsline {subsection}{\numberline {11.17.4}分组 Lasso (Grouped Lasso)}{247}{subsection.11.17.4}%
-\contentsline {subsubsection}{完整例子：房价预测中的分组 Lasso}{248}{equation.11.17.72}%
-\contentsline {subsection}{\numberline {11.17.5}Lasso 的进一步性质}{249}{subsection.11.17.5}%
-\contentsline {subsection}{\numberline {11.17.6}路径坐标优化 (Pathwise Coordinate Descent)}{250}{subsection.11.17.6}%
-\contentsline {section}{\numberline {11.18}计算考量}{250}{section.11.18}%
-\contentsline {section}{\numberline {11.19}小结}{251}{section.11.19}%
-\contentsline {chapter}{\numberline {第十二章\hspace {.3em}}分类的线性方法}{257}{chapter.12}%
-\contentsline {section}{\numberline {12.1}引言}{257}{section.12.1}%
-\contentsline {subsubsection}{基本设定}{257}{section.12.1}%
-\contentsline {subsubsection}{判别函数与分类规则}{257}{section.12.1}%
-\contentsline {subsubsection}{决策边界}{257}{equation.12.1.1}%
-\contentsline {subsubsection}{线性判别函数的充要条件}{257}{equation.12.1.2}%
-\contentsline {subsubsection}{损失函数}{258}{equation.12.1.2}%
-\contentsline {subsubsection}{期望预测误差 (EPE)}{258}{equation.12.1.2}%
-\contentsline {subsubsection}{Bayes 分类器：EPE 的最优解}{258}{equation.12.1.4}%
-\contentsline {subsubsection}{框架统一}{259}{equation.12.1.4}%
-\contentsline {subsection}{\numberline {12.1.1}判别函数方法}{259}{subsection.12.1.1}%
-\contentsline {subsection}{\numberline {12.1.2}Logit 变换与 Logistic 模型}{259}{subsection.12.1.2}%
-\contentsline {subsubsection}{Logistic 回归中的 $\delta _k$ 是什么？}{259}{equation.12.1.7}%
-\contentsline {subsubsection}{$\delta _k$ 本身并非线性，但单调变换后是线性的}{260}{equation.12.1.7}%
-\contentsline {subsubsection}{$\delta _k$ 的一般取法}{260}{equation.12.1.7}%
-\contentsline {subsubsection}{「后验概率」的理解}{260}{equation.12.1.7}%
-\contentsline {subsubsection}{训练的本质：用数据估计 $\delta _k$}{261}{equation.12.1.7}%
-\contentsline {subsection}{\numberline {12.1.3}实操流程：从线性函数到分类决策}{262}{subsection.12.1.3}%
-\contentsline {subsubsection}{预测阶段（前向传播）：三段式流水线}{262}{Item.295}%
-\contentsline {subsubsection}{训练阶段：用什么损失函数？}{262}{Item.295}%
-\contentsline {subsubsection}{$\Pr (G=1\mid X=x)$ 的作用}{263}{remark.12.1}%
-\contentsline {subsubsection}{一句话总结}{263}{Item.298}%
-\contentsline {subsection}{\numberline {12.1.4}基展开：从线性到非线性}{263}{subsection.12.1.4}%
-\contentsline {subsection}{\numberline {12.1.5}本章对 $f$ 的核心限制}{263}{subsection.12.1.5}%
-\contentsline {section}{\numberline {12.2}指示矩阵的线性回归}{264}{section.12.2}%
-\contentsline {subsection}{\numberline {12.2.1}模型设定}{264}{subsection.12.2.1}%
-\contentsline {subsection}{\numberline {12.2.2}理论依据}{265}{subsection.12.2.2}%
-\contentsline {subsection}{\numberline {12.2.3}最近目标分类视角}{265}{subsection.12.2.3}%
-\contentsline {subsection}{\numberline {12.2.4}完整数值示例（$N=5,\tmspace +\thickmuskip {.2777em}K=3,\tmspace +\thickmuskip {.2777em}p=1$）}{265}{subsection.12.2.4}%
-\contentsline {subsubsection}{Step 1：构造数据}{265}{subsection.12.2.4}%
-\contentsline {subsubsection}{Step 2：构建设计矩阵 $\mathbf {X}$ 和指示矩阵 $\mathbf {Y}$}{266}{subsection.12.2.4}%
-\contentsline {subsubsection}{Step 3：计算 $\mathbf {X}^\top \mathbf {X}$ 和 $\mathbf {X}^\top \mathbf {Y}$}{266}{subsection.12.2.4}%
-\contentsline {subsubsection}{Step 4：求逆并计算系数矩阵 $\hat {\mathbf {B}}$}{266}{subsection.12.2.4}%
-\contentsline {subsubsection}{Step 5：用 $\hat {\mathbf {B}}$ 对新点分类}{266}{subsection.12.2.4}%
-\contentsline {subsubsection}{Step 6：确定决策边界}{267}{subsection.12.2.4}%
-\contentsline {subsection}{\numberline {12.2.5}Masking 问题}{267}{subsection.12.2.5}%
-\contentsline {subsection}{\numberline {12.2.6}Masking 数值演示（$N=5,\tmspace +\thickmuskip {.2777em}K=3,\tmspace +\thickmuskip {.2777em}p=1$）}{267}{subsection.12.2.6}%
-\contentsline {subsubsection}{数据构造：让中间类「被夹击」}{267}{subsection.12.2.6}%
-\contentsline {subsubsection}{Step 1--2：构造 $\mathbf {X}$ 和 $\mathbf {Y}$}{268}{subsection.12.2.6}%
-\contentsline {subsubsection}{Step 3：计算 $\mathbf {X}^\top \mathbf {X}$ 和 $\mathbf {X}^\top \mathbf {Y}$}{268}{subsection.12.2.6}%
-\contentsline {subsubsection}{Step 4：系数矩阵 $\hat {\mathbf {B}}$}{268}{subsection.12.2.6}%
-\contentsline {subsubsection}{Step 5：检验各类拟合值——谁在主导？}{269}{subsection.12.2.6}%
-\contentsline {subsubsection}{Step 6：从数学上看为什么会这样}{269}{subsection.12.2.6}%
-\contentsline {subsubsection}{与正常示例的对比}{269}{subsection.12.2.6}%
-\contentsline {subsubsection}{本质原因}{270}{subsection.12.2.6}%
-\contentsline {subsubsection}{为什么只有 1 个点时 $\hat {f}_2$ 恰好是常数？——最小二乘的视角}{270}{subsection.12.2.6}%
-\contentsline {section}{\numberline {12.3}线性判别分析 (LDA)}{271}{section.12.3}%
-\contentsline {subsection}{\numberline {12.3.1}Bayes 分类框架}{271}{subsection.12.3.1}%
-\contentsline {subsubsection}{为什么最优分类需要 $\Pr (G \mid X)$？——从损失函数到后验概率}{271}{equation.12.3.13}%
-\contentsline {subsubsection}{LDA/QDA 如何逼近 Bayes 上界}{273}{equation.12.3.19}%
-\contentsline {subsubsection}{LDA/QDA 的训练：估计什么参数？}{273}{equation.12.3.19}%
-\contentsline {subsubsection}{完整数值示例：从密度到后验到决策}{274}{equation.12.3.19}%
-\contentsline {subsection}{\numberline {12.3.2}Gaussian 假设下的 LDA}{276}{subsection.12.3.2}%
-\contentsline {subsection}{\numberline {12.3.3}线性判别函数}{276}{subsection.12.3.3}%
-\contentsline {subsection}{\numberline {12.3.4}参数估计}{276}{subsection.12.3.4}%
-\contentsline {subsection}{\numberline {12.3.5}二分类 LDA 与最小二乘的对应}{276}{subsection.12.3.5}%
-\contentsline {section}{\numberline {12.4}二次判别分析 (QDA)}{277}{section.12.4}%
-\contentsline {subsection}{\numberline {12.4.1}参数数量}{277}{subsection.12.4.1}%
-\contentsline {subsection}{\numberline {12.4.2}LDA 与 QDA 的性能讨论}{277}{subsection.12.4.2}%
-\contentsline {section}{\numberline {12.5}正则化判别分析 (RDA)}{277}{section.12.5}%
-\contentsline {subsection}{\numberline {12.5.1}模型形式}{278}{subsection.12.5.1}%
-\contentsline {section}{\numberline {12.6}LDA 的计算}{278}{section.12.6}%
-\contentsline {subsection}{\numberline {12.6.1}对角化方法}{278}{subsection.12.6.1}%
-\contentsline {subsection}{\numberline {12.6.2}LDA 的球形化实现}{278}{subsection.12.6.2}%
-\contentsline {subsubsection}{为什么要球形化？}{278}{subsection.12.6.2}%
-\contentsline {subsubsection}{球形化变换}{279}{subsection.12.6.2}%
-\contentsline {subsubsection}{变换后的协方差}{279}{equation.12.6.28}%
-\contentsline {subsubsection}{Sphering 的几何含义}{279}{equation.12.6.28}%
-\contentsline {subsubsection}{球形化后的分类规则}{279}{Item.304}%
-\contentsline {subsubsection}{两步实现总结}{280}{Item.304}%
-\contentsline {section}{\numberline {12.7}降秩线性判别分析}{280}{section.12.7}%
-\contentsline {subsection}{\numberline {12.7.1}动机：质心在低维仿射子空间中}{280}{subsection.12.7.1}%
-\contentsline {subsection}{\numberline {12.7.2}Fisher 的判别准则}{280}{subsection.12.7.2}%
-\contentsline {subsubsection}{各符号的精确含义}{281}{equation.12.7.29}%
-\contentsline {subsubsection}{为什么是比值形式？}{281}{equation.12.7.29}%
-\contentsline {subsection}{\numberline {12.7.3}LDA 子空间的计算步骤}{282}{subsection.12.7.3}%
-\contentsline {subsection}{\numberline {12.7.4}用于分类与降维}{282}{subsection.12.7.4}%
-\contentsline {subsection}{\numberline {12.7.5}Fisher 方法与 Gaussian LDA 的等价性}{282}{subsection.12.7.5}%
-\contentsline {subsection}{\numberline {12.7.6}总结}{283}{subsection.12.7.6}%
-\contentsline {section}{\numberline {12.8}几何视角：$W^{-1}$-内积空间中的 LDA 与 Fisher}{283}{section.12.8}%
-\contentsline {subsection}{\numberline {12.8.1}$W^{-1}$-内积空间}{283}{subsection.12.8.1}%
-\contentsline {subsection}{\numberline {12.8.2}标准内积 vs $W^{-1}$-内积}{284}{subsection.12.8.2}%
-\contentsline {subsection}{\numberline {12.8.3}在此框架下重新理解 LDA}{284}{subsection.12.8.3}%
-\contentsline {subsection}{\numberline {12.8.4}在此框架下重新理解 Fisher}{284}{subsection.12.8.4}%
-\contentsline {subsection}{\numberline {12.8.5}球形化的几何意义}{285}{subsection.12.8.5}%
-\contentsline {subsection}{\numberline {12.8.6}统一视角总结}{285}{subsection.12.8.6}%
-\contentsline {section}{\numberline {12.9}Logistic 回归}{285}{section.12.9}%
-\contentsline {subsection}{\numberline {12.9.1}回到判别函数与 EPE 框架}{285}{subsection.12.9.1}%
-\contentsline {subsection}{\numberline {12.9.2}模型设定}{286}{subsection.12.9.2}%
-\contentsline {subsubsection}{出发点：我们有什么，不知道什么}{286}{subsection.12.9.2}%
-\contentsline {subsubsection}{核心假设：log-odds 是线性的}{286}{subsection.12.9.2}%
-\contentsline {subsubsection}{从 log-odds 到后验概率}{286}{equation.12.9.31}%
-\contentsline {subsubsection}{训练的本质：找参数 $\beta $}{286}{equation.12.9.32}%
-\contentsline {subsection}{\numberline {12.9.3}拟合：最大似然与 IRLS}{287}{subsection.12.9.3}%
-\contentsline {subsubsection}{二分类情形}{287}{equation.12.9.33}%
-\contentsline {subsubsection}{Newton-Raphson 算法}{287}{equation.12.9.35}%
-\contentsline {subsubsection}{矩阵形式与 IRLS}{287}{equation.12.9.36}%
-\contentsline {subsection}{\numberline {12.9.4}示例：南非心脏病数据}{288}{subsection.12.9.4}%
-\contentsline {subsection}{\numberline {12.9.5}二次近似与推断}{288}{subsection.12.9.5}%
-\contentsline {subsubsection}{与加权最小二乘的联系}{288}{subsection.12.9.5}%
-\contentsline {subsubsection}{Pearson 卡方与离差}{289}{equation.12.9.38}%
-\contentsline {subsubsection}{渐近理论}{289}{equation.12.9.39}%
-\contentsline {subsubsection}{模型选择的快捷方法}{289}{equation.12.9.39}%
-\contentsline {subsubsection}{GLM 框架}{289}{equation.12.9.39}%
-\contentsline {subsubsection}{几何解释：$W$-加权内积空间}{289}{equation.12.9.39}%
-\contentsline {subsection}{\numberline {12.9.6}$L_1$ 正则化 Logistic 回归}{291}{subsection.12.9.6}%
-\contentsline {subsection}{\numberline {12.9.7}Logistic 回归还是 LDA？}{292}{subsection.12.9.7}%
-\contentsline {subsubsection}{形式上的等价}{292}{subsection.12.9.7}%
-\contentsline {subsubsection}{似然分解视角}{292}{subsection.12.9.7}%
-\contentsline {subsubsection}{效率与鲁棒性的权衡}{292}{equation.12.9.42}%
-\contentsline {subsection}{\numberline {12.9.8}LDA 和 Logistic 回归总结}{293}{subsection.12.9.8}%
-\contentsline {section}{\numberline {12.10}分离超平面}{293}{section.12.10}%
-\contentsline {subsection}{\numberline {12.10.1}超平面的线性代数}{293}{subsection.12.10.1}%
-\contentsline {subsection}{\numberline {12.10.2}Rosenblatt 感知机学习算法}{293}{subsection.12.10.2}%
-\contentsline {subsubsection}{动机：一条不断修正的线}{293}{subsection.12.10.2}%
-\contentsline {subsubsection}{目标函数}{294}{Item.317}%
-\contentsline {subsubsection}{随机梯度下降更新}{294}{equation.12.10.44}%
-\contentsline {subsubsection}{收敛性与问题}{294}{equation.12.10.45}%
-\contentsline {subsection}{\numberline {12.10.3}最优分离超平面}{295}{subsection.12.10.3}%
-\contentsline {subsubsection}{优化问题的建立}{295}{subsection.12.10.3}%
-\contentsline {subsubsection}{几何解释}{295}{equation.12.10.46}%
-\contentsline {subsubsection}{Lagrange 对偶推导}{295}{equation.12.10.46}%
-\contentsline {subsubsection}{KKT 条件与支持向量}{295}{equation.12.10.49}%
-\contentsline {subsubsection}{分类函数}{296}{equation.12.10.50}%
-\contentsline {subsubsection}{与 LDA 和 Logistic 回归的对比}{296}{equation.12.10.51}%
-\contentsline {subsubsection}{不可分情况的推广}{296}{equation.12.10.51}%
-\contentsline {section}{\numberline {12.11}本章小结}{297}{section.12.11}%
-\contentsline {chapter}{\numberline {第十三章\hspace {.3em}}基展开与正则化}{299}{chapter.13}%
-\contentsline {section}{\numberline {13.1}引言}{299}{section.13.1}%
-\contentsline {subsection}{\numberline {13.1.1}两种突破线性的思路：参数化 vs 非参数化}{299}{subsection.13.1.1}%
-\contentsline {subsection}{\numberline {13.1.2}核心思想：变换输入空间}{300}{subsection.13.1.2}%
-\contentsline {subsection}{\numberline {13.1.3}常见基函数示例}{300}{subsection.13.1.3}%
-\contentsline {subsection}{\numberline {13.1.4}复杂度的控制}{300}{subsection.13.1.4}%
-\contentsline {section}{\numberline {13.2}分段多项式与样条}{301}{section.13.2}%
-\contentsline {subsection}{\numberline {13.2.1}分段常数与分段线性}{301}{subsection.13.2.1}%
-\contentsline {subsection}{\numberline {13.2.2}截断幂基}{301}{subsection.13.2.2}%
-\contentsline {subsection}{\numberline {13.2.3}三次样条 (Cubic Spline)}{303}{subsection.13.2.3}%
-\contentsline {subsection}{\numberline {13.2.4}一般阶样条}{303}{subsection.13.2.4}%
-\contentsline {subsection}{\numberline {13.2.5}节点选择}{305}{subsection.13.2.5}%
-\contentsline {subsubsection}{R 中的实现}{305}{subsection.13.2.5}%
-\contentsline {subsubsection}{实践中节点位置怎么选？}{306}{subsection.13.2.5}%
-\contentsline {subsubsection}{分位数放置是最优的吗？}{306}{subsection.13.2.5}%
-\contentsline {subsection}{\numberline {13.2.6}自然三次样条}{307}{subsection.13.2.6}%
-\contentsline {subsubsection}{为什么边界外是线性的？}{307}{equation.13.2.4}%
-\contentsline {subsubsection}{基函数构造示例（$K=5$）}{308}{equation.13.2.4}%
-\contentsline {subsection}{\numberline {13.2.7}样条方法概览}{308}{subsection.13.2.7}%
-\contentsline {subsection}{\numberline {13.2.8}示例：南非心脏病数据（续）}{309}{subsection.13.2.8}%
-\contentsline {subsubsection}{问题设定}{309}{subsection.13.2.8}%
-\contentsline {subsubsection}{第一步：线性 Logistic 回归 → 确定谁不显著}{309}{subsection.13.2.8}%
-\contentsline {subsubsection}{第二步：改用自然样条 → 允许非线性效应}{310}{subsection.13.2.8}%
-\contentsline {subsubsection}{第三步：模型选择与最终结果}{310}{equation.13.2.5}%
-\contentsline {subsubsection}{关键发现与解释}{312}{figure.caption.11}%
-\contentsline {subsubsection}{数学推导：$\hat {f}_{\mathrm {sbp}}(x)$ 如何计算}{313}{figure.caption.11}%
-\contentsline {subsubsection}{标准误 (Standard Error) 的定义}{313}{figure.caption.11}%
-\contentsline {subsubsection}{训练与画图的时序}{314}{figure.caption.11}%
-\contentsline {subsection}{\numberline {13.2.9}示例：音素识别}{314}{subsection.13.2.9}%
-\contentsline {section}{\numberline {13.3}滤波与特征提取}{315}{section.13.3}%
-\contentsline {section}{\numberline {13.4}光滑样条}{315}{section.13.4}%
-\contentsline {subsection}{\numberline {13.4.1}惩罚残差平方和}{316}{subsection.13.4.1}%
-\contentsline {subsection}{\numberline {13.4.2}有限维解}{316}{subsection.13.4.2}%
-\contentsline {subsection}{\numberline {13.4.3}完整示例：光滑样条的符号化流程}{317}{subsection.13.4.3}%
-\contentsline {subsubsection}{给定}{317}{subsection.13.4.3}%
-\contentsline {subsubsection}{Step 1——选择光滑参数 $\lambda $（或等价地 $\mathrm {df}_\lambda $）}{317}{subsection.13.4.3}%
-\contentsline {subsubsection}{Step 2——构造自然三次样条基矩阵}{317}{subsection.13.4.3}%
-\contentsline {subsubsection}{Step 3——构造惩罚矩阵}{317}{subsection.13.4.3}%
-\contentsline {subsubsection}{Step 4——求解广义岭回归}{318}{subsection.13.4.3}%
-\contentsline {subsubsection}{Step 5——在新点 $x_0$ 处预测}{318}{subsection.13.4.3}%
-\contentsline {subsubsection}{Step 6——复杂度与 $\lambda $ 的选择}{318}{subsection.13.4.3}%
-\contentsline {subsubsection}{与回归样条的操作对比}{318}{subsection.13.4.3}%
-\contentsline {subsection}{\numberline {13.4.4}自由度与光滑矩阵}{319}{subsection.13.4.4}%
-\contentsline {subsubsection}{光滑矩阵 $\mathbf {S}_\lambda $}{319}{subsection.13.4.4}%
-\contentsline {subsubsection}{投影光滑器 vs 收缩光滑器}{319}{equation.13.4.9}%
-\contentsline {subsubsection}{光滑样条的自由度}{319}{equation.13.4.9}%
-\contentsline {subsubsection}{特征分解}{319}{equation.13.4.10}%
-\contentsline {subsubsection}{等价核——光滑样条的局部性}{320}{equation.13.4.10}%
-\contentsline {section}{\numberline {13.5}光滑参数的自动选择}{320}{section.13.5}%
-\contentsline {subsection}{\numberline {13.5.1}用有效自由度参数化}{320}{subsection.13.5.1}%
-\contentsline {subsection}{\numberline {13.5.2}偏差-方差权衡}{320}{subsection.13.5.2}%
-\contentsline {subsection}{\numberline {13.5.3}交叉验证 (CV)}{323}{subsection.13.5.3}%
-\contentsline {section}{\numberline {13.6}非参数 Logistic 回归}{323}{section.13.6}%
-\contentsline {section}{\numberline {13.7}多维样条}{324}{section.13.7}%
-\contentsline {subsection}{\numberline {13.7.1}张量积基}{324}{subsection.13.7.1}%
-\contentsline {subsection}{\numberline {13.7.2}薄板样条 (Thin-Plate Splines)}{327}{subsection.13.7.2}%
-\contentsline {subsection}{\numberline {13.7.3}加性样条与 ANOVA 分解}{327}{subsection.13.7.3}%
-\contentsline {subsection}{\numberline {13.7.4}小结：从一维到多维的选择路线}{328}{subsection.13.7.4}%
-\contentsline {section}{\numberline {13.8}正则化与再生核 Hilbert 空间 (RKHS)}{328}{section.13.8}%
-\contentsline {subsection}{\numberline {13.8.1}一般形式}{328}{subsection.13.8.1}%
-\contentsline {subsection}{\numberline {13.8.2}RKHS 与核方法}{329}{subsection.13.8.2}%
-\contentsline {subsubsection}{正定核}{329}{subsection.13.8.2}%
-\contentsline {subsubsection}{再生核 Hilbert 空间 (RKHS)}{329}{equation.13.8.16}%
-\contentsline {subsubsection}{表示定理如何导出 $\bm {\alpha }$ 的解}{330}{equation.13.8.17}%
-\contentsline {subsection}{\numberline {13.8.3}实例}{332}{subsection.13.8.3}%
-\contentsline {subsection}{\numberline {13.8.4}实践指南：何时使用核方法}{332}{subsection.13.8.4}%
-\contentsline {subsubsection}{核方法的理想适用场景}{332}{subsection.13.8.4}%
-\contentsline {subsubsection}{何时不应使用核方法}{333}{subsection.13.8.4}%
-\contentsline {subsubsection}{EDA 中值得注意的信号}{333}{subsection.13.8.4}%
-\contentsline {subsubsection}{快速决策表}{334}{Item.327}%
-\contentsline {section}{\numberline {13.9}小波光滑}{334}{section.13.9}%
-\contentsline {subsection}{\numberline {13.9.1}核心思想：时间-频率定位}{334}{subsection.13.9.1}%
-\contentsline {subsection}{\numberline {13.9.2}多分辨率分析}{334}{subsection.13.9.2}%
-\contentsline {subsection}{\numberline {13.9.3}小波变换的数学定义}{335}{subsection.13.9.3}%
-\contentsline {subsection}{\numberline {13.9.4}自适应小波阈值 (Wavelet Shrinkage)}{336}{subsection.13.9.4}%
-\contentsline {subsection}{\numberline {13.9.5}小波 vs 光滑样条（图 5.19）}{336}{subsection.13.9.5}%
-\contentsline {section}{\numberline {13.10}本章小结}{339}{section.13.10}%
-\contentsline {chapter}{\numberline {第十四章\hspace {.3em}}核光滑方法}{341}{chapter.14}%
-\contentsline {section}{\numberline {14.1}一维核光滑器}{341}{section.14.1}%
-\contentsline {subsection}{\numberline {14.1.1}从 $k$-最近邻平均到核加权平均}{341}{subsection.14.1.1}%
-\contentsline {subsection}{\numberline {14.1.2}核函数的形式}{343}{subsection.14.1.2}%
-\contentsline {subsection}{\numberline {14.1.3}三种常用核}{343}{subsection.14.1.3}%
-\contentsline {subsection}{\numberline {14.1.4}实践中的注意事项}{343}{subsection.14.1.4}%
-\contentsline {section}{\numberline {14.2}局部线性回归}{344}{section.14.2}%
-\contentsline {subsection}{\numberline {14.2.1}边界偏差问题}{344}{subsection.14.2.1}%
-\contentsline {subsection}{\numberline {14.2.2}局部加权最小二乘}{344}{subsection.14.2.2}%
-\contentsline {subsection}{\numberline {14.2.3}矩阵形式与等价核}{344}{subsection.14.2.3}%
-\contentsline {subsection}{\numberline {14.2.4}自动核木工（Automatic Kernel Carpentry）}{345}{subsection.14.2.4}%
-\contentsline {section}{\numberline {14.3}局部多项式回归}{346}{section.14.3}%
-\contentsline {subsection}{\numberline {14.3.1}$d$ 阶局部多项式拟合}{346}{subsection.14.3.1}%
-\contentsline {subsection}{\numberline {14.3.2}削峰填谷效应}{347}{subsection.14.3.2}%
-\contentsline {subsection}{\numberline {14.3.3}偏差--方差权衡}{347}{subsection.14.3.3}%
-\contentsline {subsection}{\numberline {14.3.4}奇数阶 vs 偶数阶：实践建议}{347}{subsection.14.3.4}%
-\contentsline {section}{\numberline {14.4}核宽度的选择}{348}{section.14.4}%
-\contentsline {subsection}{\numberline {14.4.1}$\lambda $ 在不同核中的含义}{348}{subsection.14.4.1}%
-\contentsline {subsection}{\numberline {14.4.2}偏差--方差权衡与窗宽}{348}{subsection.14.4.2}%
-\contentsline {subsection}{\numberline {14.4.3}线性估计量与光滑矩阵}{348}{subsection.14.4.3}%
-\contentsline {subsection}{\numberline {14.4.4}有效自由度}{349}{subsection.14.4.4}%
-\contentsline {section}{\numberline {14.5}$\mathbb {R}^p$ 中的局部回归}{349}{section.14.5}%
-\contentsline {subsection}{\numberline {14.5.1}多项式向量与径向核}{350}{subsection.14.5.1}%
-\contentsline {subsection}{\numberline {14.5.2}高维中的边界问题与维数灾难}{350}{subsection.14.5.2}%
-\contentsline {section}{\numberline {14.6}$\mathbb {R}^p$ 中的结构化局部回归模型}{351}{section.14.6}%
-\contentsline {subsection}{\numberline {14.6.1}结构化核}{351}{subsection.14.6.1}%
-\contentsline {subsection}{\numberline {14.6.2}结构化回归函数}{351}{subsection.14.6.2}%
-\contentsline {subsection}{\numberline {14.6.3}变系数模型}{352}{subsection.14.6.3}%
-\contentsline {section}{\numberline {14.7}局部似然与其他模型}{352}{section.14.7}%
-\contentsline {subsection}{\numberline {14.7.1}局部似然}{352}{subsection.14.7.1}%
-\contentsline {subsection}{\numberline {14.7.2}局部自回归时间序列}{352}{subsection.14.7.2}%
-\contentsline {subsection}{\numberline {14.7.3}局部多类 Logistic 回归}{353}{subsection.14.7.3}%
-\contentsline {section}{\numberline {14.8}核密度估计与分类}{353}{section.14.8}%
-\contentsline {subsection}{\numberline {14.8.1}核密度估计}{353}{subsection.14.8.1}%
-\contentsline {subsection}{\numberline {14.8.2}核密度分类}{354}{subsection.14.8.2}%
-\contentsline {subsection}{\numberline {14.8.3}朴素 Bayes 分类器}{354}{subsection.14.8.3}%
-\contentsline {section}{\numberline {14.9}径向基函数与核}{355}{section.14.9}%
-\contentsline {section}{\numberline {14.10}混合模型用于密度估计与分类}{356}{section.14.10}%
-\contentsline {section}{\numberline {14.11}计算考量}{356}{section.14.11}%
-\contentsline {chapter}{\numberline {第十五章\hspace {.3em}}模型评估与选择}{359}{chapter.15}%
-\contentsline {section}{\numberline {15.1}引言}{359}{section.15.1}%
-\contentsline {section}{\numberline {15.2}偏差、方差与模型复杂度}{359}{section.15.2}%
-\contentsline {subsection}{\numberline {15.2.1}定量响应情形}{359}{subsection.15.2.1}%
-\contentsline {subsubsection}{$\mathrm {Err}_{\mathcal {T}}$ 中的 $(X^0, Y^0)$ 是从测试集中抽的吗？}{359}{equation.15.2.1}%
-\contentsline {subsubsection}{如何区分不同训练集训练出的模型？}{361}{equation.15.2.2}%
-\contentsline {subsubsection}{期望预测误差和测试误差的区别}{361}{equation.15.2.2}%
-\contentsline {subsubsection}{$\overline {\mathrm {err}}$、$\mathrm {Err}_{\mathcal {T}}$、$\mathrm {Err}$ 三者的关系}{361}{equation.15.2.3}%
-\contentsline {subsection}{\numberline {15.2.2}定性响应情形}{362}{subsection.15.2.2}%
-\contentsline {subsection}{\numberline {15.2.3}模型选择 vs 模型评估}{362}{subsection.15.2.3}%
-\contentsline {section}{\numberline {15.3}偏差-方差分解}{363}{section.15.3}%
-\contentsline {subsection}{\numberline {15.3.1}$k$-最近邻回归的偏差-方差分解}{363}{subsection.15.3.1}%
-\contentsline {subsection}{\numberline {15.3.2}线性回归的偏差-方差分解}{364}{subsection.15.3.2}%
-\contentsline {subsection}{\numberline {15.3.3}岭回归的偏差分解}{364}{subsection.15.3.3}%
-\contentsline {subsection}{\numberline {15.3.4}示例：偏差-方差权衡}{364}{subsection.15.3.4}%
-\contentsline {section}{\numberline {15.4}训练误差的乐观性}{367}{section.15.4}%
-\contentsline {subsection}{\numberline {15.4.1}泛化误差、期望误差与样本内误差}{367}{subsection.15.4.1}%
-\contentsline {subsubsection}{$\mathrm {Err}_{\text {in}}$ 与 $\mathrm {Err}_{\mathcal {T}}$ 的关系}{368}{equation.15.4.17}%
-\contentsline {subsubsection}{$\mathrm {Err}_{\text {in}}$ 与最终目标 $\mathrm {Err}$ 的关系}{368}{equation.15.4.17}%
-\contentsline {subsection}{\numberline {15.4.2}乐观性及其性质}{368}{subsection.15.4.2}%
-\contentsline {subsection}{\numberline {15.4.3}线性拟合的特殊情形}{369}{subsection.15.4.3}%
-\contentsline {section}{\numberline {15.5}样本内预测误差的估计}{370}{section.15.5}%
-\contentsline {subsection}{\numberline {15.5.1}$C_p$ 统计量}{370}{subsection.15.5.1}%
-\contentsline {subsection}{\numberline {15.5.2}AIC准则}{370}{subsection.15.5.2}%
-\contentsline {subsection}{\numberline {15.5.3}AIC 的实践使用}{371}{subsection.15.5.3}%
-\contentsline {section}{\numberline {15.6}有效参数个数}{371}{section.15.6}%
-\contentsline {subsection}{\numberline {15.6.1}线性拟合方法的有效自由度}{371}{subsection.15.6.1}%
-\contentsline {subsection}{\numberline {15.6.2}神经网络的的有效参数个数}{372}{subsection.15.6.2}%
-\contentsline {section}{\numberline {15.7}贝叶斯方法与 BIC}{372}{section.15.7}%
-\contentsline {subsection}{\numberline {15.7.1}BIC 的定义}{372}{subsection.15.7.1}%
-\contentsline {subsection}{\numberline {15.7.2}BIC 的贝叶斯推导}{372}{subsection.15.7.2}%
-\contentsline {subsection}{\numberline {15.7.3}AIC 与 BIC 的比较}{373}{subsection.15.7.3}%
-\contentsline {subsubsection}{如何直观理解 $C_p$、AIC、df、BIC？}{373}{subsection.15.7.3}%
-\contentsline {section}{\numberline {15.8}最小描述长度}{374}{section.15.8}%
-\contentsline {subsection}{\numberline {15.8.1}编码与熵}{374}{subsection.15.8.1}%
-\contentsline {subsection}{\numberline {15.8.2}MDL 用于模型选择}{374}{subsection.15.8.2}%
-\contentsline {section}{\numberline {15.9}Vapnik--Chervonenkis 维}{374}{section.15.9}%
-\contentsline {subsection}{\numberline {15.9.1}打散与 VC 维定义}{374}{subsection.15.9.1}%
-\contentsline {subsection}{\numberline {15.9.2}VC 界与结构风险最小化}{375}{subsection.15.9.2}%
-\contentsline {subsection}{\numberline {15.9.3}示例：AIC、BIC、SRM 的比较}{375}{subsection.15.9.3}%
-\contentsline {section}{\numberline {15.10}交叉验证}{375}{section.15.10}%
-\contentsline {subsection}{\numberline {15.10.1}$K$ 折交叉验证}{377}{subsection.15.10.1}%
-\contentsline {subsection}{\numberline {15.10.2}$K$ 的选择：偏差-方差权衡}{378}{subsection.15.10.2}%
-\contentsline {subsection}{\numberline {15.10.3}广义交叉验证（GCV）}{378}{subsection.15.10.3}%
-\contentsline {subsection}{\numberline {15.10.4}交叉验证的正确与错误做法}{379}{subsection.15.10.4}%
-\contentsline {subsection}{\numberline {15.10.5}交叉验证真的有效吗？——高维示例}{382}{subsection.15.10.5}%
-\contentsline {section}{\numberline {15.11}自助法（Bootstrap）}{382}{section.15.11}%
-\contentsline {subsection}{\numberline {15.11.1}基本思想}{382}{subsection.15.11.1}%
-\contentsline {subsection}{\numberline {15.11.2}Bootstrap 估计预测误差}{384}{subsection.15.11.2}%
-\contentsline {subsection}{\numberline {15.11.3}示例：CV 与 Bootstrap 比较}{385}{subsection.15.11.3}%
-\contentsline {section}{\numberline {15.12}条件误差还是期望误差？}{386}{section.15.12}%
-\contentsline {section}{\numberline {15.13}本章小结}{387}{section.15.13}%
-\contentsline {subsection}{\numberline {15.13.1}核心框架}{387}{subsection.15.13.1}%
-\contentsline {subsection}{\numberline {15.13.2}方法选用指南}{388}{subsection.15.13.2}%
-\contentsline {subsection}{\numberline {15.13.3}关键结论}{388}{subsection.15.13.3}%
-\contentsline {chapter}{\numberline {第十六章\hspace {.3em}}模型推断与平均}{391}{chapter.16}%
-\contentsline {section}{\numberline {16.1}引言}{391}{section.16.1}%
-\contentsline {section}{\numberline {16.2}Bootstrap 与最大似然方法}{391}{section.16.2}%
-\contentsline {subsection}{\numberline {16.2.1}一个光滑示例}{391}{subsection.16.2.1}%
-\contentsline {subsection}{\numberline {16.2.2}非参数 Bootstrap 与参数 Bootstrap}{392}{subsection.16.2.2}%
-\contentsline {subsection}{\numberline {16.2.3}最大似然推断}{394}{subsection.16.2.3}%
-\contentsline {subsubsection}{基本定义}{394}{subsection.16.2.3}%
-\contentsline {subsubsection}{MLE 框架的完整定义体系}{394}{equation.16.2.10}%
-\contentsline {subsubsection}{Cramér-Rao 下界}{396}{figure.caption.39}%
-\contentsline {subsubsection}{正则条件与推导}{396}{Item.368}%
-\contentsline {subsubsection}{三个完整示例}{397}{equation.16.2.16}%
-\contentsline {subsubsection}{渐近正态性}{399}{equation.16.2.16}%
-\contentsline {subsubsection}{光滑示例的最大似然解}{399}{equation.16.2.19}%
-\contentsline {subsection}{\numberline {16.2.4}Bootstrap 与最大似然的比较}{399}{subsection.16.2.4}%
-\contentsline {section}{\numberline {16.3}贝叶斯方法}{400}{section.16.3}%
-\contentsline {subsection}{\numberline {16.3.1}基本框架}{400}{subsection.16.3.1}%
-\contentsline {subsection}{\numberline {16.3.2}光滑示例的贝叶斯分析}{402}{subsection.16.3.2}%
-\contentsline {subsection}{\numberline {16.3.3}Bootstrap 与贝叶斯推断的正式关系}{402}{subsection.16.3.3}%
-\contentsline {subsubsection}{四种方法的统一视角}{403}{Item.378}%
-\contentsline {subsection}{\numberline {16.3.4}Bootstrap 用法总览}{403}{subsection.16.3.4}%
-\contentsline {section}{\numberline {16.4}EM 算法}{404}{section.16.4}%
-\contentsline {subsection}{\numberline {16.4.1}两分量高斯混合模型}{404}{subsection.16.4.1}%
-\contentsline {subsection}{\numberline {16.4.2}EM 算法的一般形式}{405}{subsection.16.4.2}%
-\contentsline {section}{\numberline {16.5}MCMC：从后验抽样}{406}{section.16.5}%
-\contentsline {subsection}{\numberline {16.5.1}背景与动机：为什么需要从后验分布抽样？}{406}{subsection.16.5.1}%
-\contentsline {subsection}{\numberline {16.5.2}先验如何作用：后验是「先验 $\times $ 似然」的目标分布}{407}{subsection.16.5.2}%
-\contentsline {subsection}{\numberline {16.5.3}马尔可夫性质：如何体现？}{408}{subsection.16.5.3}%
-\contentsline {subsection}{\numberline {16.5.4}为什么联合分布最终稳定？}{409}{subsection.16.5.4}%
-\contentsline {subsection}{\numberline {16.5.5}一个具体的 Gibbs 采样例子}{409}{subsection.16.5.5}%
-\contentsline {subsection}{\numberline {16.5.6}Gibbs 采样}{410}{subsection.16.5.6}%
-\contentsline {subsubsection}{收敛性与边际密度估计}{410}{remark.16.5}%
-\contentsline {subsubsection}{高斯混合模型的 Gibbs 采样}{411}{remark.16.6}%
-\contentsline {subsubsection}{其他 MCMC 方法}{411}{remark.16.7}%
-\contentsline {subsection}{\numberline {16.5.7}MCMC 的实践：有限步收敛与诊断}{412}{subsection.16.5.7}%
-\contentsline {section}{\numberline {16.6}Bagging}{413}{section.16.6}%
-\contentsline {subsection}{\numberline {16.6.1}分类情形：投票 vs 平均概率}{413}{subsection.16.6.1}%
-\contentsline {subsection}{\numberline {16.6.2}例：树与模拟数据}{413}{subsection.16.6.2}%
-\contentsline {subsection}{\numberline {16.6.3}Bagging 为什么有效}{414}{subsection.16.6.3}%
-\contentsline {subsubsection}{0-1 损失下不成立}{415}{equation.16.6.36}%
-\contentsline {subsubsection}{Bagging 不生效的情形}{415}{remark.16.11}%
-\contentsline {section}{\numberline {16.7}模型平均与 Stacking}{416}{section.16.7}%
-\contentsline {subsection}{\numberline {16.7.1}频率学派视角}{417}{subsection.16.7.1}%
-\contentsline {subsection}{\numberline {16.7.2}Stacking}{418}{subsection.16.7.2}%
-\contentsline {subsection}{\numberline {16.7.3}小结：模型组合方法的谱系}{418}{subsection.16.7.3}%
-\contentsline {section}{\numberline {16.8}随机搜索：Bumping}{420}{section.16.8}%
-\contentsline {section}{\numberline {16.9}本章小结}{421}{section.16.9}%
-\contentsline {subsection}{\numberline {16.9.1}核心框架：两条主线}{421}{subsection.16.9.1}%
-\contentsline {subsection}{\numberline {16.9.2}方法选用指南}{422}{subsection.16.9.2}%
-\contentsline {subsection}{\numberline {16.9.3}关键结论}{422}{subsection.16.9.3}%
-\contentsline {chapter}{\numberline {第十七章\hspace {.3em}}加性模型、树及相关方法}{425}{chapter.17}%
-\contentsline {section}{\numberline {17.1}广义加性模型}{425}{section.17.1}%
-\contentsline {subsection}{\numberline {17.1.1}模型定义}{425}{subsection.17.1.1}%
-\contentsline {subsection}{\numberline {17.1.2}拟合加性模型：Backfitting}{426}{subsection.17.1.2}%
-\contentsline {subsection}{\numberline {17.1.3}例：加性 logistic 回归（spam 数据）}{430}{subsection.17.1.3}%
-\contentsline {subsection}{\numberline {17.1.4}小结}{431}{subsection.17.1.4}%
-\contentsline {section}{\numberline {17.2}基于树的方法}{432}{section.17.2}%
-\contentsline {subsection}{\numberline {17.2.1}背景}{432}{subsection.17.2.1}%
-\contentsline {subsection}{\numberline {17.2.2}回归树}{434}{subsection.17.2.2}%
-\contentsline {subsection}{\numberline {17.2.3}分类树}{436}{subsection.17.2.3}%
-\contentsline {subsection}{\numberline {17.2.4}其他问题}{437}{subsection.17.2.4}%
-\contentsline {subsection}{\numberline {17.2.5}分类性能评估统计量}{438}{subsection.17.2.5}%
-\contentsline {section}{\numberline {17.3}PRIM：Bump Hunting}{440}{section.17.3}%
-\contentsline {section}{\numberline {17.4}MARS：多元自适应回归样条}{443}{section.17.4}%
-\contentsline {section}{\numberline {17.5}专家分层混合（HME）}{446}{section.17.5}%
-\contentsline {subsubsection}{训练：回归还是分类，以及如何估计参数}{448}{equation.17.5.36}%
-\contentsline {section}{\numberline {17.6}缺失数据}{450}{section.17.6}%
-\contentsline {section}{\numberline {17.7}计算考虑}{452}{section.17.7}%
-\contentsline {section}{\numberline {17.8}本章总结：加性模型、树及相关方法}{452}{section.17.8}%
-\contentsline {subsection}{\numberline {17.8.1}核心主题}{452}{subsection.17.8.1}%
-\contentsline {subsection}{\numberline {17.8.2}五种方法的对比}{453}{subsection.17.8.2}%
-\contentsline {subsection}{\numberline {17.8.3}关键结论}{453}{subsection.17.8.3}%
-\contentsline {chapter}{\numberline {第十八章\hspace {.3em}}提升与加性树（Boosting and Additive Trees）}{455}{chapter.18}%
-\contentsline {section}{\numberline {18.1}Boosting 方法}{455}{section.18.1}%
-\contentsline {paragraph}{sgn 怎么理解？}{456}{equation.18.1.2}%
-\contentsline {subsection}{\numberline {18.1.1}本章概览}{457}{subsection.18.1.1}%
-\contentsline {section}{\numberline {18.2}Boosting 拟合加性模型}{458}{section.18.2}%
-\contentsline {paragraph}{Boosting 拟合的「加性模型」是基于 GAM 吗？}{459}{equation.18.2.7}%
-\contentsline {section}{\numberline {18.3}前向分阶段加性建模}{459}{section.18.3}%
-\contentsline {section}{\numberline {18.4}指数损失与 AdaBoost}{460}{section.18.4}%
-\contentsline {section}{\numberline {18.5}为什么用指数损失}{462}{section.18.5}%
-\contentsline {section}{\numberline {18.6}损失函数与稳健性}{462}{section.18.6}%
-\contentsline {paragraph}{二项偏差 $\log (1+e^{-2yf})$ 真的是「负二项对数似然」吗？}{463}{section.18.6}%
-\contentsline {subsection}{\numberline {18.6.1}平方误差损失不适合分类}{464}{subsection.18.6.1}%
-\contentsline {paragraph}{$\mathbb {E}(Y \mid x) = 2\Pr (Y = 1 \mid x) - 1$ 这个等号怎么成立的？}{464}{equation.18.6.20}%
-\contentsline {subsection}{\numberline {18.6.2}K 类分类的损失}{464}{subsection.18.6.2}%
-\contentsline {subsection}{\numberline {18.6.3}回归的稳健损失}{465}{subsection.18.6.3}%
-\contentsline {subsubsection}{Huber 损失}{465}{subsection.18.6.3}%
-\contentsline {paragraph}{既然 AdaBoost 是指数损失，那我能设计一个基于 Huber 的 boost 吗？}{466}{remark.18.4}%
-\contentsline {section}{\numberline {18.7}数据挖掘的「现成」程序}{467}{section.18.7}%
-\contentsline {section}{\numberline {18.8}Boosting 树}{469}{section.18.8}%
-\contentsline {paragraph}{误分类损失下 $\hat \gamma _j$ 取「众数类」是什么？}{469}{equation.18.8.27}%
-\contentsline {paragraph}{为什么式 \eqref {eq:10_28} 的提升树模型没有显式权重 $\beta _m$？}{470}{equation.18.8.29}%
-\contentsline {section}{\numberline {18.9}通过梯度提升的数值优化}{471}{section.18.9}%
-\contentsline {subsection}{\numberline {18.9.1}最速下降}{472}{subsection.18.9.1}%
-\contentsline {paragraph}{为什么要取「使损失最小」的步长 $\rho _m$？}{472}{equation.18.9.36}%
-\contentsline {subsection}{\numberline {18.9.2}梯度提升}{474}{subsection.18.9.2}%
-\contentsline {paragraph}{式 \eqref {eq:10_37} 中「谁和谁」在比较？}{474}{equation.18.9.37}%
-\contentsline {subsection}{\numberline {18.9.3}梯度提升的实现}{475}{subsection.18.9.3}%
-\contentsline {section}{\numberline {18.10}提升树的合适大小}{476}{section.18.10}%
-\contentsline {section}{\numberline {18.11}正则化}{477}{section.18.11}%
-\contentsline {subsection}{\numberline {18.11.1}收缩}{477}{subsection.18.11.1}%
-\contentsline {subsection}{\numberline {18.11.2}子采样}{477}{subsection.18.11.2}%
-\contentsline {section}{\numberline {18.12}解释}{478}{section.18.12}%
-\contentsline {subsection}{\numberline {18.12.1}预测变量的相对重要性}{478}{subsection.18.12.1}%
-\contentsline {subsection}{\numberline {18.12.2}部分依赖图}{479}{subsection.18.12.2}%
-\contentsline {subsection}{\numberline {18.12.3}解释工具的谱系：树特有 vs 模型无关}{480}{subsection.18.12.3}%
-\contentsline {section}{\numberline {18.13}示例}{481}{section.18.13}%
-\contentsline {subsection}{\numberline {18.13.1}California Housing}{481}{subsection.18.13.1}%
-\contentsline {subsection}{\numberline {18.13.2}New Zealand Fish}{482}{subsection.18.13.2}%
-\contentsline {subsection}{\numberline {18.13.3}Demographics Data}{482}{subsection.18.13.3}%
-\contentsline {section}{\numberline {18.14}本章总结}{483}{section.18.14}%
-\contentsline {subsection}{\numberline {18.14.1}核心结论}{483}{subsection.18.14.1}%
-\contentsline {chapter}{\numberline {第十九章\hspace {.3em}}Neural Networks（神经网络）}{485}{chapter.19}%
-\contentsline {section}{\numberline {19.1}引言}{485}{section.19.1}%
-\contentsline {section}{\numberline {19.2}投影寻踪回归 (Projection Pursuit Regression, PPR)}{485}{section.19.2}%
-\contentsline {paragraph}{为什么 $g_m(\omega _m^T X)$ 只在 $\omega _m$ 定义的方向上变化？$\omega _m^T X$ 是内积吗？}{485}{figure.caption.45}%
-\contentsline {paragraph}{$X_1X_2 = \frac {(X_1+X_2)^2 - (X_1-X_2)^2}{4}$ 里投影方向和 $g_m$ 是什么？}{486}{remark.19.2}%
-\contentsline {subsection}{\numberline {19.2.1}PPR 的拟合算法}{487}{subsection.19.2.1}%
-\contentsline {paragraph}{PPR 像 EM 吗？PPR 常用吗？}{488}{remark.19.5}%
-\contentsline {section}{\numberline {19.3}神经网络}{489}{section.19.3}%
-\contentsline {section}{\numberline {19.4}拟合神经网络}{490}{section.19.4}%
-\contentsline {subsection}{\numberline {19.4.1}误差函数}{490}{subsection.19.4.1}%
-\contentsline {subsection}{\numberline {19.4.2}反向传播 (Back-Propagation)}{492}{subsection.19.4.2}%
-\contentsline {paragraph}{反向传播方程的详细推导}{493}{equation.19.4.18}%
-\contentsline {paragraph}{公式意义}{494}{equation.19.4.19}%
-\contentsline {subsection}{\numberline {19.4.3}Batch 学习与在线学习}{495}{subsection.19.4.3}%
-\contentsline {section}{\numberline {19.5}训练神经网络的若干问题}{495}{section.19.5}%
-\contentsline {subsection}{\numberline {19.5.1}起始值 (Starting Values)}{495}{subsection.19.5.1}%
-\contentsline {subsection}{\numberline {19.5.2}过拟合 (Overfitting)}{495}{subsection.19.5.2}%
-\contentsline {subsection}{\numberline {19.5.3}输入的缩放 (Scaling of the Inputs)}{496}{subsection.19.5.3}%
-\contentsline {subsection}{\numberline {19.5.4}隐藏单元数与层数 (Number of Hidden Units and Layers)}{496}{subsection.19.5.4}%
-\contentsline {subsection}{\numberline {19.5.5}多重极小 (Multiple Minima)}{496}{subsection.19.5.5}%
-\contentsline {section}{\numberline {19.6}模拟数据例子 (Example: Simulated Data)}{496}{section.19.6}%
-\contentsline {paragraph}{脊函数和径向函数的定义分别是什么？}{497}{remark.19.21}%
-\contentsline {paragraph}{为什么球对称径向函数对神经网络不友好？能否通过更换 sigmoid 来提升？}{498}{remark.19.22}%
-\contentsline {section}{\numberline {19.7}ZIP 码数据例子 (Example: ZIP Code Data)}{498}{section.19.7}%
-\contentsline {section}{\numberline {19.8}讨论 (Discussion)}{500}{section.19.8}%
-\contentsline {section}{\numberline {19.9}贝叶斯神经网络与 NIPS 2003 挑战}{500}{section.19.9}%
-\contentsline {subsection}{\numberline {19.9.1}Bayes、Boosting 与 Bagging}{501}{subsection.19.9.1}%
-\contentsline {paragraph}{HMC 的严格数学定理}{501}{equation.19.9.24}%
-\contentsline {paragraph}{贝叶斯神经网络的形式化定义}{502}{remark.19.29}%
-\contentsline {paragraph}{BNN 的四步流程}{502}{definition.19.4}%
-\contentsline {paragraph}{弥散高斯先验 (diffuse Gaussian prior)}{503}{Item.497}%
-\contentsline {paragraph}{ARD 的全称与定义}{504}{Item.499}%
-\contentsline {paragraph}{筛选特征集与 ARD 缩减特征集}{505}{equation.19.9.27}%
-\contentsline {subsection}{\numberline {19.9.2}性能比较}{506}{subsection.19.9.2}%
-\contentsline {section}{\numberline {19.10}计算考虑 (Computational Considerations)}{506}{section.19.10}%
-\contentsline {section}{\numberline {19.11}本章小结}{507}{section.19.11}%
-\contentsline {subsection}{\numberline {19.11.1}核心框架}{507}{subsection.19.11.1}%
-\contentsline {subsection}{\numberline {19.11.2}要点回顾}{507}{subsection.19.11.2}%
-\contentsline {chapter}{\numberline {第二十章\hspace {.3em}}Support Vector Machines and Flexible Discriminants（支持向量机与灵活判别）}{509}{chapter.20}%
-\contentsline {section}{\numberline {20.1}引言}{509}{section.20.1}%
-\contentsline {section}{\numberline {20.2}支持向量分类器}{509}{section.20.2}%
-\contentsline {paragraph}{为什么选 (12.6) 而不是 (12.5)？}{511}{equation.20.2.6}%
-\contentsline {subsection}{\numberline {20.2.1}计算支持向量分类器}{511}{subsection.20.2.1}%
-\contentsline {subsection}{\numberline {20.2.2}混合示例（续）}{512}{subsection.20.2.2}%
-\contentsline {section}{\numberline {20.3}支持向量机与核}{513}{section.20.3}%
-\contentsline {subsection}{\numberline {20.3.1}计算用于分类的 SVM}{513}{subsection.20.3.1}%
-\contentsline {paragraph}{多项式核到底对应什么样的基展开？以二次核为例}{514}{equation.20.3.22}%
-\contentsline {subsection}{\numberline {20.3.2}SVM 作为惩罚方法}{515}{subsection.20.3.2}%
-\contentsline {subsection}{\numberline {20.3.3}函数估计与再生核 (Function Estimation and Reproducing Kernels)}{516}{subsection.20.3.3}%
-\contentsline {subsection}{\numberline {20.3.4}SVM 与维数灾难}{517}{subsection.20.3.4}%
-\contentsline {paragraph}{为什么「固定权重」是关键？}{518}{remark.20.18}%
-\contentsline {paragraph}{一个具体例子：圆柱形边界}{518}{remark.20.18}%
-\contentsline {paragraph}{与表 \ref {tab:12_2} 的印证}{518}{remark.20.18}%
-\contentsline {paragraph}{实际使用 SVM 时怎么筛选核？}{519}{remark.20.19}%
-\contentsline {subsection}{\numberline {20.3.5}SVM 分类器的路径算法}{520}{subsection.20.3.5}%
-\contentsline {subsection}{\numberline {20.3.6}支持向量机用于回归}{521}{subsection.20.3.6}%
-\contentsline {subsection}{\numberline {20.3.7}回归与核}{522}{subsection.20.3.7}%
-\contentsline {subsection}{\numberline {20.3.8}讨论}{523}{subsection.20.3.8}%
-\contentsline {section}{\numberline {20.4}推广线性判别分析 (Generalizing Linear Discriminant Analysis)}{524}{section.20.4}%
-\contentsline {section}{\numberline {20.5}灵活判别分析 (Flexible Discriminant Analysis, FDA)}{525}{section.20.5}%
-\contentsline {paragraph}{完整的 FDA 计算步骤（最优评分算法）}{526}{equation.20.5.56}%
-\contentsline {subsection}{\numberline {20.5.1}计算 FDA 估计}{528}{subsection.20.5.1}%
-\contentsline {section}{\numberline {20.6}惩罚判别分析 (Penalized Discriminant Analysis, PDA)}{530}{section.20.6}%
-\contentsline {section}{\numberline {20.7}混合判别分析 (Mixture Discriminant Analysis, MDA)}{532}{section.20.7}%
-\contentsline {paragraph}{「原型」（prototype）指什么？「不均质（inhomogeneous）」怎么定义？}{532}{section.20.7}%
-\contentsline {paragraph}{怎么知道在度量空间中是不是多簇的（类是否不均质）？}{533}{Item.516}%
-\contentsline {subsection}{\numberline {20.7.1}示例：波形数据 (Waveform Data)}{535}{subsection.20.7.1}%
-\contentsline {section}{\numberline {20.8}计算考虑}{536}{section.20.8}%
-\contentsline {section}{\numberline {20.9}本章总结}{536}{section.20.9}%
+\contentsline {part}{第一部分\hspace {1em}统计学基础}{23}{part.1}%
+\contentsline {chapter}{\numberline {第一章\hspace {.3em}}概率论回顾}{25}{chapter.1}%
+\contentsline {section}{\numberline {1.1}随机变量与分布}{25}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}离散随机变量}{25}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.1.2}连续随机变量}{25}{subsection.1.1.2}%
+\contentsline {subsection}{\numberline {1.1.3}常见分布}{25}{subsection.1.1.3}%
+\contentsline {section}{\numberline {1.2}条件概率与独立性}{26}{section.1.2}%
+\contentsline {section}{\numberline {1.3}矩与特征}{26}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Pearson 与 Spearman 相关系数}{26}{subsection.1.3.1}%
+\contentsline {chapter}{\numberline {第二章\hspace {.3em}}样本及抽样分布}{29}{chapter.2}%
+\contentsline {section}{\numberline {2.1}随机样本}{29}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}总体与样本}{29}{subsection.2.1.1}%
+\contentsline {subsubsection}{从总体到统计量：四步概念梳理}{30}{Item.8}%
+\contentsline {subsection}{\numberline {2.1.2}常用统计量}{32}{subsection.2.1.2}%
+\contentsline {subsubsection}{推导目标}{32}{equation.2.1.7}%
+\contentsline {subsubsection}{前提假设}{32}{equation.2.1.7}%
+\contentsline {subsubsection}{关键恒等式}{32}{equation.2.1.7}%
+\contentsline {subsubsection}{逐项求期望}{32}{equation.2.1.8}%
+\contentsline {subsubsection}{合并得到最终结果}{33}{equation.2.1.14}%
+\contentsline {subsubsection}{结论}{33}{equation.2.1.15}%
+\contentsline {subsubsection}{直观解释：自由度的损失}{34}{equation.2.1.18}%
+\contentsline {section}{\numberline {2.2}直方图和箱线图}{34}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}直方图}{34}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}箱线图}{35}{subsection.2.2.2}%
+\contentsline {subsubsection}{箱线图结构示意}{35}{equation.2.2.22}%
+\contentsline {subsubsection}{异常值判定规则}{35}{figure.caption.2}%
+\contentsline {subsection}{\numberline {2.2.3}经验分布函数}{36}{subsection.2.2.3}%
+\contentsline {section}{\numberline {2.3}抽样分布}{36}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}$\chi ^2$ 分布（卡方分布）}{36}{subsection.2.3.1}%
+\contentsline {subsubsection}{历史背景}{36}{subsection.2.3.1}%
+\contentsline {subsubsection}{直观理解}{36}{subsection.2.3.1}%
+\contentsline {subsubsection}{核心问题：总体不是 $\mathcal {N}(0,1)$ 时怎么用卡方？}{36}{subsection.2.3.1}%
+\contentsline {subsubsection}{典型应用场景}{38}{equation.2.3.28}%
+\contentsline {subsubsection}{拟合优度检验——完整流程与实例}{38}{Item.22}%
+\contentsline {subsubsection}{概念澄清：常见用词误区}{40}{equation.2.3.31}%
+\contentsline {subsubsection}{核心原理：为什么 $\DOTSB \sum@ \slimits@ (O_i-E_i)^2/E_i$ 服从 $\chi ^2$ 分布？}{40}{Item.27}%
+\contentsline {subsubsection}{定义与性质}{43}{equation.2.3.41}%
+\contentsline {subsection}{\numberline {2.3.2}$t$ 分布（学生氏分布）}{43}{subsection.2.3.2}%
+\contentsline {subsubsection}{历史背景——"Student" 的真实身份}{43}{subsection.2.3.2}%
+\contentsline {subsubsection}{直观理解}{44}{subsection.2.3.2}%
+\contentsline {subsubsection}{核心桥梁：$S$ 怎样与 $\chi ^2$ 挂钩——从 $t$ 定义到 $t$ 检验}{44}{equation.2.3.45}%
+\contentsline {subsubsection}{典型应用场景}{45}{Item.32}%
+\contentsline {subsubsection}{单样本 $t$ 检验——完整流程与实例}{46}{Item.37}%
+\contentsline {subsubsection}{关键前提：为什么假定 $X_i$ 服从正态分布？违背了怎么办？}{47}{equation.2.3.51}%
+\contentsline {subsubsection}{Q-Q 图详解：为什么能检查正态性？}{48}{Item.41}%
+\contentsline {subsubsection}{定义与性质}{50}{remark.2.4}%
+\contentsline {subsection}{\numberline {2.3.3}$F$ 分布}{51}{subsection.2.3.3}%
+\contentsline {subsubsection}{历史背景}{51}{subsection.2.3.3}%
+\contentsline {subsubsection}{直观理解}{51}{subsection.2.3.3}%
+\contentsline {subsubsection}{典型应用场景}{51}{equation.2.3.54}%
+\contentsline {subsubsection}{单因素 ANOVA——完整流程与实例}{52}{Item.46}%
+\contentsline {subsubsection}{定义与性质}{55}{Item.49}%
+\contentsline {subsubsection}{三大抽样分布对比总结}{55}{equation.2.3.64}%
+\contentsline {subsubsection}{常见理解误区：各分布的适用范围被窄化了}{55}{equation.2.3.64}%
+\contentsline {subsection}{\numberline {2.3.4}正态总体的抽样分布定理（核心定理）}{56}{subsection.2.3.4}%
+\contentsline {chapter}{\numberline {第三章\hspace {.3em}}参数估计}{59}{chapter.3}%
+\contentsline {section}{\numberline {3.1}点估计}{59}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}矩估计法}{59}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}极大似然估计 (MLE)}{59}{subsection.3.1.2}%
+\contentsline {subsubsection}{完整示例：正态分布 $N(\mu , \sigma ^2)$ 的 MLE}{61}{remark.3.2}%
+\contentsline {subsubsection}{概念纠正：似然函数 $L(\theta )$ 究竟是谁的"概率"？}{62}{equation.3.1.16}%
+\contentsline {subsubsection}{频率学派 vs. 贝叶斯学派：根本分歧}{63}{equation.3.1.18}%
+\contentsline {subsubsection}{深层追问：把 $\theta $ 当常数 vs. 当变量，实际差别在哪？}{65}{equation.3.1.19}%
+\contentsline {subsection}{\numberline {3.1.3}最大后验估计 (MAP)}{67}{subsection.3.1.3}%
+\contentsline {section}{\numberline {3.2}基于截尾样本的最大似然估计}{68}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}定时截尾}{68}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}定数截尾}{68}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}指数分布截尾样本的 MLE}{68}{subsection.3.2.3}%
+\contentsline {section}{\numberline {3.3}估计量的评选标准}{68}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}无偏性}{68}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}有效性}{69}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}相合性（一致性）}{69}{subsection.3.3.3}%
+\contentsline {subsection}{\numberline {3.3.4}均方误差（综合评价）}{69}{subsection.3.3.4}%
+\contentsline {section}{\numberline {3.4}区间估计}{69}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}基本概念}{69}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}枢轴量法（构造置信区间的通用方法）}{70}{subsection.3.4.2}%
+\contentsline {section}{\numberline {3.5}正态总体均值与方差的区间估计}{70}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}单个正态总体均值的置信区间}{70}{subsection.3.5.1}%
+\contentsline {subsubsection}{$\sigma ^2$ 已知时}{70}{subsection.3.5.1}%
+\contentsline {subsubsection}{$\sigma ^2$ 未知时}{70}{equation.3.5.30}%
+\contentsline {subsection}{\numberline {3.5.2}单个正态总体方差的置信区间}{70}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}两个正态总体均值差的置信区间}{71}{subsection.3.5.3}%
+\contentsline {subsubsection}{$\sigma _1^2, \sigma _2^2$ 已知}{71}{subsection.3.5.3}%
+\contentsline {subsubsection}{$\sigma _1^2 = \sigma _2^2 = \sigma ^2$ 但 $\sigma ^2$ 未知}{71}{equation.3.5.33}%
+\contentsline {subsection}{\numberline {3.5.4}两个正态总体方差比的置信区间}{71}{subsection.3.5.4}%
+\contentsline {section}{\numberline {3.6}(0-1) 分布参数的区间估计}{71}{section.3.6}%
+\contentsline {section}{\numberline {3.7}单侧置信区间}{72}{section.3.7}%
+\contentsline {chapter}{\numberline {第四章\hspace {.3em}}假设检验}{73}{chapter.4}%
+\contentsline {section}{\numberline {4.1}假设检验的基本概念}{73}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}假设检验问题}{73}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}两类错误}{73}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}拒绝域与检验统计量}{74}{subsection.4.1.3}%
+\contentsline {section}{\numberline {4.2}正态总体均值的假设检验}{74}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}单个正态总体均值的检验}{74}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}两个正态总体均值差的检验}{75}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}配对数据的 $t$ 检验}{75}{subsection.4.2.3}%
+\contentsline {section}{\numberline {4.3}正态总体方差的假设检验}{76}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}单个正态总体方差的检验 — $\chi ^2$ 检验}{76}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}两个正态总体方差比的检验 — $F$ 检验}{76}{subsection.4.3.2}%
+\contentsline {section}{\numberline {4.4}置信区间与假设检验之间的关系}{76}{section.4.4}%
+\contentsline {section}{\numberline {4.5}样本容量的选取}{77}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}$Z$ 检验的样本容量}{77}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}$t$ 检验的样本容量}{77}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}影响样本容量的因素}{78}{subsection.4.5.3}%
+\contentsline {section}{\numberline {4.6}分布拟合检验}{78}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}$\chi ^2$ 拟合优度检验}{78}{subsection.4.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}正态性检验概述}{79}{subsection.4.6.2}%
+\contentsline {section}{\numberline {4.7}秩和检验}{79}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}Wilcoxon 秩和检验（两独立样本）}{79}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}Wilcoxon 符号秩检验（配对样本）}{81}{subsection.4.7.2}%
+\contentsline {section}{\numberline {4.8}假设检验问题的 $p$ 值检验法}{84}{section.4.8}%
+\contentsline {subsection}{\numberline {4.8.1}$p$ 值的定义}{84}{subsection.4.8.1}%
+\contentsline {subsection}{\numberline {4.8.2}$p$ 值的解释}{84}{subsection.4.8.2}%
+\contentsline {subsection}{\numberline {4.8.3}$p$ 值与置信区间的关系}{85}{subsection.4.8.3}%
+\contentsline {chapter}{\numberline {第五章\hspace {.3em}}方差分析及回归分析}{89}{chapter.5}%
+\contentsline {section}{\numberline {5.1}单因素试验的方差分析}{89}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}问题的提出}{89}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}平方和分解}{90}{subsection.5.1.2}%
+\contentsline {subsection}{\numberline {5.1.3}$F$ 检验}{90}{subsection.5.1.3}%
+\contentsline {subsection}{\numberline {5.1.4}多重比较}{91}{subsection.5.1.4}%
+\contentsline {section}{\numberline {5.2}双因素试验的方差分析}{92}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}无交互作用的双因素 ANOVA}{92}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}有交互作用的双因素 ANOVA}{94}{subsection.5.2.2}%
+\contentsline {section}{\numberline {5.3}一元线性回归}{97}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}模型与假设}{97}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}最小二乘估计 (OLS)}{97}{subsection.5.3.2}%
+\contentsline {subsection}{\numberline {5.3.3}拟合优度：$R^2$}{97}{subsection.5.3.3}%
+\contentsline {subsection}{\numberline {5.3.4}回归系数的假设检验}{98}{subsection.5.3.4}%
+\contentsline {subsection}{\numberline {5.3.5}置信区间与预测区间}{98}{subsection.5.3.5}%
+\contentsline {section}{\numberline {5.4}多元线性回归}{99}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}模型与矩阵形式}{99}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}最小二乘估计}{99}{subsection.5.4.2}%
+\contentsline {subsection}{\numberline {5.4.3}显著性检验}{100}{subsection.5.4.3}%
+\contentsline {subsection}{\numberline {5.4.4}多重共线性}{100}{subsection.5.4.4}%
+\contentsline {subsection}{\numberline {5.4.5}回归诊断：假设验证}{101}{subsection.5.4.5}%
+\contentsline {subsubsection}{正态性检验：Shapiro-Wilk 检验与 Q-Q 图}{101}{subsection.5.4.5}%
+\contentsline {subsubsection}{方差齐性（Homoscedasticity）}{101}{definition.5.5}%
+\contentsline {subsubsection}{异常值与影响力点}{102}{definition.5.5}%
+\contentsline {subsection}{\numberline {5.4.6}混合效应模型简介}{102}{subsection.5.4.6}%
+\contentsline {subsection}{\numberline {5.4.7}分位数回归（Quantile Regression）}{103}{subsection.5.4.7}%
+\contentsline {subsubsection}{基本概念}{103}{subsection.5.4.7}%
+\contentsline {subsubsection}{损失函数：检查函数（Check Function）}{103}{subsection.5.4.7}%
+\contentsline {subsubsection}{模型形式}{104}{equation.5.4.68}%
+\contentsline {subsubsection}{NIPT 中的应用}{104}{equation.5.4.69}%
+\contentsline {subsection}{\numberline {5.4.8}模型选择}{104}{subsection.5.4.8}%
+\contentsline {chapter}{\numberline {第六章\hspace {.3em}}Bootstrap 方法}{107}{chapter.6}%
+\contentsline {section}{\numberline {6.1}非参数 Bootstrap 方法}{107}{section.6.1}%
+\contentsline {subsection}{\numberline {6.1.1}基本思想}{107}{subsection.6.1.1}%
+\contentsline {subsection}{\numberline {6.1.2}Bootstrap 标准误}{107}{subsection.6.1.2}%
+\contentsline {subsection}{\numberline {6.1.3}Bootstrap 置信区间}{108}{subsection.6.1.3}%
+\contentsline {subsection}{\numberline {6.1.4}为什么有放回抽样？}{108}{subsection.6.1.4}%
+\contentsline {section}{\numberline {6.2}参数 Bootstrap 方法}{109}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}与非参数 Bootstrap 的区别}{109}{subsection.6.2.1}%
+\contentsline {subsection}{\numberline {6.2.2}算法}{109}{subsection.6.2.2}%
+\contentsline {subsection}{\numberline {6.2.3}何时用哪种 Bootstrap？}{110}{subsection.6.2.3}%
+\contentsline {subsection}{\numberline {6.2.4}Cluster Bootstrap（聚类自助法）}{111}{subsection.6.2.4}%
+\contentsline {chapter}{\numberline {第七章\hspace {.3em}}统计实践：从建模到报告}{113}{chapter.7}%
+\contentsline {section}{\numberline {7.1}$R^2$ 与 $p$ 值的区别与联系}{113}{section.7.1}%
+\contentsline {subsection}{\numberline {7.1.1}框架对比}{113}{subsection.7.1.1}%
+\contentsline {subsection}{\numberline {7.1.2}为什么 $R^2$ 很低但 $p$ 值可以显著？}{114}{subsection.7.1.2}%
+\contentsline {subsection}{\numberline {7.1.3}用“射击靶子”理解二者}{114}{subsection.7.1.3}%
+\contentsline {subsection}{\numberline {7.1.4}四种组合判断表}{114}{subsection.7.1.4}%
+\contentsline {subsection}{\numberline {7.1.5}常见误区纠正}{115}{subsection.7.1.5}%
+\contentsline {section}{\numberline {7.2}因素分析的标准流程}{115}{section.7.2}%
+\contentsline {subsection}{\numberline {7.2.1}第 1 步：相关性扫描 —— 看方向和显著性}{115}{subsection.7.2.1}%
+\contentsline {subsection}{\numberline {7.2.2}第 2 步：建立回归模型 —— 量化效应大小}{115}{subsection.7.2.2}%
+\contentsline {subsection}{\numberline {7.2.3}第 3 步：模型诊断 —— 验证假设}{116}{subsection.7.2.3}%
+\contentsline {subsection}{\numberline {7.2.4}第 4 步：模型改进 —— 从简单到复杂}{116}{subsection.7.2.4}%
+\contentsline {subsection}{\numberline {7.2.5}第 5 步：报告与解释 —— 讲好故事}{116}{subsection.7.2.5}%
+\contentsline {subsection}{\numberline {7.2.6}完整流程图}{117}{subsection.7.2.6}%
+\contentsline {section}{\numberline {7.3}APA 学术报告规范}{117}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}核心原则}{117}{subsection.7.3.1}%
+\contentsline {subsection}{\numberline {7.3.2}常见统计量的 APA 报告格式}{118}{subsection.7.3.2}%
+\contentsline {subsection}{\numberline {7.3.3}$p$ 值的写法}{118}{subsection.7.3.3}%
+\contentsline {subsection}{\numberline {7.3.4}完整报告示例}{118}{subsection.7.3.4}%
+\contentsline {subsection}{\numberline {7.3.5}建模竞赛论文的 APA 使用要点}{119}{subsection.7.3.5}%
+\contentsline {section}{\numberline {7.4}方法选择速查表}{119}{section.7.4}%
+\contentsline {chapter}{\numberline {第八章\hspace {.3em}}信息论基础}{121}{chapter.8}%
+\contentsline {section}{\numberline {8.1}基本概念}{121}{section.8.1}%
+\contentsline {part}{第二部分\hspace {1em}机器学习}{123}{part.2}%
+\contentsline {chapter}{\numberline {第九章\hspace {.3em}}矩阵运算与张量记号}{125}{chapter.9}%
+\contentsline {section}{\numberline {9.1}迹运算}{125}{section.9.1}%
+\contentsline {section}{\numberline {9.2}正定与半正定矩阵}{125}{section.9.2}%
+\contentsline {section}{\numberline {9.3}矩阵求导}{126}{section.9.3}%
+\contentsline {subsection}{\numberline {9.3.1}标量对向量的导数}{126}{subsection.9.3.1}%
+\contentsline {subsection}{\numberline {9.3.2}标量对矩阵的导数}{127}{subsection.9.3.2}%
+\contentsline {subsection}{\numberline {9.3.3}向量对向量的导数（雅可比矩阵）}{127}{subsection.9.3.3}%
+\contentsline {section}{\numberline {9.4}张量分析的指标记号}{127}{section.9.4}%
+\contentsline {subsection}{\numberline {9.4.1}Einstein 求和约定}{127}{subsection.9.4.1}%
+\contentsline {subsection}{\numberline {9.4.2}Kronecker $\delta $ 符号}{128}{subsection.9.4.2}%
+\contentsline {subsection}{\numberline {9.4.3}偏导数的指标写法}{128}{subsection.9.4.3}%
+\contentsline {subsection}{\numberline {9.4.4}矩阵对标量的导数}{129}{subsection.9.4.4}%
+\contentsline {subsection}{\numberline {9.4.5}何时用矩阵记号，何时用指标记号}{129}{subsection.9.4.5}%
+\contentsline {section}{\numberline {9.5}谱分解与奇异值分解 (SVD)}{130}{section.9.5}%
+\contentsline {subsection}{\numberline {9.5.1}对称矩阵的谱分解}{130}{subsection.9.5.1}%
+\contentsline {subsection}{\numberline {9.5.2}奇异值分解（SVD）}{130}{subsection.9.5.2}%
+\contentsline {section}{\numberline {9.6}矩阵范数}{131}{section.9.6}%
+\contentsline {section}{\numberline {9.7}关键恒等式}{131}{section.9.7}%
+\contentsline {subsection}{\numberline {9.7.1}Woodbury 矩阵求逆公式}{131}{subsection.9.7.1}%
+\contentsline {subsection}{\numberline {9.7.2}矩阵求逆引理（Woodbury 的特例）}{131}{subsection.9.7.2}%
+\contentsline {subsection}{\numberline {9.7.3}期望的二次型}{132}{subsection.9.7.3}%
+\contentsline {chapter}{\numberline {第十章\hspace {.3em}}统计学习导论}{133}{chapter.10}%
+\contentsline {section}{\numberline {10.1}监督学习的数学框架}{133}{section.10.1}%
+\contentsline {subsection}{\numberline {10.1.1}基本设定}{133}{subsection.10.1.1}%
+\contentsline {subsection}{\numberline {10.1.2}损失函数}{133}{subsection.10.1.2}%
+\contentsline {subsection}{\numberline {10.1.3}期望风险与经验风险}{134}{subsection.10.1.3}%
+\contentsline {subsection}{\numberline {10.1.4}EPE 与 ERM：理想与现实的桥梁}{134}{subsection.10.1.4}%
+\contentsline {subsubsection}{EPE 是真正的目标}{135}{subsection.10.1.4}%
+\contentsline {subsubsection}{ERM 是唯一能做的}{135}{subsection.10.1.4}%
+\contentsline {subsubsection}{EPE 与 ERM 的对比}{135}{subsection.10.1.4}%
+\contentsline {subsubsection}{核心张力：泛化差距}{135}{subsection.10.1.4}%
+\contentsline {subsection}{\numberline {10.1.5}最优预测器：回归函数}{136}{subsection.10.1.5}%
+\contentsline {subsubsection}{平方损失下的推导（回归）}{136}{subsection.10.1.5}%
+\contentsline {subsubsection}{EPE 的一般形式：损失矩阵}{137}{equation.10.1.14}%
+\contentsline {subsubsection}{0--1 损失下的详细推导（0--1 作为特例验证）}{138}{equation.10.1.17}%
+\contentsline {subsubsection}{三种损失形式的统一视角}{138}{equation.10.1.21}%
+\contentsline {subsection}{\numberline {10.1.6}两种建模策略}{139}{subsection.10.1.6}%
+\contentsline {subsection}{\numberline {10.1.7}完整示例：从数据到预测}{139}{subsection.10.1.7}%
+\contentsline {subsubsection}{例 1：一元线性回归（参数方法）}{139}{subsection.10.1.7}%
+\contentsline {subsubsection}{例 2：二分类——线性回归用作分类器（ESL \S 2.4 经典示例）}{140}{equation.10.1.22}%
+\contentsline {subsubsection}{例 3：k-近邻 (k-NN) 分类——非参数方法的代表}{142}{equation.10.1.28}%
+\contentsline {subsection}{\numberline {10.1.8}理论回看：从最优预测器到实际估计器}{144}{subsection.10.1.8}%
+\contentsline {subsubsection}{线性回归的估计器（例 1 \& 例 2）}{144}{subsection.10.1.8}%
+\contentsline {subsubsection}{k-NN 的估计器（例 3）}{144}{equation.10.1.32}%
+\contentsline {subsubsection}{两种估计器的渐近行为：谁逼近了 $f^*$？}{144}{equation.10.1.33}%
+\contentsline {subsubsection}{两种策略对比}{146}{equation.10.1.33}%
+\contentsline {subsection}{\numberline {10.1.9}统计学习 vs 经典统计：两种推理框架}{146}{subsection.10.1.9}%
+\contentsline {subsubsection}{经典统计框架（推断范式）}{146}{subsection.10.1.9}%
+\contentsline {subsubsection}{统计学习框架（预测范式）}{146}{subsection.10.1.9}%
+\contentsline {subsubsection}{核心对比}{147}{subsection.10.1.9}%
+\contentsline {subsubsection}{两者并非对立}{147}{subsection.10.1.9}%
+\contentsline {section}{\numberline {10.2}无监督学习的数学框架}{147}{section.10.2}%
+\contentsline {subsection}{\numberline {10.2.1}基本设定}{147}{subsection.10.2.1}%
+\contentsline {subsection}{\numberline {10.2.2}聚类}{148}{subsection.10.2.2}%
+\contentsline {subsection}{\numberline {10.2.3}密度估计}{148}{subsection.10.2.3}%
+\contentsline {subsection}{\numberline {10.2.4}降维}{148}{subsection.10.2.4}%
+\contentsline {section}{\numberline {10.3}监督学习与无监督学习的对比}{149}{section.10.3}%
+\contentsline {section}{\numberline {10.4}维数灾难与高维空间中的局部方法}{149}{section.10.4}%
+\contentsline {subsection}{\numberline {10.4.1}单位超立方体中的邻域}{149}{subsection.10.4.1}%
+\contentsline {subsection}{\numberline {10.4.2}期望邻域边长}{150}{subsection.10.4.2}%
+\contentsline {subsection}{\numberline {10.4.3}1-NN 的偏差-方差分解（高维示例）}{150}{subsection.10.4.3}%
+\contentsline {subsection}{\numberline {10.4.4}线性模型 vs 1-NN：高维下的 EPE 对比}{151}{subsection.10.4.4}%
+\contentsline {subsection}{\numberline {10.4.5}维数灾难的形式化定义与启示}{152}{subsection.10.4.5}%
+\contentsline {section}{\numberline {10.5}统计学习的基本框架：从模型到估计}{152}{section.10.5}%
+\contentsline {subsection}{\numberline {10.5.1}加性误差模型与条件期望}{152}{subsection.10.5.1}%
+\contentsline {subsection}{\numberline {10.5.2}条件方差：为什么可以不是常数}{154}{subsection.10.5.2}%
+\contentsline {subsection}{\numberline {10.5.3}期望预测误差与最优预测器}{154}{subsection.10.5.3}%
+\contentsline {subsection}{\numberline {10.5.4}监督学习的数学表述}{155}{subsection.10.5.4}%
+\contentsline {subsection}{\numberline {10.5.5}函数逼近视角}{155}{subsection.10.5.5}%
+\contentsline {subsubsection}{线性模型}{155}{subsection.10.5.5}%
+\contentsline {subsubsection}{线性基展开}{156}{equation.10.5.52}%
+\contentsline {subsection}{\numberline {10.5.6}参数估计 I：最小二乘法}{156}{subsection.10.5.6}%
+\contentsline {subsection}{\numberline {10.5.7}参数估计 II：极大似然估计}{157}{subsection.10.5.7}%
+\contentsline {subsubsection}{条件似然}{157}{subsection.10.5.7}%
+\contentsline {subsubsection}{正态误差下的 MLE $\Leftrightarrow $ 最小二乘}{157}{equation.10.5.58}%
+\contentsline {subsubsection}{分类问题：多项似然 $\Leftrightarrow $ 交叉熵}{157}{equation.10.5.60}%
+\contentsline {subsection}{\numberline {10.5.8}参数估计 III：从 EPE 到 ERM}{158}{subsection.10.5.8}%
+\contentsline {subsubsection}{EPE vs.\ ERM}{158}{subsection.10.5.8}%
+\contentsline {subsection}{\numberline {10.5.9}无约束最小化的根本困境}{159}{subsection.10.5.9}%
+\contentsline {subsubsection}{无穷多完美解}{159}{subsection.10.5.9}%
+\contentsline {subsubsection}{出路：对解空间施加限制}{160}{subsection.10.5.9}%
+\contentsline {subsection}{\numberline {10.5.10}受限制的估计量：几类经典方法}{160}{subsection.10.5.10}%
+\contentsline {subsubsection}{粗糙惩罚与平滑样条}{160}{subsection.10.5.10}%
+\contentsline {subsubsection}{核方法与局部回归}{161}{equation.10.5.68}%
+\contentsline {subsubsection}{基函数与字典方法}{163}{equation.10.5.72}%
+\contentsline {subsection}{\numberline {10.5.11}模型选择与偏差-方差权衡}{165}{subsection.10.5.11}%
+\contentsline {subsubsection}{偏差-方差分解}{165}{subsection.10.5.11}%
+\contentsline {subsubsection}{$k$-NN 的偏差-方差分析}{168}{equation.10.5.89}%
+\contentsline {subsubsection}{训练误差 vs.\ 测试误差}{169}{equation.10.5.90}%
+\contentsline {subsubsection}{模型选择的实践方法}{170}{figure.caption.5}%
+\contentsline {subsection}{\numberline {10.5.12}总结：从模型到估计的统一框架}{170}{subsection.10.5.12}%
+\contentsline {chapter}{\numberline {第十一章\hspace {.3em}}线性回归模型与最小二乘法}{173}{chapter.11}%
+\contentsline {section}{\numberline {11.1}引言：为什么从线性模型开始}{173}{section.11.1}%
+\contentsline {section}{\numberline {11.2}线性回归模型}{173}{section.11.2}%
+\contentsline {subsection}{\numberline {11.2.1}模型形式}{173}{subsection.11.2.1}%
+\contentsline {subsection}{\numberline {11.2.2}输入的来源}{174}{subsection.11.2.2}%
+\contentsline {subsection}{\numberline {11.2.3}矩阵记号}{174}{subsection.11.2.3}%
+\contentsline {section}{\numberline {11.3}最小二乘估计}{175}{section.11.3}%
+\contentsline {subsection}{\numberline {11.3.1}残差平方和}{175}{subsection.11.3.1}%
+\contentsline {subsection}{\numberline {11.3.2}矩阵形式的解}{175}{subsection.11.3.2}%
+\contentsline {subsubsection}{方式一：矩阵微积分求导}{175}{equation.11.3.6}%
+\contentsline {subsubsection}{方式二：Einstein 求和约定 (Einstein Summation)}{177}{equation.11.3.12}%
+\contentsline {subsubsection}{两种方式的对比}{178}{equation.11.3.17}%
+\contentsline {subsection}{\numberline {11.3.3}拟合值与 Hat Matrix}{178}{subsection.11.3.3}%
+\contentsline {subsection}{\numberline {11.3.4}几何解释}{179}{subsection.11.3.4}%
+\contentsline {section}{\numberline {11.4}估计量的抽样性质}{179}{section.11.4}%
+\contentsline {subsection}{\numberline {11.4.1}一阶矩与二阶矩的假设}{179}{subsection.11.4.1}%
+\contentsline {subsubsection}{用 $\mathbf {y} = \mathbf {X}\bm {\beta } + \bm {\varepsilon }$ 理解三个假设}{180}{equation.11.4.23}%
+\contentsline {subsection}{\numberline {11.4.2}三层限制：从模型选择到无偏性的逻辑链}{182}{subsection.11.4.2}%
+\contentsline {subsubsection}{第一层：我们对 $f$ 施加了什么限制？}{182}{subsection.11.4.2}%
+\contentsline {subsubsection}{第二层：在这个限制下，$\hat {\bm {\beta }}$ 是不是``好''的？}{183}{subsection.11.4.2}%
+\contentsline {subsubsection}{第三层：$\mathbf {X}$ 固定时，期望到底是对什么取的？}{183}{subsection.11.4.2}%
+\contentsline {subsection}{\numberline {11.4.3}深入理解：固定设计与随机设计}{184}{subsection.11.4.3}%
+\contentsline {subsubsection}{固定设计 (Fixed Design)}{185}{subsection.11.4.3}%
+\contentsline {subsubsection}{随机设计 (Random Design)}{185}{subsection.11.4.3}%
+\contentsline {subsubsection}{两者关系：条件推断作为桥梁}{186}{subsection.11.4.3}%
+\contentsline {subsubsection}{三种视角的对比}{186}{subsection.11.4.3}%
+\contentsline {subsubsection}{ESL 的选择：为什么偏好固定设计视角？}{186}{subsection.11.4.3}%
+\contentsline {subsection}{\numberline {11.4.4}条件推断：实践中你真正在做的事}{187}{subsection.11.4.4}%
+\contentsline {subsubsection}{什么是条件推断？}{187}{subsection.11.4.4}%
+\contentsline {subsubsection}{为什么条件推断是默认选择？}{187}{definition.11.7}%
+\contentsline {subsubsection}{条件推断下，置信区间的正确解读}{188}{Item.188}%
+\contentsline {subsubsection}{条件推断 vs 无条件推断：什么时候有区别？}{188}{Item.188}%
+\contentsline {subsubsection}{你需要记住的三个要点}{189}{Item.192}%
+\contentsline {subsubsection}{总结图：从数据生成到推断的完整逻辑链}{189}{Item.195}%
+\contentsline {subsection}{\numberline {11.4.5}$\sigma ^2$ 的无偏估计}{191}{subsection.11.4.5}%
+\contentsline {subsection}{\numberline {11.4.6}单个系数的方差}{191}{subsection.11.4.6}%
+\contentsline {section}{\numberline {11.5}正态假设下的推断}{191}{section.11.5}%
+\contentsline {subsection}{\numberline {11.5.1}正态误差假设}{192}{subsection.11.5.1}%
+\contentsline {subsection}{\numberline {11.5.2}$\hat {\bm {\beta }}$ 的抽样分布}{192}{subsection.11.5.2}%
+\contentsline {subsection}{\numberline {11.5.3}单个系数的检验：$t$ 检验到底在检验什么？}{192}{subsection.11.5.3}%
+\contentsline {subsubsection}{原假设与备择假设}{192}{subsection.11.5.3}%
+\contentsline {subsubsection}{检验的逻辑结构}{193}{remark.11.4}%
+\contentsline {subsubsection}{等价形式：用 $t$ 值与临界值比较}{194}{Item.199}%
+\contentsline {subsubsection}{$t$ 检验与置信区间的关系}{194}{Item.199}%
+\contentsline {subsubsection}{常见误区}{194}{equation.11.5.36}%
+\contentsline {subsubsection}{追问：$t$ 检验不显著，可以直接去掉这个变量吗？}{195}{Item.204}%
+\contentsline {subsection}{\numberline {11.5.4}置信区间与显著性检验}{196}{subsection.11.5.4}%
+\contentsline {subsection}{\numberline {11.5.5}进一步可检验的假设}{197}{subsection.11.5.5}%
+\contentsline {subsection}{\numberline {11.5.6}$F$ 检验与嵌套模型比较}{197}{subsection.11.5.6}%
+\contentsline {subsubsection}{嵌套模型与 $F$ 统计量}{197}{subsection.11.5.6}%
+\contentsline {subsubsection}{特例：检验所有非截距系数}{198}{equation.11.5.38}%
+\contentsline {subsection}{\numberline {11.5.7}联合置信域}{198}{subsection.11.5.7}%
+\contentsline {section}{\numberline {11.6}高斯-马尔可夫定理}{198}{section.11.6}%
+\contentsline {subsection}{\numberline {11.6.1}定理陈述与意义}{198}{subsection.11.6.1}%
+\contentsline {subsection}{\numberline {11.6.2}MSE 分解：偏差-方差视角}{199}{subsection.11.6.2}%
+\contentsline {section}{\numberline {11.7}预测误差的分解}{199}{section.11.7}%
+\contentsline {subsection}{\numberline {11.7.1}新观测的预测}{200}{subsection.11.7.1}%
+\contentsline {subsection}{\numberline {11.7.2}期望预测误差 (Expected Prediction Error)}{200}{subsection.11.7.2}%
+\contentsline {subsection}{\numberline {11.7.3}训练误差 vs 预测误差}{200}{subsection.11.7.3}%
+\contentsline {section}{\numberline {11.8}多元回归作为单变量回归的叠加}{201}{section.11.8}%
+\contentsline {subsection}{\numberline {11.8.1}单变量回归的最小二乘}{201}{subsection.11.8.1}%
+\contentsline {subsection}{\numberline {11.8.2}有截距时的处理}{201}{subsection.11.8.2}%
+\contentsline {subsection}{\numberline {11.8.3}推广到多元：正交化 (Gram-Schmidt)}{201}{subsection.11.8.3}%
+\contentsline {subsection}{\numberline {11.8.4}直观理解}{202}{subsection.11.8.4}%
+\contentsline {subsection}{\numberline {11.8.5}QR 分解：从 Gram-Schmidt 到数值计算}{202}{subsection.11.8.5}%
+\contentsline {subsubsection}{从 Gram-Schmidt 到矩阵分解}{202}{subsection.11.8.5}%
+\contentsline {subsubsection}{标准化得到 QR 分解}{203}{equation.11.8.46}%
+\contentsline {subsubsection}{用 QR 分解求解最小二乘}{203}{equation.11.8.47}%
+\contentsline {subsubsection}{单个系数的方差}{203}{equation.11.8.48}%
+\contentsline {subsubsection}{QR vs 正规方程：数值稳定性}{204}{equation.11.8.49}%
+\contentsline {section}{\numberline {11.9}多输出回归 (Multiple Outputs)}{204}{section.11.9}%
+\contentsline {subsection}{\numberline {11.9.1}模型形式}{204}{subsection.11.9.1}%
+\contentsline {subsection}{\numberline {11.9.2}矩阵形式}{205}{subsection.11.9.2}%
+\contentsline {subsection}{\numberline {11.9.3}最小二乘估计}{205}{subsection.11.9.3}%
+\contentsline {subsection}{\numberline {11.9.4}当误差跨输出相关时}{205}{subsection.11.9.4}%
+\contentsline {section}{\numberline {11.10}实例：前列腺癌数据}{206}{section.11.10}%
+\contentsline {subsection}{\numberline {11.10.1}变量说明}{206}{subsection.11.10.1}%
+\contentsline {subsection}{\numberline {11.10.2}预测变量的相关矩阵}{207}{subsection.11.10.2}%
+\contentsline {subsection}{\numberline {11.10.3}全模型回归结果}{207}{subsection.11.10.3}%
+\contentsline {subsection}{\numberline {11.10.4}$F$ 检验：小模型 vs 大模型}{208}{subsection.11.10.4}%
+\contentsline {section}{\numberline {11.11}完整示例：手算一个线性回归}{208}{section.11.11}%
+\contentsline {subsection}{\numberline {11.11.1}数据与模型}{208}{subsection.11.11.1}%
+\contentsline {subsection}{\numberline {11.11.2}Step 1：估计 $\hat {\bm {\beta }}$}{209}{subsection.11.11.2}%
+\contentsline {subsection}{\numberline {11.11.3}Step 2：拟合值与残差}{209}{subsection.11.11.3}%
+\contentsline {subsection}{\numberline {11.11.4}Step 3：$\sigma ^2$ 的无偏估计}{210}{subsection.11.11.4}%
+\contentsline {subsection}{\numberline {11.11.5}Step 4：系数的标准误与 $t$ 检验}{210}{subsection.11.11.5}%
+\contentsline {subsection}{\numberline {11.11.6}Step 5：$F$ 检验——小模型 vs 大模型}{210}{subsection.11.11.6}%
+\contentsline {subsection}{\numberline {11.11.7}Step 6：$R^2$ 与模型解释力}{211}{subsection.11.11.7}%
+\contentsline {subsection}{\numberline {11.11.8}Step 7：95\% 置信区间}{211}{subsection.11.11.8}%
+\contentsline {subsection}{\numberline {11.11.9}Step 8：预测新观测}{212}{subsection.11.11.9}%
+\contentsline {subsection}{\numberline {11.11.10}总结：从这个例子学到了什么}{212}{subsection.11.11.10}%
+\contentsline {section}{\numberline {11.12}子集选择与系数收缩}{212}{section.11.12}%
+\contentsline {subsection}{\numberline {11.12.1}为什么要超越最小二乘？}{213}{subsection.11.12.1}%
+\contentsline {subsection}{\numberline {11.12.2}最优子集选择 (Best-Subset Selection)}{213}{subsection.11.12.2}%
+\contentsline {subsection}{\numberline {11.12.3}逐步选择 (Stepwise Selection)}{214}{subsection.11.12.3}%
+\contentsline {subsubsection}{前向逐步选择 (Forward-Stepwise)}{214}{subsection.11.12.3}%
+\contentsline {subsubsection}{后向逐步选择 (Backward-Stepwise)}{214}{Item.226}%
+\contentsline {subsubsection}{三种方法的比较}{214}{Item.229}%
+\contentsline {subsubsection}{关于基于 $F$ 检验的逐步选择}{215}{Item.229}%
+\contentsline {paragraph}{多重检验问题 (Multiple Testing)}{215}{Item.229}%
+\contentsline {paragraph}{选择后偏倚 (Post-Selection Bias)}{215}{Item.229}%
+\contentsline {paragraph}{现代实践：收缩方法优于逐步选择}{216}{Item.229}%
+\contentsline {subsubsection}{其他实践注意事项}{216}{Item.229}%
+\contentsline {subsection}{\numberline {11.12.4}前向分段回归 (Forward-Stagewise Regression)}{216}{subsection.11.12.4}%
+\contentsline {subsection}{\numberline {11.12.5}小结：子集选择的统一视角}{217}{subsection.11.12.5}%
+\contentsline {section}{\numberline {11.13}收缩方法 (Shrinkage Methods)}{218}{section.11.13}%
+\contentsline {subsection}{\numberline {11.13.1}前列腺癌实例回顾}{218}{subsection.11.13.1}%
+\contentsline {subsection}{\numberline {11.13.2}岭回归 (Ridge Regression)}{219}{subsection.11.13.2}%
+\contentsline {subsubsection}{定义与两种等价形式}{219}{subsection.11.13.2}%
+\contentsline {subsubsection}{矩阵形式与闭式解}{219}{equation.11.13.56}%
+\contentsline {subsubsection}{贝叶斯解释}{220}{equation.11.13.58}%
+\contentsline {subsection}{\numberline {11.13.3}岭回归的 SVD 视角}{220}{subsection.11.13.3}%
+\contentsline {subsubsection}{LS 的 SVD 表示}{220}{equation.11.13.59}%
+\contentsline {subsubsection}{岭回归的 SVD 表示}{220}{equation.11.13.60}%
+\contentsline {subsection}{\numberline {11.13.4}主成分与方差方向}{222}{subsection.11.13.4}%
+\contentsline {subsection}{\numberline {11.13.5}有效自由度}{222}{subsection.11.13.5}%
+\contentsline {subsection}{\numberline {11.13.6}Lasso}{222}{subsection.11.13.6}%
+\contentsline {subsubsection}{定义}{222}{subsection.11.13.6}%
+\contentsline {subsubsection}{Lasso 与岭回归的本质区别}{223}{equation.11.13.65}%
+\contentsline {subsection}{\numberline {11.13.7}正交输入情形下的统一视角}{223}{subsection.11.13.7}%
+\contentsline {subsection}{\numberline {11.13.8}几何直观：$p=2$ 时的图形比较}{225}{subsection.11.13.8}%
+\contentsline {subsubsection}{图中三种元素的含义（逐层解读）}{225}{subsection.11.13.8}%
+\contentsline {subsubsection}{为什么 Lasso 产生零系数而 Ridge 不能？}{226}{Item.238}%
+\contentsline {subsection}{\numberline {11.13.9}一般 $L_q$ 惩罚与贝叶斯统一视角}{226}{subsection.11.13.9}%
+\contentsline {subsubsection}{推导：从最大后验 (MAP) 到正则化}{227}{equation.11.13.66}%
+\contentsline {subsubsection}{为什么 $q=2$ 对应高斯，$q=1$ 对应拉普拉斯？}{227}{equation.11.13.66}%
+\contentsline {subsection}{\numberline {11.13.10}弹性网 (Elastic Net)}{228}{subsection.11.13.10}%
+\contentsline {subsection}{\numberline {11.13.11}最小角回归 (LAR)——Lasso 的高效算法}{229}{subsection.11.13.11}%
+\contentsline {subsubsection}{与前向逐步的对比}{229}{subsection.11.13.11}%
+\contentsline {subsubsection}{算法直觉}{229}{subsection.11.13.11}%
+\contentsline {subsection}{\numberline {11.13.12}小结：收缩方法谱系}{230}{subsection.11.13.12}%
+\contentsline {section}{\numberline {11.14}使用导出输入方向的方法 (Derived Input Directions)}{230}{section.11.14}%
+\contentsline {subsection}{\numberline {11.14.1}主成分回归 (PCR)}{230}{subsection.11.14.1}%
+\contentsline {subsection}{\numberline {11.14.2}偏最小二乘 (PLS)}{231}{subsection.11.14.2}%
+\contentsline {subsection}{\numberline {11.14.3}PCR 与 PLS 的优化问题}{231}{subsection.11.14.3}%
+\contentsline {subsection}{\numberline {11.14.4}深入理解 PLS：正交投影、实例与动机}{232}{subsection.11.14.4}%
+\contentsline {subsubsection}{从正交投影看 PLS}{232}{subsection.11.14.4}%
+\contentsline {subsubsection}{完整数值例子}{233}{Item.253}%
+\contentsline {subsubsection}{为什么同时考虑方差和相关性？}{235}{Item.258}%
+\contentsline {section}{\numberline {11.15}选择与收缩方法的比较 (Discussion)}{237}{section.11.15}%
+\contentsline {section}{\numberline {11.16}多输出收缩与选择}{238}{section.11.16}%
+\contentsline {subsubsection}{前文方法（子集选择、岭回归、Lasso）在多输出场景下有什么局限？}{238}{section.11.16}%
+\contentsline {subsubsection}{CCA / 降秩回归 / C+W 的前提条件是什么？}{239}{Item.265}%
+\contentsline {subsection}{\numberline {11.16.1}典型相关分析 (CCA)}{239}{subsection.11.16.1}%
+\contentsline {subsubsection}{第一步：CCA 的优化问题}{242}{Item.270}%
+\contentsline {subsubsection}{第二步：白化——消去分母}{243}{Item.270}%
+\contentsline {subsubsection}{第三步：Rayleigh 商与 SVD}{243}{Item.270}%
+\contentsline {subsubsection}{第四步：回到原始坐标}{244}{theorem.11.6}%
+\contentsline {subsubsection}{用一句话记住}{244}{theorem.11.6}%
+\contentsline {subsection}{\numberline {11.16.2}降秩回归 (Reduced-Rank Regression)}{245}{subsection.11.16.2}%
+\contentsline {subsubsection}{$\bm {\Sigma }^{-1}$ 是什么？}{245}{equation.11.16.70}%
+\contentsline {subsubsection}{「降秩」是让输入变量变少吗？}{245}{equation.11.16.70}%
+\contentsline {subsection}{\numberline {11.16.3}Curds \& Whey 收缩}{246}{subsection.11.16.3}%
+\contentsline {section}{\numberline {11.17}Lasso 深入与路径算法}{248}{section.11.17}%
+\contentsline {subsection}{\numberline {11.17.1}增量前向分段回归 (Incremental Forward Stagewise, FS)}{248}{subsection.11.17.1}%
+\contentsline {subsection}{\numberline {11.17.2}分段线性路径算法}{249}{subsection.11.17.2}%
+\contentsline {subsection}{\numberline {11.17.3}Dantzig 选择器}{249}{subsection.11.17.3}%
+\contentsline {subsection}{\numberline {11.17.4}分组 Lasso (Grouped Lasso)}{249}{subsection.11.17.4}%
+\contentsline {subsubsection}{完整例子：房价预测中的分组 Lasso}{250}{equation.11.17.72}%
+\contentsline {subsection}{\numberline {11.17.5}Lasso 的进一步性质}{251}{subsection.11.17.5}%
+\contentsline {subsection}{\numberline {11.17.6}路径坐标优化 (Pathwise Coordinate Descent)}{252}{subsection.11.17.6}%
+\contentsline {section}{\numberline {11.18}计算考量}{252}{section.11.18}%
+\contentsline {section}{\numberline {11.19}小结}{253}{section.11.19}%
+\contentsline {chapter}{\numberline {第十二章\hspace {.3em}}分类的线性方法}{259}{chapter.12}%
+\contentsline {section}{\numberline {12.1}引言}{259}{section.12.1}%
+\contentsline {subsubsection}{基本设定}{259}{section.12.1}%
+\contentsline {subsubsection}{判别函数与分类规则}{259}{section.12.1}%
+\contentsline {subsubsection}{决策边界}{259}{equation.12.1.1}%
+\contentsline {subsubsection}{线性判别函数的充要条件}{259}{equation.12.1.2}%
+\contentsline {subsubsection}{损失函数}{260}{equation.12.1.2}%
+\contentsline {subsubsection}{期望预测误差 (EPE)}{260}{equation.12.1.2}%
+\contentsline {subsubsection}{Bayes 分类器：EPE 的最优解}{260}{equation.12.1.4}%
+\contentsline {subsubsection}{框架统一}{261}{equation.12.1.4}%
+\contentsline {subsection}{\numberline {12.1.1}判别函数方法}{261}{subsection.12.1.1}%
+\contentsline {subsection}{\numberline {12.1.2}Logit 变换与 Logistic 模型}{261}{subsection.12.1.2}%
+\contentsline {subsubsection}{Logistic 回归中的 $\delta _k$ 是什么？}{261}{equation.12.1.7}%
+\contentsline {subsubsection}{$\delta _k$ 本身并非线性，但单调变换后是线性的}{262}{equation.12.1.7}%
+\contentsline {subsubsection}{$\delta _k$ 的一般取法}{262}{equation.12.1.7}%
+\contentsline {subsubsection}{「后验概率」的理解}{262}{equation.12.1.7}%
+\contentsline {subsubsection}{训练的本质：用数据估计 $\delta _k$}{263}{equation.12.1.7}%
+\contentsline {subsection}{\numberline {12.1.3}实操流程：从线性函数到分类决策}{264}{subsection.12.1.3}%
+\contentsline {subsubsection}{预测阶段（前向传播）：三段式流水线}{264}{Item.295}%
+\contentsline {subsubsection}{训练阶段：用什么损失函数？}{264}{Item.295}%
+\contentsline {subsubsection}{$\Pr (G=1\mid X=x)$ 的作用}{265}{remark.12.1}%
+\contentsline {subsubsection}{一句话总结}{265}{Item.298}%
+\contentsline {subsection}{\numberline {12.1.4}基展开：从线性到非线性}{265}{subsection.12.1.4}%
+\contentsline {subsection}{\numberline {12.1.5}本章对 $f$ 的核心限制}{265}{subsection.12.1.5}%
+\contentsline {section}{\numberline {12.2}指示矩阵的线性回归}{266}{section.12.2}%
+\contentsline {subsection}{\numberline {12.2.1}模型设定}{266}{subsection.12.2.1}%
+\contentsline {subsection}{\numberline {12.2.2}理论依据}{267}{subsection.12.2.2}%
+\contentsline {subsection}{\numberline {12.2.3}最近目标分类视角}{267}{subsection.12.2.3}%
+\contentsline {subsection}{\numberline {12.2.4}完整数值示例（$N=5,\tmspace +\thickmuskip {.2777em}K=3,\tmspace +\thickmuskip {.2777em}p=1$）}{267}{subsection.12.2.4}%
+\contentsline {subsubsection}{Step 1：构造数据}{267}{subsection.12.2.4}%
+\contentsline {subsubsection}{Step 2：构建设计矩阵 $\mathbf {X}$ 和指示矩阵 $\mathbf {Y}$}{268}{subsection.12.2.4}%
+\contentsline {subsubsection}{Step 3：计算 $\mathbf {X}^\top \mathbf {X}$ 和 $\mathbf {X}^\top \mathbf {Y}$}{268}{subsection.12.2.4}%
+\contentsline {subsubsection}{Step 4：求逆并计算系数矩阵 $\hat {\mathbf {B}}$}{268}{subsection.12.2.4}%
+\contentsline {subsubsection}{Step 5：用 $\hat {\mathbf {B}}$ 对新点分类}{268}{subsection.12.2.4}%
+\contentsline {subsubsection}{Step 6：确定决策边界}{269}{subsection.12.2.4}%
+\contentsline {subsection}{\numberline {12.2.5}Masking 问题}{269}{subsection.12.2.5}%
+\contentsline {subsection}{\numberline {12.2.6}Masking 数值演示（$N=5,\tmspace +\thickmuskip {.2777em}K=3,\tmspace +\thickmuskip {.2777em}p=1$）}{269}{subsection.12.2.6}%
+\contentsline {subsubsection}{数据构造：让中间类「被夹击」}{269}{subsection.12.2.6}%
+\contentsline {subsubsection}{Step 1--2：构造 $\mathbf {X}$ 和 $\mathbf {Y}$}{270}{subsection.12.2.6}%
+\contentsline {subsubsection}{Step 3：计算 $\mathbf {X}^\top \mathbf {X}$ 和 $\mathbf {X}^\top \mathbf {Y}$}{270}{subsection.12.2.6}%
+\contentsline {subsubsection}{Step 4：系数矩阵 $\hat {\mathbf {B}}$}{270}{subsection.12.2.6}%
+\contentsline {subsubsection}{Step 5：检验各类拟合值——谁在主导？}{271}{subsection.12.2.6}%
+\contentsline {subsubsection}{Step 6：从数学上看为什么会这样}{271}{subsection.12.2.6}%
+\contentsline {subsubsection}{与正常示例的对比}{271}{subsection.12.2.6}%
+\contentsline {subsubsection}{本质原因}{272}{subsection.12.2.6}%
+\contentsline {subsubsection}{为什么只有 1 个点时 $\hat {f}_2$ 恰好是常数？——最小二乘的视角}{272}{subsection.12.2.6}%
+\contentsline {section}{\numberline {12.3}线性判别分析 (LDA)}{273}{section.12.3}%
+\contentsline {subsection}{\numberline {12.3.1}Bayes 分类框架}{273}{subsection.12.3.1}%
+\contentsline {subsubsection}{为什么最优分类需要 $\Pr (G \mid X)$？——从损失函数到后验概率}{273}{equation.12.3.13}%
+\contentsline {subsubsection}{LDA/QDA 如何逼近 Bayes 上界}{275}{equation.12.3.19}%
+\contentsline {subsubsection}{LDA/QDA 的训练：估计什么参数？}{275}{equation.12.3.19}%
+\contentsline {subsubsection}{完整数值示例：从密度到后验到决策}{276}{equation.12.3.19}%
+\contentsline {subsection}{\numberline {12.3.2}Gaussian 假设下的 LDA}{278}{subsection.12.3.2}%
+\contentsline {subsection}{\numberline {12.3.3}线性判别函数}{278}{subsection.12.3.3}%
+\contentsline {subsection}{\numberline {12.3.4}参数估计}{278}{subsection.12.3.4}%
+\contentsline {subsection}{\numberline {12.3.5}二分类 LDA 与最小二乘的对应}{278}{subsection.12.3.5}%
+\contentsline {section}{\numberline {12.4}二次判别分析 (QDA)}{279}{section.12.4}%
+\contentsline {subsection}{\numberline {12.4.1}参数数量}{279}{subsection.12.4.1}%
+\contentsline {subsection}{\numberline {12.4.2}LDA 与 QDA 的性能讨论}{279}{subsection.12.4.2}%
+\contentsline {section}{\numberline {12.5}正则化判别分析 (RDA)}{279}{section.12.5}%
+\contentsline {subsection}{\numberline {12.5.1}模型形式}{280}{subsection.12.5.1}%
+\contentsline {section}{\numberline {12.6}LDA 的计算}{280}{section.12.6}%
+\contentsline {subsection}{\numberline {12.6.1}对角化方法}{280}{subsection.12.6.1}%
+\contentsline {subsection}{\numberline {12.6.2}LDA 的球形化实现}{280}{subsection.12.6.2}%
+\contentsline {subsubsection}{为什么要球形化？}{280}{subsection.12.6.2}%
+\contentsline {subsubsection}{球形化变换}{281}{subsection.12.6.2}%
+\contentsline {subsubsection}{变换后的协方差}{281}{equation.12.6.28}%
+\contentsline {subsubsection}{Sphering 的几何含义}{281}{equation.12.6.28}%
+\contentsline {subsubsection}{球形化后的分类规则}{281}{Item.304}%
+\contentsline {subsubsection}{两步实现总结}{282}{Item.304}%
+\contentsline {section}{\numberline {12.7}降秩线性判别分析}{282}{section.12.7}%
+\contentsline {subsection}{\numberline {12.7.1}动机：质心在低维仿射子空间中}{282}{subsection.12.7.1}%
+\contentsline {subsection}{\numberline {12.7.2}Fisher 的判别准则}{282}{subsection.12.7.2}%
+\contentsline {subsubsection}{各符号的精确含义}{283}{equation.12.7.29}%
+\contentsline {subsubsection}{为什么是比值形式？}{283}{equation.12.7.29}%
+\contentsline {subsection}{\numberline {12.7.3}LDA 子空间的计算步骤}{284}{subsection.12.7.3}%
+\contentsline {subsection}{\numberline {12.7.4}用于分类与降维}{284}{subsection.12.7.4}%
+\contentsline {subsection}{\numberline {12.7.5}Fisher 方法与 Gaussian LDA 的等价性}{284}{subsection.12.7.5}%
+\contentsline {subsection}{\numberline {12.7.6}总结}{285}{subsection.12.7.6}%
+\contentsline {section}{\numberline {12.8}几何视角：$W^{-1}$-内积空间中的 LDA 与 Fisher}{285}{section.12.8}%
+\contentsline {subsection}{\numberline {12.8.1}$W^{-1}$-内积空间}{285}{subsection.12.8.1}%
+\contentsline {subsection}{\numberline {12.8.2}标准内积 vs $W^{-1}$-内积}{286}{subsection.12.8.2}%
+\contentsline {subsection}{\numberline {12.8.3}在此框架下重新理解 LDA}{286}{subsection.12.8.3}%
+\contentsline {subsection}{\numberline {12.8.4}在此框架下重新理解 Fisher}{286}{subsection.12.8.4}%
+\contentsline {subsection}{\numberline {12.8.5}球形化的几何意义}{287}{subsection.12.8.5}%
+\contentsline {subsection}{\numberline {12.8.6}统一视角总结}{287}{subsection.12.8.6}%
+\contentsline {section}{\numberline {12.9}Logistic 回归}{287}{section.12.9}%
+\contentsline {subsection}{\numberline {12.9.1}回到判别函数与 EPE 框架}{287}{subsection.12.9.1}%
+\contentsline {subsection}{\numberline {12.9.2}模型设定}{288}{subsection.12.9.2}%
+\contentsline {subsubsection}{出发点：我们有什么，不知道什么}{288}{subsection.12.9.2}%
+\contentsline {subsubsection}{核心假设：log-odds 是线性的}{288}{subsection.12.9.2}%
+\contentsline {subsubsection}{从 log-odds 到后验概率}{288}{equation.12.9.31}%
+\contentsline {subsubsection}{训练的本质：找参数 $\beta $}{288}{equation.12.9.32}%
+\contentsline {subsection}{\numberline {12.9.3}拟合：最大似然与 IRLS}{289}{subsection.12.9.3}%
+\contentsline {subsubsection}{二分类情形}{289}{equation.12.9.33}%
+\contentsline {subsubsection}{Newton-Raphson 算法}{289}{equation.12.9.35}%
+\contentsline {subsubsection}{矩阵形式与 IRLS}{289}{equation.12.9.36}%
+\contentsline {subsection}{\numberline {12.9.4}示例：南非心脏病数据}{290}{subsection.12.9.4}%
+\contentsline {subsection}{\numberline {12.9.5}二次近似与推断}{290}{subsection.12.9.5}%
+\contentsline {subsubsection}{与加权最小二乘的联系}{290}{subsection.12.9.5}%
+\contentsline {subsubsection}{Pearson 卡方与离差}{291}{equation.12.9.38}%
+\contentsline {subsubsection}{渐近理论}{291}{equation.12.9.39}%
+\contentsline {subsubsection}{模型选择的快捷方法}{291}{equation.12.9.39}%
+\contentsline {subsubsection}{GLM 框架}{291}{equation.12.9.39}%
+\contentsline {subsubsection}{几何解释：$W$-加权内积空间}{291}{equation.12.9.39}%
+\contentsline {subsection}{\numberline {12.9.6}$L_1$ 正则化 Logistic 回归}{293}{subsection.12.9.6}%
+\contentsline {subsection}{\numberline {12.9.7}Logistic 回归还是 LDA？}{294}{subsection.12.9.7}%
+\contentsline {subsubsection}{形式上的等价}{294}{subsection.12.9.7}%
+\contentsline {subsubsection}{似然分解视角}{294}{subsection.12.9.7}%
+\contentsline {subsubsection}{效率与鲁棒性的权衡}{294}{equation.12.9.42}%
+\contentsline {subsection}{\numberline {12.9.8}LDA 和 Logistic 回归总结}{295}{subsection.12.9.8}%
+\contentsline {section}{\numberline {12.10}分离超平面}{295}{section.12.10}%
+\contentsline {subsection}{\numberline {12.10.1}超平面的线性代数}{295}{subsection.12.10.1}%
+\contentsline {subsection}{\numberline {12.10.2}Rosenblatt 感知机学习算法}{295}{subsection.12.10.2}%
+\contentsline {subsubsection}{动机：一条不断修正的线}{295}{subsection.12.10.2}%
+\contentsline {subsubsection}{目标函数}{296}{Item.317}%
+\contentsline {subsubsection}{随机梯度下降更新}{296}{equation.12.10.44}%
+\contentsline {subsubsection}{收敛性与问题}{296}{equation.12.10.45}%
+\contentsline {subsection}{\numberline {12.10.3}最优分离超平面}{297}{subsection.12.10.3}%
+\contentsline {subsubsection}{优化问题的建立}{297}{subsection.12.10.3}%
+\contentsline {subsubsection}{几何解释}{297}{equation.12.10.46}%
+\contentsline {subsubsection}{Lagrange 对偶推导}{297}{equation.12.10.46}%
+\contentsline {subsubsection}{KKT 条件与支持向量}{297}{equation.12.10.49}%
+\contentsline {subsubsection}{分类函数}{298}{equation.12.10.50}%
+\contentsline {subsubsection}{与 LDA 和 Logistic 回归的对比}{298}{equation.12.10.51}%
+\contentsline {subsubsection}{不可分情况的推广}{298}{equation.12.10.51}%
+\contentsline {section}{\numberline {12.11}本章小结}{299}{section.12.11}%
+\contentsline {chapter}{\numberline {第十三章\hspace {.3em}}基展开与正则化}{301}{chapter.13}%
+\contentsline {section}{\numberline {13.1}引言}{301}{section.13.1}%
+\contentsline {subsection}{\numberline {13.1.1}两种突破线性的思路：参数化 vs 非参数化}{301}{subsection.13.1.1}%
+\contentsline {subsection}{\numberline {13.1.2}核心思想：变换输入空间}{302}{subsection.13.1.2}%
+\contentsline {subsection}{\numberline {13.1.3}常见基函数示例}{302}{subsection.13.1.3}%
+\contentsline {subsection}{\numberline {13.1.4}复杂度的控制}{302}{subsection.13.1.4}%
+\contentsline {section}{\numberline {13.2}分段多项式与样条}{303}{section.13.2}%
+\contentsline {subsection}{\numberline {13.2.1}分段常数与分段线性}{303}{subsection.13.2.1}%
+\contentsline {subsection}{\numberline {13.2.2}截断幂基}{303}{subsection.13.2.2}%
+\contentsline {subsection}{\numberline {13.2.3}三次样条 (Cubic Spline)}{305}{subsection.13.2.3}%
+\contentsline {subsection}{\numberline {13.2.4}一般阶样条}{305}{subsection.13.2.4}%
+\contentsline {subsection}{\numberline {13.2.5}节点选择}{307}{subsection.13.2.5}%
+\contentsline {subsubsection}{R 中的实现}{307}{subsection.13.2.5}%
+\contentsline {subsubsection}{实践中节点位置怎么选？}{308}{subsection.13.2.5}%
+\contentsline {subsubsection}{分位数放置是最优的吗？}{308}{subsection.13.2.5}%
+\contentsline {subsection}{\numberline {13.2.6}自然三次样条}{309}{subsection.13.2.6}%
+\contentsline {subsubsection}{为什么边界外是线性的？}{309}{equation.13.2.4}%
+\contentsline {subsubsection}{基函数构造示例（$K=5$）}{310}{equation.13.2.4}%
+\contentsline {subsection}{\numberline {13.2.7}样条方法概览}{310}{subsection.13.2.7}%
+\contentsline {subsection}{\numberline {13.2.8}示例：南非心脏病数据（续）}{311}{subsection.13.2.8}%
+\contentsline {subsubsection}{问题设定}{311}{subsection.13.2.8}%
+\contentsline {subsubsection}{第一步：线性 Logistic 回归 → 确定谁不显著}{311}{subsection.13.2.8}%
+\contentsline {subsubsection}{第二步：改用自然样条 → 允许非线性效应}{312}{subsection.13.2.8}%
+\contentsline {subsubsection}{第三步：模型选择与最终结果}{312}{equation.13.2.5}%
+\contentsline {subsubsection}{关键发现与解释}{314}{figure.caption.11}%
+\contentsline {subsubsection}{数学推导：$\hat {f}_{\mathrm {sbp}}(x)$ 如何计算}{315}{figure.caption.11}%
+\contentsline {subsubsection}{标准误 (Standard Error) 的定义}{315}{figure.caption.11}%
+\contentsline {subsubsection}{训练与画图的时序}{316}{figure.caption.11}%
+\contentsline {subsection}{\numberline {13.2.9}示例：音素识别}{316}{subsection.13.2.9}%
+\contentsline {section}{\numberline {13.3}滤波与特征提取}{317}{section.13.3}%
+\contentsline {section}{\numberline {13.4}光滑样条}{317}{section.13.4}%
+\contentsline {subsection}{\numberline {13.4.1}惩罚残差平方和}{318}{subsection.13.4.1}%
+\contentsline {subsection}{\numberline {13.4.2}有限维解}{318}{subsection.13.4.2}%
+\contentsline {subsection}{\numberline {13.4.3}完整示例：光滑样条的符号化流程}{319}{subsection.13.4.3}%
+\contentsline {subsubsection}{给定}{319}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 1——选择光滑参数 $\lambda $（或等价地 $\mathrm {df}_\lambda $）}{319}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 2——构造自然三次样条基矩阵}{319}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 3——构造惩罚矩阵}{319}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 4——求解广义岭回归}{320}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 5——在新点 $x_0$ 处预测}{320}{subsection.13.4.3}%
+\contentsline {subsubsection}{Step 6——复杂度与 $\lambda $ 的选择}{320}{subsection.13.4.3}%
+\contentsline {subsubsection}{与回归样条的操作对比}{320}{subsection.13.4.3}%
+\contentsline {subsection}{\numberline {13.4.4}自由度与光滑矩阵}{321}{subsection.13.4.4}%
+\contentsline {subsubsection}{光滑矩阵 $\mathbf {S}_\lambda $}{321}{subsection.13.4.4}%
+\contentsline {subsubsection}{投影光滑器 vs 收缩光滑器}{321}{equation.13.4.9}%
+\contentsline {subsubsection}{光滑样条的自由度}{321}{equation.13.4.9}%
+\contentsline {subsubsection}{特征分解}{321}{equation.13.4.10}%
+\contentsline {subsubsection}{等价核——光滑样条的局部性}{322}{equation.13.4.10}%
+\contentsline {section}{\numberline {13.5}光滑参数的自动选择}{322}{section.13.5}%
+\contentsline {subsection}{\numberline {13.5.1}用有效自由度参数化}{322}{subsection.13.5.1}%
+\contentsline {subsection}{\numberline {13.5.2}偏差-方差权衡}{322}{subsection.13.5.2}%
+\contentsline {subsection}{\numberline {13.5.3}交叉验证 (CV)}{325}{subsection.13.5.3}%
+\contentsline {section}{\numberline {13.6}非参数 Logistic 回归}{325}{section.13.6}%
+\contentsline {section}{\numberline {13.7}多维样条}{326}{section.13.7}%
+\contentsline {subsection}{\numberline {13.7.1}张量积基}{326}{subsection.13.7.1}%
+\contentsline {subsection}{\numberline {13.7.2}薄板样条 (Thin-Plate Splines)}{329}{subsection.13.7.2}%
+\contentsline {subsection}{\numberline {13.7.3}加性样条与 ANOVA 分解}{329}{subsection.13.7.3}%
+\contentsline {subsection}{\numberline {13.7.4}小结：从一维到多维的选择路线}{330}{subsection.13.7.4}%
+\contentsline {section}{\numberline {13.8}正则化与再生核 Hilbert 空间 (RKHS)}{330}{section.13.8}%
+\contentsline {subsection}{\numberline {13.8.1}一般形式}{330}{subsection.13.8.1}%
+\contentsline {subsection}{\numberline {13.8.2}RKHS 与核方法}{331}{subsection.13.8.2}%
+\contentsline {subsubsection}{正定核}{331}{subsection.13.8.2}%
+\contentsline {subsubsection}{再生核 Hilbert 空间 (RKHS)}{331}{equation.13.8.16}%
+\contentsline {subsubsection}{表示定理如何导出 $\bm {\alpha }$ 的解}{332}{equation.13.8.17}%
+\contentsline {subsection}{\numberline {13.8.3}实例}{334}{subsection.13.8.3}%
+\contentsline {subsection}{\numberline {13.8.4}实践指南：何时使用核方法}{334}{subsection.13.8.4}%
+\contentsline {subsubsection}{核方法的理想适用场景}{334}{subsection.13.8.4}%
+\contentsline {subsubsection}{何时不应使用核方法}{335}{subsection.13.8.4}%
+\contentsline {subsubsection}{EDA 中值得注意的信号}{335}{subsection.13.8.4}%
+\contentsline {subsubsection}{快速决策表}{336}{Item.327}%
+\contentsline {section}{\numberline {13.9}小波光滑}{336}{section.13.9}%
+\contentsline {subsection}{\numberline {13.9.1}核心思想：时间-频率定位}{336}{subsection.13.9.1}%
+\contentsline {subsection}{\numberline {13.9.2}多分辨率分析}{336}{subsection.13.9.2}%
+\contentsline {subsection}{\numberline {13.9.3}小波变换的数学定义}{337}{subsection.13.9.3}%
+\contentsline {subsection}{\numberline {13.9.4}自适应小波阈值 (Wavelet Shrinkage)}{338}{subsection.13.9.4}%
+\contentsline {subsection}{\numberline {13.9.5}小波 vs 光滑样条（图 5.19）}{338}{subsection.13.9.5}%
+\contentsline {section}{\numberline {13.10}本章小结}{341}{section.13.10}%
+\contentsline {chapter}{\numberline {第十四章\hspace {.3em}}核光滑方法}{343}{chapter.14}%
+\contentsline {section}{\numberline {14.1}一维核光滑器}{343}{section.14.1}%
+\contentsline {subsection}{\numberline {14.1.1}从 $k$-最近邻平均到核加权平均}{343}{subsection.14.1.1}%
+\contentsline {subsection}{\numberline {14.1.2}核函数的形式}{345}{subsection.14.1.2}%
+\contentsline {subsection}{\numberline {14.1.3}三种常用核}{345}{subsection.14.1.3}%
+\contentsline {subsection}{\numberline {14.1.4}实践中的注意事项}{345}{subsection.14.1.4}%
+\contentsline {section}{\numberline {14.2}局部线性回归}{346}{section.14.2}%
+\contentsline {subsection}{\numberline {14.2.1}边界偏差问题}{346}{subsection.14.2.1}%
+\contentsline {subsection}{\numberline {14.2.2}局部加权最小二乘}{346}{subsection.14.2.2}%
+\contentsline {subsection}{\numberline {14.2.3}矩阵形式与等价核}{346}{subsection.14.2.3}%
+\contentsline {subsection}{\numberline {14.2.4}自动核木工（Automatic Kernel Carpentry）}{347}{subsection.14.2.4}%
+\contentsline {section}{\numberline {14.3}局部多项式回归}{348}{section.14.3}%
+\contentsline {subsection}{\numberline {14.3.1}$d$ 阶局部多项式拟合}{348}{subsection.14.3.1}%
+\contentsline {subsection}{\numberline {14.3.2}削峰填谷效应}{349}{subsection.14.3.2}%
+\contentsline {subsection}{\numberline {14.3.3}偏差--方差权衡}{349}{subsection.14.3.3}%
+\contentsline {subsection}{\numberline {14.3.4}奇数阶 vs 偶数阶：实践建议}{349}{subsection.14.3.4}%
+\contentsline {section}{\numberline {14.4}核宽度的选择}{350}{section.14.4}%
+\contentsline {subsection}{\numberline {14.4.1}$\lambda $ 在不同核中的含义}{350}{subsection.14.4.1}%
+\contentsline {subsection}{\numberline {14.4.2}偏差--方差权衡与窗宽}{350}{subsection.14.4.2}%
+\contentsline {subsection}{\numberline {14.4.3}线性估计量与光滑矩阵}{350}{subsection.14.4.3}%
+\contentsline {subsection}{\numberline {14.4.4}有效自由度}{351}{subsection.14.4.4}%
+\contentsline {section}{\numberline {14.5}$\mathbb {R}^p$ 中的局部回归}{351}{section.14.5}%
+\contentsline {subsection}{\numberline {14.5.1}多项式向量与径向核}{352}{subsection.14.5.1}%
+\contentsline {subsection}{\numberline {14.5.2}高维中的边界问题与维数灾难}{352}{subsection.14.5.2}%
+\contentsline {section}{\numberline {14.6}$\mathbb {R}^p$ 中的结构化局部回归模型}{353}{section.14.6}%
+\contentsline {subsection}{\numberline {14.6.1}结构化核}{353}{subsection.14.6.1}%
+\contentsline {subsection}{\numberline {14.6.2}结构化回归函数}{353}{subsection.14.6.2}%
+\contentsline {subsection}{\numberline {14.6.3}变系数模型}{354}{subsection.14.6.3}%
+\contentsline {section}{\numberline {14.7}局部似然与其他模型}{354}{section.14.7}%
+\contentsline {subsection}{\numberline {14.7.1}局部似然}{354}{subsection.14.7.1}%
+\contentsline {subsection}{\numberline {14.7.2}局部自回归时间序列}{354}{subsection.14.7.2}%
+\contentsline {subsection}{\numberline {14.7.3}局部多类 Logistic 回归}{355}{subsection.14.7.3}%
+\contentsline {section}{\numberline {14.8}核密度估计与分类}{355}{section.14.8}%
+\contentsline {subsection}{\numberline {14.8.1}核密度估计}{355}{subsection.14.8.1}%
+\contentsline {subsection}{\numberline {14.8.2}核密度分类}{356}{subsection.14.8.2}%
+\contentsline {subsection}{\numberline {14.8.3}朴素 Bayes 分类器}{356}{subsection.14.8.3}%
+\contentsline {section}{\numberline {14.9}径向基函数与核}{357}{section.14.9}%
+\contentsline {section}{\numberline {14.10}混合模型用于密度估计与分类}{358}{section.14.10}%
+\contentsline {section}{\numberline {14.11}计算考量}{358}{section.14.11}%
+\contentsline {chapter}{\numberline {第十五章\hspace {.3em}}模型评估与选择}{361}{chapter.15}%
+\contentsline {section}{\numberline {15.1}引言}{361}{section.15.1}%
+\contentsline {section}{\numberline {15.2}偏差、方差与模型复杂度}{361}{section.15.2}%
+\contentsline {subsection}{\numberline {15.2.1}定量响应情形}{361}{subsection.15.2.1}%
+\contentsline {subsubsection}{$\mathrm {Err}_{\mathcal {T}}$ 中的 $(X^0, Y^0)$ 是从测试集中抽的吗？}{361}{equation.15.2.1}%
+\contentsline {subsubsection}{如何区分不同训练集训练出的模型？}{363}{equation.15.2.2}%
+\contentsline {subsubsection}{期望预测误差和测试误差的区别}{363}{equation.15.2.2}%
+\contentsline {subsubsection}{$\overline {\mathrm {err}}$、$\mathrm {Err}_{\mathcal {T}}$、$\mathrm {Err}$ 三者的关系}{363}{equation.15.2.3}%
+\contentsline {subsection}{\numberline {15.2.2}定性响应情形}{364}{subsection.15.2.2}%
+\contentsline {subsection}{\numberline {15.2.3}模型选择 vs 模型评估}{364}{subsection.15.2.3}%
+\contentsline {section}{\numberline {15.3}偏差-方差分解}{365}{section.15.3}%
+\contentsline {subsection}{\numberline {15.3.1}$k$-最近邻回归的偏差-方差分解}{365}{subsection.15.3.1}%
+\contentsline {subsection}{\numberline {15.3.2}线性回归的偏差-方差分解}{366}{subsection.15.3.2}%
+\contentsline {subsection}{\numberline {15.3.3}岭回归的偏差分解}{366}{subsection.15.3.3}%
+\contentsline {subsection}{\numberline {15.3.4}示例：偏差-方差权衡}{366}{subsection.15.3.4}%
+\contentsline {section}{\numberline {15.4}训练误差的乐观性}{369}{section.15.4}%
+\contentsline {subsection}{\numberline {15.4.1}泛化误差、期望误差与样本内误差}{369}{subsection.15.4.1}%
+\contentsline {subsubsection}{$\mathrm {Err}_{\text {in}}$ 与 $\mathrm {Err}_{\mathcal {T}}$ 的关系}{370}{equation.15.4.17}%
+\contentsline {subsubsection}{$\mathrm {Err}_{\text {in}}$ 与最终目标 $\mathrm {Err}$ 的关系}{370}{equation.15.4.17}%
+\contentsline {subsection}{\numberline {15.4.2}乐观性及其性质}{370}{subsection.15.4.2}%
+\contentsline {subsection}{\numberline {15.4.3}线性拟合的特殊情形}{371}{subsection.15.4.3}%
+\contentsline {section}{\numberline {15.5}样本内预测误差的估计}{372}{section.15.5}%
+\contentsline {subsection}{\numberline {15.5.1}$C_p$ 统计量}{372}{subsection.15.5.1}%
+\contentsline {subsection}{\numberline {15.5.2}AIC准则}{372}{subsection.15.5.2}%
+\contentsline {subsection}{\numberline {15.5.3}AIC 的实践使用}{373}{subsection.15.5.3}%
+\contentsline {section}{\numberline {15.6}有效参数个数}{373}{section.15.6}%
+\contentsline {subsection}{\numberline {15.6.1}线性拟合方法的有效自由度}{373}{subsection.15.6.1}%
+\contentsline {subsection}{\numberline {15.6.2}神经网络的的有效参数个数}{374}{subsection.15.6.2}%
+\contentsline {section}{\numberline {15.7}贝叶斯方法与 BIC}{374}{section.15.7}%
+\contentsline {subsection}{\numberline {15.7.1}BIC 的定义}{374}{subsection.15.7.1}%
+\contentsline {subsection}{\numberline {15.7.2}BIC 的贝叶斯推导}{374}{subsection.15.7.2}%
+\contentsline {subsection}{\numberline {15.7.3}AIC 与 BIC 的比较}{375}{subsection.15.7.3}%
+\contentsline {subsubsection}{如何直观理解 $C_p$、AIC、df、BIC？}{375}{subsection.15.7.3}%
+\contentsline {section}{\numberline {15.8}最小描述长度}{376}{section.15.8}%
+\contentsline {subsection}{\numberline {15.8.1}编码与熵}{376}{subsection.15.8.1}%
+\contentsline {subsection}{\numberline {15.8.2}MDL 用于模型选择}{376}{subsection.15.8.2}%
+\contentsline {section}{\numberline {15.9}Vapnik--Chervonenkis 维}{376}{section.15.9}%
+\contentsline {subsection}{\numberline {15.9.1}打散与 VC 维定义}{376}{subsection.15.9.1}%
+\contentsline {subsection}{\numberline {15.9.2}VC 界与结构风险最小化}{377}{subsection.15.9.2}%
+\contentsline {subsection}{\numberline {15.9.3}示例：AIC、BIC、SRM 的比较}{377}{subsection.15.9.3}%
+\contentsline {section}{\numberline {15.10}交叉验证}{377}{section.15.10}%
+\contentsline {subsection}{\numberline {15.10.1}$K$ 折交叉验证}{379}{subsection.15.10.1}%
+\contentsline {subsection}{\numberline {15.10.2}$K$ 的选择：偏差-方差权衡}{380}{subsection.15.10.2}%
+\contentsline {subsection}{\numberline {15.10.3}广义交叉验证（GCV）}{380}{subsection.15.10.3}%
+\contentsline {subsection}{\numberline {15.10.4}交叉验证的正确与错误做法}{381}{subsection.15.10.4}%
+\contentsline {subsection}{\numberline {15.10.5}交叉验证真的有效吗？——高维示例}{384}{subsection.15.10.5}%
+\contentsline {section}{\numberline {15.11}自助法（Bootstrap）}{384}{section.15.11}%
+\contentsline {subsection}{\numberline {15.11.1}基本思想}{384}{subsection.15.11.1}%
+\contentsline {subsection}{\numberline {15.11.2}Bootstrap 估计预测误差}{386}{subsection.15.11.2}%
+\contentsline {subsection}{\numberline {15.11.3}示例：CV 与 Bootstrap 比较}{387}{subsection.15.11.3}%
+\contentsline {section}{\numberline {15.12}条件误差还是期望误差？}{388}{section.15.12}%
+\contentsline {section}{\numberline {15.13}本章小结}{389}{section.15.13}%
+\contentsline {subsection}{\numberline {15.13.1}核心框架}{389}{subsection.15.13.1}%
+\contentsline {subsection}{\numberline {15.13.2}方法选用指南}{390}{subsection.15.13.2}%
+\contentsline {subsection}{\numberline {15.13.3}关键结论}{390}{subsection.15.13.3}%
+\contentsline {chapter}{\numberline {第十六章\hspace {.3em}}模型推断与平均}{393}{chapter.16}%
+\contentsline {section}{\numberline {16.1}引言}{393}{section.16.1}%
+\contentsline {section}{\numberline {16.2}Bootstrap 与最大似然方法}{393}{section.16.2}%
+\contentsline {subsection}{\numberline {16.2.1}一个光滑示例}{393}{subsection.16.2.1}%
+\contentsline {subsection}{\numberline {16.2.2}非参数 Bootstrap 与参数 Bootstrap}{394}{subsection.16.2.2}%
+\contentsline {subsection}{\numberline {16.2.3}最大似然推断}{396}{subsection.16.2.3}%
+\contentsline {subsubsection}{基本定义}{396}{subsection.16.2.3}%
+\contentsline {subsubsection}{MLE 框架的完整定义体系}{396}{equation.16.2.10}%
+\contentsline {subsubsection}{Cramér-Rao 下界}{398}{figure.caption.39}%
+\contentsline {subsubsection}{正则条件与推导}{398}{Item.368}%
+\contentsline {subsubsection}{三个完整示例}{399}{equation.16.2.16}%
+\contentsline {subsubsection}{渐近正态性}{401}{equation.16.2.16}%
+\contentsline {subsubsection}{光滑示例的最大似然解}{401}{equation.16.2.19}%
+\contentsline {subsection}{\numberline {16.2.4}Bootstrap 与最大似然的比较}{401}{subsection.16.2.4}%
+\contentsline {section}{\numberline {16.3}贝叶斯方法}{402}{section.16.3}%
+\contentsline {subsection}{\numberline {16.3.1}基本框架}{402}{subsection.16.3.1}%
+\contentsline {subsection}{\numberline {16.3.2}光滑示例的贝叶斯分析}{404}{subsection.16.3.2}%
+\contentsline {subsection}{\numberline {16.3.3}Bootstrap 与贝叶斯推断的正式关系}{404}{subsection.16.3.3}%
+\contentsline {subsubsection}{四种方法的统一视角}{405}{Item.378}%
+\contentsline {subsection}{\numberline {16.3.4}Bootstrap 用法总览}{405}{subsection.16.3.4}%
+\contentsline {section}{\numberline {16.4}EM 算法}{406}{section.16.4}%
+\contentsline {subsection}{\numberline {16.4.1}两分量高斯混合模型}{406}{subsection.16.4.1}%
+\contentsline {subsection}{\numberline {16.4.2}EM 算法的一般形式}{407}{subsection.16.4.2}%
+\contentsline {section}{\numberline {16.5}MCMC：从后验抽样}{408}{section.16.5}%
+\contentsline {subsection}{\numberline {16.5.1}背景与动机：为什么需要从后验分布抽样？}{408}{subsection.16.5.1}%
+\contentsline {subsection}{\numberline {16.5.2}先验如何作用：后验是「先验 $\times $ 似然」的目标分布}{409}{subsection.16.5.2}%
+\contentsline {subsection}{\numberline {16.5.3}马尔可夫性质：如何体现？}{410}{subsection.16.5.3}%
+\contentsline {subsection}{\numberline {16.5.4}为什么联合分布最终稳定？}{411}{subsection.16.5.4}%
+\contentsline {subsection}{\numberline {16.5.5}一个具体的 Gibbs 采样例子}{411}{subsection.16.5.5}%
+\contentsline {subsection}{\numberline {16.5.6}Gibbs 采样}{412}{subsection.16.5.6}%
+\contentsline {subsubsection}{收敛性与边际密度估计}{412}{remark.16.5}%
+\contentsline {subsubsection}{高斯混合模型的 Gibbs 采样}{413}{remark.16.6}%
+\contentsline {subsubsection}{其他 MCMC 方法}{413}{remark.16.7}%
+\contentsline {subsection}{\numberline {16.5.7}MCMC 的实践：有限步收敛与诊断}{414}{subsection.16.5.7}%
+\contentsline {section}{\numberline {16.6}Bagging}{415}{section.16.6}%
+\contentsline {subsection}{\numberline {16.6.1}分类情形：投票 vs 平均概率}{415}{subsection.16.6.1}%
+\contentsline {subsection}{\numberline {16.6.2}例：树与模拟数据}{415}{subsection.16.6.2}%
+\contentsline {subsection}{\numberline {16.6.3}Bagging 为什么有效}{416}{subsection.16.6.3}%
+\contentsline {subsubsection}{0-1 损失下不成立}{417}{equation.16.6.36}%
+\contentsline {subsubsection}{Bagging 不生效的情形}{417}{remark.16.11}%
+\contentsline {section}{\numberline {16.7}模型平均与 Stacking}{418}{section.16.7}%
+\contentsline {subsection}{\numberline {16.7.1}频率学派视角}{419}{subsection.16.7.1}%
+\contentsline {subsection}{\numberline {16.7.2}Stacking}{420}{subsection.16.7.2}%
+\contentsline {subsection}{\numberline {16.7.3}小结：模型组合方法的谱系}{420}{subsection.16.7.3}%
+\contentsline {section}{\numberline {16.8}随机搜索：Bumping}{422}{section.16.8}%
+\contentsline {section}{\numberline {16.9}本章小结}{423}{section.16.9}%
+\contentsline {subsection}{\numberline {16.9.1}核心框架：两条主线}{423}{subsection.16.9.1}%
+\contentsline {subsection}{\numberline {16.9.2}方法选用指南}{424}{subsection.16.9.2}%
+\contentsline {subsection}{\numberline {16.9.3}关键结论}{424}{subsection.16.9.3}%
+\contentsline {chapter}{\numberline {第十七章\hspace {.3em}}加性模型、树及相关方法}{427}{chapter.17}%
+\contentsline {section}{\numberline {17.1}广义加性模型}{427}{section.17.1}%
+\contentsline {subsection}{\numberline {17.1.1}模型定义}{427}{subsection.17.1.1}%
+\contentsline {subsection}{\numberline {17.1.2}拟合加性模型：Backfitting}{428}{subsection.17.1.2}%
+\contentsline {subsection}{\numberline {17.1.3}例：加性 logistic 回归（spam 数据）}{432}{subsection.17.1.3}%
+\contentsline {subsection}{\numberline {17.1.4}小结}{433}{subsection.17.1.4}%
+\contentsline {section}{\numberline {17.2}基于树的方法}{434}{section.17.2}%
+\contentsline {subsection}{\numberline {17.2.1}背景}{434}{subsection.17.2.1}%
+\contentsline {subsection}{\numberline {17.2.2}回归树}{436}{subsection.17.2.2}%
+\contentsline {subsection}{\numberline {17.2.3}分类树}{438}{subsection.17.2.3}%
+\contentsline {subsection}{\numberline {17.2.4}其他问题}{439}{subsection.17.2.4}%
+\contentsline {subsection}{\numberline {17.2.5}分类性能评估统计量}{440}{subsection.17.2.5}%
+\contentsline {section}{\numberline {17.3}PRIM：Bump Hunting}{442}{section.17.3}%
+\contentsline {section}{\numberline {17.4}MARS：多元自适应回归样条}{445}{section.17.4}%
+\contentsline {section}{\numberline {17.5}专家分层混合（HME）}{448}{section.17.5}%
+\contentsline {subsubsection}{训练：回归还是分类，以及如何估计参数}{450}{equation.17.5.36}%
+\contentsline {section}{\numberline {17.6}缺失数据}{452}{section.17.6}%
+\contentsline {section}{\numberline {17.7}计算考虑}{454}{section.17.7}%
+\contentsline {section}{\numberline {17.8}本章总结：加性模型、树及相关方法}{454}{section.17.8}%
+\contentsline {subsection}{\numberline {17.8.1}核心主题}{454}{subsection.17.8.1}%
+\contentsline {subsection}{\numberline {17.8.2}五种方法的对比}{455}{subsection.17.8.2}%
+\contentsline {subsection}{\numberline {17.8.3}关键结论}{455}{subsection.17.8.3}%
+\contentsline {chapter}{\numberline {第十八章\hspace {.3em}}提升与加性树（Boosting and Additive Trees）}{457}{chapter.18}%
+\contentsline {section}{\numberline {18.1}Boosting 方法}{457}{section.18.1}%
+\contentsline {paragraph}{sgn 怎么理解？}{458}{equation.18.1.2}%
+\contentsline {subsection}{\numberline {18.1.1}本章概览}{459}{subsection.18.1.1}%
+\contentsline {section}{\numberline {18.2}Boosting 拟合加性模型}{460}{section.18.2}%
+\contentsline {paragraph}{Boosting 拟合的「加性模型」是基于 GAM 吗？}{461}{equation.18.2.7}%
+\contentsline {section}{\numberline {18.3}前向分阶段加性建模}{461}{section.18.3}%
+\contentsline {section}{\numberline {18.4}指数损失与 AdaBoost}{462}{section.18.4}%
+\contentsline {section}{\numberline {18.5}为什么用指数损失}{464}{section.18.5}%
+\contentsline {section}{\numberline {18.6}损失函数与稳健性}{464}{section.18.6}%
+\contentsline {paragraph}{二项偏差 $\log (1+e^{-2yf})$ 真的是「负二项对数似然」吗？}{465}{section.18.6}%
+\contentsline {subsection}{\numberline {18.6.1}平方误差损失不适合分类}{466}{subsection.18.6.1}%
+\contentsline {paragraph}{$\mathbb {E}(Y \mid x) = 2\Pr (Y = 1 \mid x) - 1$ 这个等号怎么成立的？}{466}{equation.18.6.20}%
+\contentsline {subsection}{\numberline {18.6.2}K 类分类的损失}{466}{subsection.18.6.2}%
+\contentsline {subsection}{\numberline {18.6.3}回归的稳健损失}{467}{subsection.18.6.3}%
+\contentsline {subsubsection}{Huber 损失}{467}{subsection.18.6.3}%
+\contentsline {paragraph}{既然 AdaBoost 是指数损失，那我能设计一个基于 Huber 的 boost 吗？}{468}{remark.18.4}%
+\contentsline {section}{\numberline {18.7}数据挖掘的「现成」程序}{469}{section.18.7}%
+\contentsline {section}{\numberline {18.8}Boosting 树}{471}{section.18.8}%
+\contentsline {paragraph}{误分类损失下 $\hat \gamma _j$ 取「众数类」是什么？}{471}{equation.18.8.27}%
+\contentsline {paragraph}{为什么式 \eqref {eq:10_28} 的提升树模型没有显式权重 $\beta _m$？}{472}{equation.18.8.29}%
+\contentsline {section}{\numberline {18.9}通过梯度提升的数值优化}{473}{section.18.9}%
+\contentsline {subsection}{\numberline {18.9.1}最速下降}{474}{subsection.18.9.1}%
+\contentsline {paragraph}{为什么要取「使损失最小」的步长 $\rho _m$？}{474}{equation.18.9.36}%
+\contentsline {subsection}{\numberline {18.9.2}梯度提升}{476}{subsection.18.9.2}%
+\contentsline {paragraph}{式 \eqref {eq:10_37} 中「谁和谁」在比较？}{476}{equation.18.9.37}%
+\contentsline {subsection}{\numberline {18.9.3}梯度提升的实现}{477}{subsection.18.9.3}%
+\contentsline {section}{\numberline {18.10}提升树的合适大小}{478}{section.18.10}%
+\contentsline {section}{\numberline {18.11}正则化}{479}{section.18.11}%
+\contentsline {subsection}{\numberline {18.11.1}收缩}{479}{subsection.18.11.1}%
+\contentsline {subsection}{\numberline {18.11.2}子采样}{479}{subsection.18.11.2}%
+\contentsline {section}{\numberline {18.12}解释}{480}{section.18.12}%
+\contentsline {subsection}{\numberline {18.12.1}预测变量的相对重要性}{480}{subsection.18.12.1}%
+\contentsline {subsection}{\numberline {18.12.2}部分依赖图}{481}{subsection.18.12.2}%
+\contentsline {subsection}{\numberline {18.12.3}解释工具的谱系：树特有 vs 模型无关}{482}{subsection.18.12.3}%
+\contentsline {section}{\numberline {18.13}示例}{483}{section.18.13}%
+\contentsline {subsection}{\numberline {18.13.1}California Housing}{483}{subsection.18.13.1}%
+\contentsline {subsection}{\numberline {18.13.2}New Zealand Fish}{484}{subsection.18.13.2}%
+\contentsline {subsection}{\numberline {18.13.3}Demographics Data}{484}{subsection.18.13.3}%
+\contentsline {section}{\numberline {18.14}本章总结}{485}{section.18.14}%
+\contentsline {subsection}{\numberline {18.14.1}核心结论}{485}{subsection.18.14.1}%
+\contentsline {chapter}{\numberline {第十九章\hspace {.3em}}Neural Networks（神经网络）}{487}{chapter.19}%
+\contentsline {section}{\numberline {19.1}引言}{487}{section.19.1}%
+\contentsline {section}{\numberline {19.2}投影寻踪回归 (Projection Pursuit Regression, PPR)}{487}{section.19.2}%
+\contentsline {paragraph}{为什么 $g_m(\omega _m^T X)$ 只在 $\omega _m$ 定义的方向上变化？$\omega _m^T X$ 是内积吗？}{487}{figure.caption.45}%
+\contentsline {paragraph}{$X_1X_2 = \frac {(X_1+X_2)^2 - (X_1-X_2)^2}{4}$ 里投影方向和 $g_m$ 是什么？}{488}{remark.19.2}%
+\contentsline {subsection}{\numberline {19.2.1}PPR 的拟合算法}{489}{subsection.19.2.1}%
+\contentsline {paragraph}{PPR 像 EM 吗？PPR 常用吗？}{490}{remark.19.5}%
+\contentsline {section}{\numberline {19.3}神经网络}{491}{section.19.3}%
+\contentsline {section}{\numberline {19.4}拟合神经网络}{492}{section.19.4}%
+\contentsline {subsection}{\numberline {19.4.1}误差函数}{492}{subsection.19.4.1}%
+\contentsline {subsection}{\numberline {19.4.2}反向传播 (Back-Propagation)}{494}{subsection.19.4.2}%
+\contentsline {paragraph}{反向传播方程的详细推导}{495}{equation.19.4.18}%
+\contentsline {paragraph}{公式意义}{496}{equation.19.4.19}%
+\contentsline {subsection}{\numberline {19.4.3}Batch 学习与在线学习}{497}{subsection.19.4.3}%
+\contentsline {section}{\numberline {19.5}训练神经网络的若干问题}{497}{section.19.5}%
+\contentsline {subsection}{\numberline {19.5.1}起始值 (Starting Values)}{497}{subsection.19.5.1}%
+\contentsline {subsection}{\numberline {19.5.2}过拟合 (Overfitting)}{497}{subsection.19.5.2}%
+\contentsline {subsection}{\numberline {19.5.3}输入的缩放 (Scaling of the Inputs)}{498}{subsection.19.5.3}%
+\contentsline {subsection}{\numberline {19.5.4}隐藏单元数与层数 (Number of Hidden Units and Layers)}{498}{subsection.19.5.4}%
+\contentsline {subsection}{\numberline {19.5.5}多重极小 (Multiple Minima)}{498}{subsection.19.5.5}%
+\contentsline {section}{\numberline {19.6}模拟数据例子 (Example: Simulated Data)}{498}{section.19.6}%
+\contentsline {paragraph}{脊函数和径向函数的定义分别是什么？}{499}{remark.19.21}%
+\contentsline {paragraph}{为什么球对称径向函数对神经网络不友好？能否通过更换 sigmoid 来提升？}{500}{remark.19.22}%
+\contentsline {section}{\numberline {19.7}ZIP 码数据例子 (Example: ZIP Code Data)}{500}{section.19.7}%
+\contentsline {section}{\numberline {19.8}讨论 (Discussion)}{502}{section.19.8}%
+\contentsline {section}{\numberline {19.9}贝叶斯神经网络与 NIPS 2003 挑战}{502}{section.19.9}%
+\contentsline {subsection}{\numberline {19.9.1}Bayes、Boosting 与 Bagging}{503}{subsection.19.9.1}%
+\contentsline {paragraph}{HMC 的严格数学定理}{503}{equation.19.9.24}%
+\contentsline {paragraph}{贝叶斯神经网络的形式化定义}{504}{remark.19.29}%
+\contentsline {paragraph}{BNN 的四步流程}{504}{definition.19.4}%
+\contentsline {paragraph}{弥散高斯先验 (diffuse Gaussian prior)}{505}{Item.497}%
+\contentsline {paragraph}{ARD 的全称与定义}{506}{Item.499}%
+\contentsline {paragraph}{筛选特征集与 ARD 缩减特征集}{507}{equation.19.9.27}%
+\contentsline {subsection}{\numberline {19.9.2}性能比较}{508}{subsection.19.9.2}%
+\contentsline {section}{\numberline {19.10}计算考虑 (Computational Considerations)}{508}{section.19.10}%
+\contentsline {section}{\numberline {19.11}本章小结}{509}{section.19.11}%
+\contentsline {subsection}{\numberline {19.11.1}核心框架}{509}{subsection.19.11.1}%
+\contentsline {subsection}{\numberline {19.11.2}要点回顾}{509}{subsection.19.11.2}%
+\contentsline {chapter}{\numberline {第二十章\hspace {.3em}}Support Vector Machines and Flexible Discriminants（支持向量机与灵活判别）}{511}{chapter.20}%
+\contentsline {section}{\numberline {20.1}引言}{511}{section.20.1}%
+\contentsline {section}{\numberline {20.2}支持向量分类器}{511}{section.20.2}%
+\contentsline {paragraph}{为什么选 (12.6) 而不是 (12.5)？}{513}{equation.20.2.6}%
+\contentsline {subsection}{\numberline {20.2.1}计算支持向量分类器}{513}{subsection.20.2.1}%
+\contentsline {subsection}{\numberline {20.2.2}混合示例（续）}{514}{subsection.20.2.2}%
+\contentsline {section}{\numberline {20.3}支持向量机与核}{515}{section.20.3}%
+\contentsline {subsection}{\numberline {20.3.1}计算用于分类的 SVM}{515}{subsection.20.3.1}%
+\contentsline {paragraph}{多项式核到底对应什么样的基展开？以二次核为例}{516}{equation.20.3.22}%
+\contentsline {subsection}{\numberline {20.3.2}SVM 作为惩罚方法}{517}{subsection.20.3.2}%
+\contentsline {subsection}{\numberline {20.3.3}函数估计与再生核 (Function Estimation and Reproducing Kernels)}{518}{subsection.20.3.3}%
+\contentsline {subsection}{\numberline {20.3.4}SVM 与维数灾难}{519}{subsection.20.3.4}%
+\contentsline {paragraph}{为什么「固定权重」是关键？}{520}{remark.20.18}%
+\contentsline {paragraph}{一个具体例子：圆柱形边界}{520}{remark.20.18}%
+\contentsline {paragraph}{与表 \ref {tab:12_2} 的印证}{520}{remark.20.18}%
+\contentsline {paragraph}{实际使用 SVM 时怎么筛选核？}{521}{remark.20.19}%
+\contentsline {subsection}{\numberline {20.3.5}SVM 分类器的路径算法}{522}{subsection.20.3.5}%
+\contentsline {subsection}{\numberline {20.3.6}支持向量机用于回归}{523}{subsection.20.3.6}%
+\contentsline {subsection}{\numberline {20.3.7}回归与核}{524}{subsection.20.3.7}%
+\contentsline {subsection}{\numberline {20.3.8}讨论}{525}{subsection.20.3.8}%
+\contentsline {section}{\numberline {20.4}推广线性判别分析 (Generalizing Linear Discriminant Analysis)}{526}{section.20.4}%
+\contentsline {section}{\numberline {20.5}灵活判别分析 (Flexible Discriminant Analysis, FDA)}{527}{section.20.5}%
+\contentsline {paragraph}{完整的 FDA 计算步骤（最优评分算法）}{528}{equation.20.5.56}%
+\contentsline {subsection}{\numberline {20.5.1}计算 FDA 估计}{530}{subsection.20.5.1}%
+\contentsline {section}{\numberline {20.6}惩罚判别分析 (Penalized Discriminant Analysis, PDA)}{532}{section.20.6}%
+\contentsline {section}{\numberline {20.7}混合判别分析 (Mixture Discriminant Analysis, MDA)}{534}{section.20.7}%
+\contentsline {paragraph}{「原型」（prototype）指什么？「不均质（inhomogeneous）」怎么定义？}{534}{section.20.7}%
+\contentsline {paragraph}{怎么知道在度量空间中是不是多簇的（类是否不均质）？}{535}{Item.516}%
+\contentsline {subsection}{\numberline {20.7.1}示例：波形数据 (Waveform Data)}{537}{subsection.20.7.1}%
+\contentsline {section}{\numberline {20.8}计算考虑}{538}{section.20.8}%
+\contentsline {section}{\numberline {20.9}本章总结}{538}{section.20.9}%
+\contentsline {chapter}{\numberline {第二十一章\hspace {.3em}}Prototype Methods and Nearest-Neighbors（原型方法与最近邻）}{541}{chapter.21}%
+\contentsline {section}{\numberline {21.1}引言}{541}{section.21.1}%
+\contentsline {section}{\numberline {21.2}原型方法}{541}{section.21.2}%
+\contentsline {subsection}{\numberline {21.2.1}K-means 聚类}{543}{subsection.21.2.1}%
+\contentsline {paragraph}{监督分类问题为什么用聚类（K-means）？}{543}{Item.530}%
+\contentsline {paragraph}{K-means 初始化原型时没有把类标签考虑进去吗？}{543}{remark.21.3}%
+\contentsline {subsection}{\numberline {21.2.2}学习向量量化（LVQ）}{544}{subsection.21.2.2}%
+\contentsline {subsection}{\numberline {21.2.3}高斯混合}{544}{subsection.21.2.3}%
+\contentsline {section}{\numberline {21.3}k-最近邻分类器}{546}{section.21.3}%
+\contentsline {subsection}{\numberline {21.3.1}示例：比较研究}{547}{subsection.21.3.1}%
+\contentsline {subsection}{\numberline {21.3.2}示例：k-最近邻与图像场景分类}{548}{subsection.21.3.2}%
+\contentsline {subsection}{\numberline {21.3.3}不变度量与切向距离}{548}{subsection.21.3.3}%
+\contentsline {section}{\numberline {21.4}自适应最近邻方法}{550}{section.21.4}%
+\contentsline {subsection}{\numberline {21.4.1}示例}{551}{subsection.21.4.1}%
+\contentsline {subsection}{\numberline {21.4.2}最近邻的全局降维}{551}{subsection.21.4.2}%
+\contentsline {section}{\numberline {21.5}计算考虑}{552}{section.21.5}%
+\contentsline {section}{\numberline {21.6}本章总结}{553}{section.21.6}%
+\contentsline {chapter}{\numberline {第二十二章\hspace {.3em}}Unsupervised Learning（非监督学习）}{555}{chapter.22}%
+\contentsline {section}{\numberline {22.1}引言}{555}{section.22.1}%
+\contentsline {section}{\numberline {22.2}关联规则}{556}{section.22.2}%
+\contentsline {subsection}{\numberline {22.2.1}市场篮子分析}{557}{subsection.22.2.1}%
+\contentsline {subsection}{\numberline {22.2.2}Apriori 算法}{559}{subsection.22.2.2}%
+\contentsline {subsection}{\numberline {22.2.3}示例：市场篮子分析}{562}{subsection.22.2.3}%
+\contentsline {subsection}{\numberline {22.2.4}非监督转化为监督学习}{563}{subsection.22.2.4}%
+\contentsline {subsection}{\numberline {22.2.5}广义关联规则}{566}{subsection.22.2.5}%
+\contentsline {subsection}{\numberline {22.2.6}监督学习方法的选择}{567}{subsection.22.2.6}%
+\contentsline {subsection}{\numberline {22.2.7}示例：市场篮子分析（续）}{567}{subsection.22.2.7}%
+\contentsline {section}{\numberline {22.3}聚类分析}{568}{section.22.3}%
+\contentsline {subsection}{\numberline {22.3.1}邻近矩阵}{569}{subsection.22.3.1}%
+\contentsline {subsection}{\numberline {22.3.2}基于属性的不相似性}{570}{subsection.22.3.2}%
+\contentsline {subsection}{\numberline {22.3.3}对象不相似性}{571}{subsection.22.3.3}%
+\contentsline {subsection}{\numberline {22.3.4}聚类算法}{572}{subsection.22.3.4}%
+\contentsline {subsection}{\numberline {22.3.5}组合算法}{572}{subsection.22.3.5}%
+\contentsline {subsection}{\numberline {22.3.6}K-means}{573}{subsection.22.3.6}%
+\contentsline {subsection}{\numberline {22.3.7}高斯混合作为软 K-means}{574}{subsection.22.3.7}%
+\contentsline {subsection}{\numberline {22.3.8}示例：人类肿瘤微阵列数据}{575}{subsection.22.3.8}%
+\contentsline {subsection}{\numberline {22.3.9}向量量化}{575}{subsection.22.3.9}%
+\contentsline {subsection}{\numberline {22.3.10}K-medoids}{576}{subsection.22.3.10}%
+\contentsline {subsection}{\numberline {22.3.11}实际问题}{577}{subsection.22.3.11}%
+\contentsline {subsection}{\numberline {22.3.12}层次聚类}{579}{subsection.22.3.12}%
+\contentsline {subsubsection}{凝聚聚类}{580}{equation.22.3.40}%
+\contentsline {subsubsection}{分裂聚类}{581}{example.22.9}%
+\contentsline {section}{\numberline {22.4}自组织映射}{582}{section.22.4}%
+\contentsline {section}{\numberline {22.5}主成分、主曲线与主曲面}{583}{section.22.5}%
+\contentsline {subsection}{\numberline {22.5.1}主成分}{583}{subsection.22.5.1}%
+\contentsline {subsection}{\numberline {22.5.2}主曲线与主曲面}{586}{subsection.22.5.2}%
+\contentsline {subsection}{\numberline {22.5.3}谱聚类}{587}{subsection.22.5.3}%
+\contentsline {subsection}{\numberline {22.5.4}核主成分}{588}{subsection.22.5.4}%
+\contentsline {subsection}{\numberline {22.5.5}稀疏主成分}{589}{subsection.22.5.5}%
